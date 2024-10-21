@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import { toast } from "react-toastify";
 import niepidLogo from './th.jpeg';
@@ -82,7 +82,10 @@ function Login() {
         return null;
       }
     } catch (ex) {
-      console.log(ex);
+      console.log(ex.response);
+      if(ex.response.status === 501){
+        alert('Invalid Device')
+      }
     }
   };
 
