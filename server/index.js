@@ -11,7 +11,7 @@ app.use(cors())
 
 app.use(requestIp.mw());
 // Allowed IPs (add your specific IP here)
-const allowedIPs = ['192.168.1.3']; // Replace with your specific IP address
+const allowedIPs = ['192.168.98.82']; // Replace with your specific IP address
 
 const getServerIPv4 = () => {
     const interfaces = os.networkInterfaces();

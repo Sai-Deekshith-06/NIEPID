@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import { toast } from "react-toastify";
 import niepidLogo from './th.jpeg';
+import cvrlogo from './cvr_logo.jpg';
 
 function Login() {
   const [cookies] = useCookies([]);
@@ -96,7 +97,10 @@ function Login() {
       </header>
       <div style={styles.container}>
         <div style={styles.infoContainer}>
-          <img src={niepidLogo} alt="NIEPID Logo" style={styles.logo} />
+          <div style={styles.logoContainer}>
+            <img src={niepidLogo} alt="NIEPID Logo" style={styles.logo} />
+            <img src={cvrlogo} alt="CVR Logo" style={styles.logo} />
+          </div>
           <h1 style={styles.instituteName}>
             NATIONAL INSTITUTE FOR THE EMPOWERMENT OF PERSONS WITH INTELLECTUAL DISABILITIES (DIVYANGJAN)
           </h1>
@@ -191,6 +195,10 @@ const styles = {
   logo: {
     width: '150px',
     marginBottom: '1rem',
+  },
+  logoContainer:{
+    display : 'flex',
+    justifyContent : 'space-between'
   },
   instituteName: {
     fontSize: '1.5rem',
