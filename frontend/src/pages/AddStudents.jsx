@@ -48,6 +48,12 @@ const useStyles = createUseStyles({
         fontWeight: '500',
         color: '#444',
     },
+    requiredlabel: {
+        marginBottom: '25px',
+        fontSize: '20px',
+        fontWeight: '500',
+        color: '#f00',
+    },
     textInput: {
         padding: '12px',
         marginTop: '5px',
@@ -55,6 +61,23 @@ const useStyles = createUseStyles({
         width: '100%',
         borderRadius: '6px',
         border: '1px solid #ccc',
+        fontSize: '15px',
+        color: '#333',
+        backgroundColor: '#f9f9f9',
+        transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
+        '&:focus': {
+            borderColor: '#007BFF',
+            outline: 'none',
+            boxShadow: '0 0 8px rgba(0, 123, 255, 0.4)',
+        },
+    },
+    requiredtextInput: {
+        padding: '12px',
+        marginTop: '5px',
+        marginBottom: '20px',
+        width: '100%',
+        borderRadius: '6px',
+        border: '1px solid #f00',
         fontSize: '15px',
         color: '#333',
         backgroundColor: '#f9f9f9',
@@ -511,18 +534,21 @@ function AddStudents() {
         //     return;
         // }
 
-        const aadharNo = formData.details.info.aadharNo;
-        const mno = formData.details.info.mobileNo;
-        console.log(mno);
+        // const aadharNo = formData.details.info.aadharNo;
+        // const mobileNo = formData.details.info.mobileNo;
+        const {regNo, regDate, dob, name, sex, aadharNo, mobileNo} = formData.details.info;
+        const classid = formData.stdCred.class;
+        console.log(mobileNo);
         // Final validation check for Aadhar number
         if (aadharNo.length !== 12 || !/^[0-9]{12}$/.test(aadharNo)) {
             alert("Aadhar number must be exactly 12 digits and numeric.");
             return; // Prevent form submission
         }
-        if (mno.length !== 10 || !/^[0-9]{10}$/.test(mno)) {
+        if (mobileNo.length !== 10 || !/^[0-9]{10}$/.test(mobileNo)) {
             alert("Mobile No. must be 10 digits");
             return; // Prevent form submission
         }
+
         const registeredDate = formData.details.info.regDate;
         const bodDate = formData.details.info.dob;
         //const currDate = new Date()
@@ -530,6 +556,11 @@ function AddStudents() {
 
         if (registeredDate < bodDate) {
             alert("Registration must be greater than Date of Birth.");
+            return; // Prevent further processing
+        }
+        
+        if(!(regNo.trim() && regDate.trim() && dob.trim() && name.trim() && sex.trim() && aadharNo.trim() && mobileNo.trim() && classid.trim())){
+            alert("Enter all required fields (Fields in RED)");
             return; // Prevent further processing
         }
 
@@ -598,54 +629,54 @@ function AddStudents() {
             <Header />
             <form onSubmit={handleSubmit} className={classes.registrationForm}>
                 <div className={classes.title} id='title'>Student Details Form</div>
-                <label className={classes.label}>
+                <label className={classes.requiredlabel}>
                     Registration Number:
                     <input
                         type="text"
                         name="regNo"
                         value={formData.details.info.regNo}
                         onChange={(e) => handleSectionChange('info', e)}
-                        className={classes.textInput}
+                        className={classes.requiredtextInput}
                     />
                 </label>
-                <label className={classes.label}>
+                <label className={classes.requiredlabel}>
                     Registration Date:
                     <input
                         type="date"
                         name="regDate"
                         value={formData.details.info.regDate}
                         onChange={(e) => handleSectionChange('info', e)}
-                        className={classes.textInput}
+                        className={classes.requiredtextInput}
                         
                     />
                 </label>
-                <label className={classes.label}>
+                <label className={classes.requiredlabel}>
                     DOB:
                     <input
                         type="date"
                         name="dob"
                         value={formData.details.info.dob}
                         onChange={(e) => handleSectionChange('info', e)}
-                        className={classes.textInput}
+                        className={classes.requiredtextInput}
                     />
                 </label>
-                <label className={classes.label}>
+                <label className={classes.requiredlabel}>
                     Name:
                     <input
                         type="text"
                         name="name"
                         value={formData.details.info.name}
                         onChange={(e) => handleSectionChange('info', e)}
-                        className={classes.textInput}
+                        className={classes.requiredtextInput}
                     />
                 </label>
-                <label className={classes.label}>
+                <label className={classes.requiredlabel}>
                     Sex:
                     <select
                         name="sex"
                         value={formData.details.info.sex}
                         onChange={handleChange}
-                        className={classes.textInput}
+                        className={classes.requiredtextInput}
                     >
                         <option value="">Select Gender</option>
                         <option value="male">Male</option>
@@ -693,14 +724,14 @@ function AddStudents() {
                         className={classes.textInput}
                     />
                 </label>
-                <label className={classes.label}>
+                <label className={classes.requiredlabel}>
                 Aadhar No:
                     <input
                         type="text"
                         name="aadharNo"
                         value={formData.details.info.aadharNo}
                         onChange={(e) => handleSectionChange('info', e)}
-                        className={classes.textInput}
+                        className={classes.requiredtextInput}
                     />
                 </label>
                 <label className={classes.label}>
@@ -713,14 +744,14 @@ function AddStudents() {
                         className={classes.textInput}
                     />
                 </label>
-                <label className={classes.label}>
+                <label className={classes.requiredlabel}>
                 Mobile No:
                     <input
                         type="text"
                         name="mobileNo"
                         value={formData.details.info.mobileNo}
                         onChange={(e) => handleSectionChange('info', e)}
-                        className={classes.textInput}
+                        className={classes.requiredtextInput}
                     />
                 </label>
                 <label className={classes.label}>
@@ -2652,13 +2683,13 @@ function AddStudents() {
                     </tbody>
                 </table>
 
-                <label className={classes.label}>
+                <label className={classes.requiredlabel}>
                     Class:
                     <select
                         name="section"
                         value={formData.stdCred.section}
                         onChange={handleChange}
-                        className={classes.textInput}
+                        className={classes.requiredtextInput}
                     >
                          <option value="">Select Class</option>
                         <option value="preprimary">Preprimary</option>
@@ -2666,13 +2697,13 @@ function AddStudents() {
                         <option value="primary2">Primary-II</option>
                     </select>
                 </label>
-                <label className={classes.label}>
+                <label className={classes.requiredlabel}>
                     Year:
                     <select
                         name="year"
                         value={formData.stdCred.year}
                         onChange={handleChange}
-                        className={classes.textInput}
+                        className={classes.requiredtextInput}
                     >
                         <option value="1">1</option>
                     </select>

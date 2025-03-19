@@ -15,7 +15,7 @@ const TeacherTable = () => {
     classId: [],
   });
 
-  
+
   const [isOpen, setIsOpen] = useState(false);
 
   // Function to open the modal
@@ -37,30 +37,30 @@ const TeacherTable = () => {
       const response =
         role === "admin"
           ? await axios.get(
-              "http://localhost:4000/admin/viewTeacher",
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  authorization: `Bearer ${localStorage.getItem("token")}`,
-                },
+            "http://localhost:4000/admin/viewTeacher",
+            {
+              headers: {
+                "Content-Type": "application/json",
+                authorization: `Bearer ${localStorage.getItem("token")}`,
               },
-              {
-                withCredentials: true,
-              }
-            )
+            },
+            {
+              withCredentials: true,
+            }
+          )
           : await axios.get(
-              "http://localhost:4000/principle/viewTeacher",
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  authorization: `Bearer ${localStorage.getItem("token")}`,
-                },
+            "http://localhost:4000/principle/viewTeacher",
+            {
+              headers: {
+                "Content-Type": "application/json",
+                authorization: `Bearer ${localStorage.getItem("token")}`,
               },
-              {
-                withCredentials: true,
-              }
-            );
-            console.log(response.data.data)
+            },
+            {
+              withCredentials: true,
+            }
+          );
+      console.log(response.data.data)
       setTeacherDetails(response.data.data);
     } catch (error) {
       console.error("Error fetching teacher details:", error.response);
@@ -85,7 +85,7 @@ const TeacherTable = () => {
 
   const replacePrimaryLabels = (text) => {
     if (!text) return '';
-    
+
     return text
       .replace(/preprimary_1/gi, 'Preprimary-1')
       .replace(/preprimary_2/gi, 'Preprimary-2')
@@ -96,7 +96,6 @@ const TeacherTable = () => {
       .replace(/primary2_1/gi, 'Primary-II-1')
       .replace(/primary2_2/gi, 'Primary-II-2')
       .replace(/primary2_3/gi, 'Primary-II-3')
-      
   };
 
   const handleDelete = async () => {
@@ -124,14 +123,14 @@ const TeacherTable = () => {
         setTeacherDetails(updatedDetails);
         setEditMode(null);
         setEditedTeacher({}); // Reset editedTeacher state
-        
+
         // Refetch data to ensure UI reflects changes immediately
         fetchData();
         toast.success("DELETE SUCCESS")
       } else {
         console.error("Failed to update teacher details.");
         toast.error(response.data.message);
-        
+
       }
     } catch (err) {
       console.log(err.response);
@@ -281,7 +280,7 @@ const TeacherTable = () => {
     headers.push("Actions");
   }
 
- 
+
 
   return (
     <>
@@ -304,7 +303,7 @@ const TeacherTable = () => {
                 key={teacher.teacherId}
                 style={index % 2 === 0 ? styles.evenRow : styles.oddRow}
               >
-              {console.log(teacher.classId)}
+                {console.log(teacher.classId)}
                 <td style={styles.td}>
                   <input
                     type="text"
@@ -367,8 +366,8 @@ const TeacherTable = () => {
                     name="classId"
                     value={
                       editMode === teacher.teacherId
-                        ? editedTeacher.classId.map((classid)=>replacePrimaryLabels(classid))
-                        : teacher.classId.map((classid)=>replacePrimaryLabels(classid))
+                        ? editedTeacher.classId.map((classid) => replacePrimaryLabels(classid))
+                        : teacher.classId.map((classid) => replacePrimaryLabels(classid))
                     }
                     onChange={handleInputChange}
                     style={styles.input}
@@ -442,16 +441,16 @@ const TeacherTable = () => {
               <label style={styles.label}>
                 Class ID:
                 <input
-                    type="text"
-                    name="classId"
-                    value={
-                      editedTeacher.classId.map((classid)=>replacePrimaryLabels(classid))
-                        
-                    }
-                    //onChange={handleInputChange}
-                    style={styles.input}
-                    readOnly={true}
-                  />
+                  type="text"
+                  name="classId"
+                  value={
+                    editedTeacher.classId.map((classid) => replacePrimaryLabels(classid))
+
+                  }
+                  //onChange={handleInputChange}
+                  style={styles.input}
+                  readOnly={true}
+                />
               </label>
               <button
                 type="submit"

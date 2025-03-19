@@ -11,7 +11,7 @@ app.use(cors())
 
 app.use(requestIp.mw());
 // Allowed IPs (add your specific IP here)
-const allowedIPs = ['192.168.98.82']; // Replace with your specific IP address
+const allowedIPs = ['192.168.1.3']; // Replace with your specific IP address
 
 const getServerIPv4 = () => {
     const interfaces = os.networkInterfaces();
@@ -40,7 +40,7 @@ const ipFilter = (req, res, next) => {
 };
 
 // Apply the IP filter middleware to all routes
-app.use(ipFilter);
+// app.use(ipFilter);
 
 //Routes
 const studentRoutes = require('./routes/student.route')
@@ -54,7 +54,7 @@ const { verifyToken, isAdmin, isStudent, isTeacher, isPrinciple } = require('./m
 const mongoose = require('mongoose')
 //mongoose.connect(process.env.MONGODB_URL)
 //For localhost uncomment the below line and comment above line***
-mongoose.connect("mongodb://127.0.0.1:27017/niepid_test")
+mongoose.connect("mongodb://127.0.0.1:27017/niepid1")
     .then((res) => { console.log("connected successfully") })
     .catch((err) => { console.log(err) })
 

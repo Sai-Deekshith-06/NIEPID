@@ -6,13 +6,14 @@ const studentDetailsModel = require('../models/studentDetails.model')
 const classModel = require('../models/class.model')
 const path = require('path')
 const xlsx = require('xlsx')
-     
+
 const generateClassId = require('../deriving/deriveClass')
 const studentJsonGenerate = require('../deriving/deriveStd')
-     
+
 const jwt = require('jsonwebtoken')
 const { type } = require('os')
-     
+const { default: mongoose } = require('mongoose')
+
 const editTeacher = async (req, res) => {
     const id = req.params.id;
     console.log(id);
@@ -41,16 +42,18 @@ const editTeacher = async (req, res) => {
         if (!updatedTeacher || !updateUser) {
             return res.status(404).json({ message: 'Teacher not found' });
         }
-     
+
         res.status(200).json(updatedTeacher);
     } catch (err) {
         console.error(err.message);
-        res.status(500).send({ message : 'Server Error' });
+        res.status(500).send({ message: 'Server Error' });
     }
 }
 
 const registerStudent = async (req, res) => {
+    const session = mongoose.startSession()
     try {
+            ; (await session).startTransaction()
         const val1 = {}
         const data = req.body
         // console.log(data)
@@ -74,8 +77,8 @@ const registerStudent = async (req, res) => {
                 res.status(405).json({ reason: "studentDetails already exists" })
                 break lable1
             }
-            const value1 = generateClassId(data.formData.stdCred.class, data.formData.stdCred.year)
-            // console.log(value1)
+            const value1 = generateClassId(data.formData.stdCred.section, data.formData.stdCred.year)
+            console.log(data.formData.stdCred)
             const arr3 = await classModel.findOne({ classId: value1 })
             // console.log(arr3.length)
             // console.log(arr3)
@@ -123,10 +126,13 @@ const registerStudent = async (req, res) => {
                         flag = true
                         console.log(ans)
                     })
-                    if (flag) {
+                if (flag) {
                     console.log("Error-402")
                     res.status(402).json({ reason: "student already exists" })
                     break lable1
+                } else {
+                    (await session).commitTransaction();
+                    res.status(200).json("success")
                 }
             }
         }
@@ -139,8 +145,10 @@ const registerStudent = async (req, res) => {
     }
     catch (error) {
         console.log("Error-404")
-        // console.log(error)
+        console.log(error)
         res.status(404).send(false)
+    } finally {
+        (await session).endSession()
     }
 }
 
@@ -285,6 +293,8 @@ const registerTeacher = async (req, res) => {
             range: 0
         });
         const data = data1.slice(1);
+
+        console.log(data)
 
         for (const row of data) {
             const isTeacher = await teacherModel.find({ 'teacherId': row.teacherId });
