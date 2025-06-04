@@ -304,29 +304,36 @@ const Student = () => {
     const [registrationDate, setRegistrationDate] = useState('');
     const [dateOfBirth, setDateOfBirth] = useState('');
     const regNo = localStorage.getItem('regNo')
+    const token = localStorage.getItem('token')
     console.log(regNo)
     useEffect(() => {
         async function fetchStudentData() {
             try {
                 console.log("Hello")
                 const role = localStorage.getItem("role");
-                console.log(role)
-                const res = await axios.get(`http://localhost:4000/admin/viewStudentDetails`, {
+                console.log(role, regNo)
+                await axios.get(`http://localhost:4000/${role}/viewStudentDetails`, {
                     headers: {
                         regNo: regNo,
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                        Authorization: `Bearer ${token}`,
                     }
                 }, { withCredentials: true }
                 )
-                // console.log(res.data)
-                const details = res.data
-                const str = new Date(details.info.regDate).toISOString()
-                setRegistrationDate(str.slice(0, 10));
-                const str1 = new Date(details.info.dob).toISOString()
-                setDateOfBirth(str1.slice(0, 10))
-                setStdentData(details)
-                // console.log("data fetched")
+                    .then((res) => {
+
+                        // console.log(res.data)
+                        const details = res.data
+                        const str = new Date(details.info.regDate).toISOString()
+                        setRegistrationDate(str.slice(0, 10));
+                        const str1 = new Date(details.info.dob).toISOString()
+                        setDateOfBirth(str1.slice(0, 10))
+                        setStdentData(details)
+                        // console.log("data fetched")
+                    })
+                    .catch((err) => {
+                        console.log(err)
+                    })
             } catch (err) {
                 console.error(err)
             }
@@ -344,8 +351,8 @@ const Student = () => {
     //         </div>
     //         <nav style={useStyles.navLinks}>
     //             <button onClick={() => {
-    //                 if (role === "principle")
-    //                     navigate("/principle/viewStudents")
+    //                 if (role === "principal")
+    //                     navigate("/principal/viewStudents")
     //                 else if (role === "admin")
     //                     navigate("/admin/viewstudents")
     //                 else if (role === "student")
@@ -371,8 +378,8 @@ const Student = () => {
                             Print
                         </button>
                         <button onClick={() => {
-                            if (role === "principle")
-                                navigate("/principle/viewStudents")
+                            if (role === "principal")
+                                navigate("/principal/viewStudents")
                             else if (role === "admin")
                                 navigate("/admin/viewstudents")
                             else if (role === "student")

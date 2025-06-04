@@ -7,7 +7,7 @@ import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Admin from "./pages/Admin";
 import Teacher from "./pages/Teacher";
-import Principle from "./pages/Principle";
+import Principal from "./pages/Principal";
 import Student from "./pages/Student";
 import StudentEval from "./pages/StudentEval";
 import ViewTeachers from "./pages/ViewTeachers";
@@ -29,7 +29,7 @@ import Class from "./pages/Class";
 // import StudentHistory from "./pages/StudentHistory";
 import PrivateRoute from './routes/PrivateRoute';
 import AdminPrivateRoute from "./routes/AdminPrivateRoute";
-import PrinciplePrivateRoute from "./routes/PrinciplePrivateRoute";
+import PrincipalPrivateRoute from "./routes/PrincipalPrivateRoute";
 import StudentPrivateRoute from "./routes/StudentPrivateRoute";
 import TeacherPrivateRoute from "./routes/TeacherPrivateRoute";
 
@@ -73,15 +73,15 @@ export default function App() {
             <Route exact path="/teacher/term/termEntry/eval/recreational" element={<Recreational />} />
             <Route exact path="/teacher/term/termEntry/eval/academic" element={<Academic />} />
             <Route exact path="/teacher/term" element={<Term />} />
-            <Route exact path="/teacher/term/termEntry" element={<TermEntry/>}/>
+            <Route exact path="/teacher/term/termEntry" element={<TermEntry />} />
 
           </Route>
-          <Route element={<PrinciplePrivateRoute />}>
-            <Route exact path="/principle" element={<Principle />} />
-            <Route exact path="/principle/viewteachers" element={<ViewTeachers />} />
-            <Route exact path="/principle/viewstudents" element={<PrincipalViewStudents />} />
-            <Route exact path="/principle/viewstudents/history/:stdentId" element={<History />} />
-            <Route exact path="/principle/viewstudents/details/:studentId" element={<StudentDetails />} />
+          <Route element={<PrincipalPrivateRoute />}>
+            <Route exact path="/principal" element={<Principal />} />
+            <Route exact path="/principal/viewteachers" element={<ViewTeachers />} />
+            <Route exact path="/principal/viewstudents" element={<PrincipalViewStudents />} />
+            <Route exact path="/principal/viewstudents/history/:stdentId" element={<History />} />
+            <Route exact path="/principal/viewstudents/details/:studentId" element={<StudentDetails />} />
           </Route>
 
         </Route>

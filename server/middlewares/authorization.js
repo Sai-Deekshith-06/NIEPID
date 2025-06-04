@@ -35,7 +35,7 @@ const isStudent = (req, res, next) => {
         next()
     else
         res.status(300).json({ "message": "Not an Student" })
-        return
+    return
 }
 const isTeacher = (req, res, next) => {
     const role = req.user.role
@@ -44,9 +44,9 @@ const isTeacher = (req, res, next) => {
     else
         res.status(300).json({ "message": "Not an Teacher" })
 }
-const isPrinciple = (req, res, next) => {
+const isprincipal = (req, res, next) => {
     const role = req.user.role
-    if (role.toLowerCase() === "principle")
+    if (role.toLowerCase() === "principal")
         next()
     else
         res.status(300).json({ "message": "Not an admin" })
@@ -55,7 +55,7 @@ const isPrinciple = (req, res, next) => {
 module.exports = {
     verifyToken,
     isAdmin,
-    isPrinciple,
+    isprincipal,
     isStudent,
     isTeacher
 }

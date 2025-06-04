@@ -37,20 +37,26 @@ const styles = {
     },
     selector: {
         display: "flex",
-        flexDirection: "column",
+        flexDirection: "row",
+        justifyContent: "space-around",
         gap: "1rem",
         marginBottom: "2rem",
         padding: "1rem",
         backgroundColor: "#f9f9f9",
         borderRadius: "5px",
         boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+        alignItems: "center",
     },
     label: {
         display: "flex",
-        flexDirection: "column",
+        flexDirection: "row",
         gap: "0.5rem",
+        width: "50%",
+        justifyContent: "flex-start",
+        alignItems: "center",
     },
     select: {
+        width: "80%",
         padding: "0.5rem",
         borderRadius: "5px",
         border: "1px solid #ccc",
@@ -86,8 +92,8 @@ const styles = {
 //                     navigate('/student')
 //                 if (role === "teacher")
 //                     navigate('/teacher')
-//                 if (role === "principle")
-//                     navigate('/principle/viewstudents')
+//                 if (role === "principal")
+//                     navigate('/principal/viewstudents')
 //                 if (role === "admin")
 //                     navigate('/admin/viewstudents')
 //             }} style={styles.backButton}>Back</button>
@@ -119,8 +125,8 @@ const StudentPerformance = () => {
                         navigate('/student')
                     if (role === "teacher")
                         navigate('/teacher')
-                    if (role === "principle")
-                        navigate('/principle/viewstudents')
+                    if (role === "principal")
+                        navigate('/principal/viewstudents')
                     if (role === "admin")
                         navigate('/admin/viewstudents')
                 }} style={styles.backButton}>Back</button>
@@ -135,22 +141,22 @@ const StudentPerformance = () => {
     const replacePrimaryLabels = (text) => {
         console.log(text)
         if (!text) return '';
-        
+
         return text
-          .replace(/preprimary_1/gi, 'Preprimary-1')
-          .replace(/preprimary_2/gi, 'Preprimary-2')
-          .replace(/preprimary_3/gi, 'Preprimary-3')
-          .replace(/primary1_1/gi, 'Primary-I-1')
-          .replace(/primary1_2/gi, 'Primary-I-2')
-          .replace(/primary1_3/gi, 'Primary-I-3')
-          .replace(/primary2_1/gi, 'Primary-II-1')
-          .replace(/primary2_2/gi, 'Primary-II-2')
-          .replace(/primary2_3/gi, 'Primary-II-3')
-          .replace(/preprimary/gi, 'Preprimary')
-          .replace(/primary1/gi, 'Primary-I')
-          .replace(/primary2/gi, 'Primary-II')
-          
-      };
+            .replace(/preprimary_1/gi, 'Preprimary-1')
+            .replace(/preprimary_2/gi, 'Preprimary-2')
+            .replace(/preprimary_3/gi, 'Preprimary-3')
+            .replace(/primary1_1/gi, 'Primary-I-1')
+            .replace(/primary1_2/gi, 'Primary-I-2')
+            .replace(/primary1_3/gi, 'Primary-I-3')
+            .replace(/primary2_1/gi, 'Primary-II-1')
+            .replace(/primary2_2/gi, 'Primary-II-2')
+            .replace(/primary2_3/gi, 'Primary-II-3')
+            .replace(/preprimary/gi, 'Preprimary')
+            .replace(/primary1/gi, 'Primary-I')
+            .replace(/primary2/gi, 'Primary-II')
+
+    };
 
     const Footer = () => (
         <footer style={styles.footer}>&copy; 2024 Student History Portal</footer>
@@ -183,10 +189,10 @@ const StudentPerformance = () => {
                     console.log(err.response)
                 })
         }
-        else if (role === "principle") {
+        else if (role === "principal") {
             console.log(role)
             console.log(id)
-            axios.get("http://localhost:4000/principle/student/viewHistory", {
+            axios.get("http://localhost:4000/principal/student/viewHistory", {
                 headers: {
                     id: id,
                     "Content-Type": "application/json",
@@ -199,7 +205,7 @@ const StudentPerformance = () => {
                         toast.error("Student is still in 1st Year", {
                             position: "top-right",
                         });
-                        navigate('/principle/viewStudents')
+                        navigate('/principal/viewStudents')
                     }
                     setStudentInfo(res.data)
 
@@ -494,20 +500,20 @@ const StudentPerformance = () => {
             })),
 
             ...(selectedYearData.termReport.length >= 4
-            ? [{
-                label: 'Average',
-                data: [
-                    selectedYearData.termReport.reduce((acc, termData) => acc + termData.percent.personalPercent, 0) / selectedYearData.termReport.length,
-                    selectedYearData.termReport.reduce((acc, termData) => acc + termData.percent.socialPercent, 0) / selectedYearData.termReport.length,
-                    selectedYearData.termReport.reduce((acc, termData) => acc + termData.percent.academicPercent, 0) / selectedYearData.termReport.length,
-                    selectedYearData.termReport.reduce((acc, termData) => acc + termData.percent.occupationalPercent, 0) / selectedYearData.termReport.length,
-                    //selectedYearData.termReport.reduce((acc, termData) => acc + termData.percent.recreationalPercent, 0) / selectedYearData.termReport.length
-                ],
-                backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                borderWidth: 1
-            }]
-            : []
-        )
+                ? [{
+                    label: 'Average',
+                    data: [
+                        selectedYearData.termReport.reduce((acc, termData) => acc + termData.percent.personalPercent, 0) / selectedYearData.termReport.length,
+                        selectedYearData.termReport.reduce((acc, termData) => acc + termData.percent.socialPercent, 0) / selectedYearData.termReport.length,
+                        selectedYearData.termReport.reduce((acc, termData) => acc + termData.percent.academicPercent, 0) / selectedYearData.termReport.length,
+                        selectedYearData.termReport.reduce((acc, termData) => acc + termData.percent.occupationalPercent, 0) / selectedYearData.termReport.length,
+                        //selectedYearData.termReport.reduce((acc, termData) => acc + termData.percent.recreationalPercent, 0) / selectedYearData.termReport.length
+                    ],
+                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                    borderWidth: 1
+                }]
+                : []
+            )
         ]
     };
 
@@ -542,7 +548,6 @@ const StudentPerformance = () => {
                             ))}
                         </select>
                     </label>
-                    <br />
                     <label style={styles.label}>
                         Year:
                         <select value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)} style={styles.select}>

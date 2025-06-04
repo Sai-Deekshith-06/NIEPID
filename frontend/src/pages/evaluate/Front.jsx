@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import image from './th.jpeg';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const Front = () => {
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ const Front = () => {
   const replacePrimaryLabels = (text) => {
     console.log(text)
     if (!text) return '';
-    
+
     return text
       .replace(/preprimary_1/gi, 'Preprimary-1')
       .replace(/preprimary_2/gi, 'Preprimary-2')
@@ -42,7 +43,7 @@ const Front = () => {
       .replace(/preprimary/gi, 'Preprimary')
       .replace(/primary1/gi, 'Primary-I')
       .replace(/primary2/gi, 'Primary-II')
-      
+
   };
 
   const Header = () => (
@@ -140,7 +141,8 @@ const Front = () => {
     })
       .then(res => {
         console.log(res.data)
-        alert("Term evaluated")
+        toast.success("Term evaluated")
+        navigateTo('/teacher/term/termEntry')
       })
       .catch(err => {
         console.log(err.response)
@@ -160,28 +162,28 @@ const Front = () => {
       <Header />
       <main style={styles.main}>
         <h1 style={styles.heading}>Functional Assessment Checklist for Programming</h1>
-        <h1 style={styles.subHeading}>{replacePrimaryLabels(section)} -- Year{year} -- Term{term}</h1>
+        <h1 style={styles.subHeading}>{replacePrimaryLabels(section)} -- Year {year} -- Term {term}</h1>
         <div style={styles.buttonContainer}>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <button style={styles.button} onClick={() => navigateTo('/teacher/term/termEntry/eval/personal')}>Personal</button>
-            <label style={{ fontSize: '13px' }}>{"Percentage : " + personalPercent + "%"}</label>
+            <label style={{ fontSize: '13px' }}>{personalPercent !== 0 ? "Percentage : " + personalPercent + "%" : ""}</label>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <button style={styles.button} onClick={() => navigateTo('/teacher/term/termEntry/eval/social')}>Social</button>
-            <label style={{ fontSize: '13px' }}>{"Percentage : " + socialPercent + "%"}</label>
+            <label style={{ fontSize: '13px' }}>{socialPercent !== 0 ? "Percentage : " + socialPercent + "%" : ""}</label>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <button style={styles.button} onClick={() => navigateTo('/teacher/term/termEntry/eval/occupational')}>Occupational</button>
-            <label style={{ fontSize: '13px' }}>{"Percentage : " + occupationalPercent + "%"}</label>
+            <label style={{ fontSize: '13px' }}>{occupationalPercent !== 0 ? "Percentage : " + occupationalPercent + "%" : ""}</label>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <button style={styles.button} onClick={() => navigateTo('/teacher/term/termEntry/eval/academic')}>Academic</button>
-            <label style={{ fontSize: '13px' }}>{"Percentage : " + academicPercent + "%"}</label>
+            <label style={{ fontSize: '13px' }}>{academicPercent !== 0 ? "Percentage : " + academicPercent + "%" : ""}</label>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <button style={styles.button} onClick={() => navigateTo('/teacher/term/termEntry/eval/recreational')}>Recreational</button>
             {/* <label style={{ fontSize: '13px' }}>{"Percentage : " + recreationalPercent + "%"}</label> */}
-            <label style={{ fontSize: '13px' }}>{"Mode : " + mode}</label>
+            <label style={{ fontSize: '13px' }}>{mode ? "Mode : " + mode : ""}</label>
           </div>
         </div>
       </main>

@@ -4,6 +4,7 @@ import { createUseStyles } from 'react-jss';
 import { useLocation } from 'react-router-dom';
 import image from './th.jpeg'
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 // import flattenStudentData from '../helpers/flattenStudentData';
 
 const useStyles = createUseStyles({
@@ -403,7 +404,8 @@ const Academic = () => {
         })
             .then((res) => {
                 console.log(res.data)
-                alert("checklist submitted")
+                toast.success("checklist submitted")
+                navigate('/teacher/eval')
             })
             .catch((err) => {
                 console.log(err.response)
@@ -461,12 +463,12 @@ const Academic = () => {
                                     className={classes.textInput}
                                 >
                                     <option value="">Select an option</option>
-                                        <option value="Yes">+</option>
-                                        {/* <option value="No">No</option> */}
-                                        <option value="NA">NA</option>
-                                        <option value="NE">NE</option>
-                                        <option value="C-P1">VP</option>
-                                        <option value="C-P2">PP</option>
+                                    <option value="Yes" title='Yes'>+</option>
+                                    {/* <option value="No">No</option> */}
+                                    <option value="NA" title='Not Applicable' >NA</option>
+                                    <option value="NE" title='No Exposure' >NE</option>
+                                    <option value="C-P1" title='Verbal Prompting' >VP</option>
+                                    <option value="C-P2" title='Physical Prompting' >PP</option>
                                 </select>
                             </td>
                         </tr>

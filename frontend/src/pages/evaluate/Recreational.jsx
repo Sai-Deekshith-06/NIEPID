@@ -4,6 +4,7 @@ import { createUseStyles } from 'react-jss';
 import { useLocation } from 'react-router-dom';
 import image from './th.jpeg'
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 // import flattenStudentData from '../helpers/flattenStudentData';
 
 const useStyles = createUseStyles({
@@ -367,7 +368,8 @@ const Recreational = () => {
         })
             .then((res) => {
                 console.log(res.data)
-                alert("checklist submitted")
+                toast.success("checklist submitted")
+                navigate('/teacher/eval')
             })
             .catch((err) => {
                 console.log(err.response)
@@ -446,7 +448,7 @@ const Recreational = () => {
                     </button>
                     <div className={classes.buttonContainer1}>
                         <div className={classes.buttonContainer2}>
-                            <label className={classes.label}>{"Percentage : " + result.percent + "%"}</label>
+                            {/* <label className={classes.label}>{"Percentage : " + result.percent + "%"}</label> */}
                             <label className={classes.label}>{"Mode : " + result.mode}</label>
                         </div>
                         <button className={classes.button} onClick={handleEvaluate}>Evaluate</button>

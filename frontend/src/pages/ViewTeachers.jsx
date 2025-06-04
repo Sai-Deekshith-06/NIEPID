@@ -49,7 +49,7 @@ const TeacherTable = () => {
             }
           )
           : await axios.get(
-            "http://localhost:4000/principle/viewTeacher",
+            "http://localhost:4000/principal/viewTeacher",
             {
               headers: {
                 "Content-Type": "application/json",
@@ -193,7 +193,7 @@ const TeacherTable = () => {
       setEditedTeacher({ ...editedTeacher, [name]: value });
     }
   };
-  //navigate('/principle')108
+  //navigate('/principal')108
 
   const handlePrint = (e) => {
     window.print();
@@ -202,10 +202,10 @@ const TeacherTable = () => {
   const navigate = useNavigate();
 
   const handleNavigate = () => {
-    if (role == "admin") {
+    if (role === "admin") {
       navigate("/admin");
-    } else if (role == "principle") {
-      navigate("/principle");
+    } else if (role === "principal") {
+      navigate("/principal");
     }
   };
 
@@ -471,7 +471,7 @@ const styles = {
   container: {
     padding: "20px",
     margin: "20px auto",
-    maxWidth: "900px",
+    maxWidth: "3000px",
     backgroundColor: "#ffffff",
     border: "1px solid #ddd",
     borderRadius: "10px",

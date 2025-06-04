@@ -11,7 +11,7 @@ app.use(cors())
 
 app.use(requestIp.mw());
 // Allowed IPs (add your specific IP here)
-const allowedIPs = ['192.168.1.3']; // Replace with your specific IP address
+const allowedIPs = ['192.168.0.107']; // Replace with your specific IP address
 
 const getServerIPv4 = () => {
     const interfaces = os.networkInterfaces();
@@ -19,7 +19,7 @@ const getServerIPv4 = () => {
     for (const interfaceName in interfaces) {
         for (const address of interfaces[interfaceName]) {
             if (address.family === 'IPv4' && !address.internal) {
-                
+
                 return address.address; // Return the first external IPv4 address found
             }
         }
@@ -47,8 +47,8 @@ const studentRoutes = require('./routes/student.route')
 const adminRoutes = require('./routes/admin.route')
 const teacherRoutes = require('./routes/teacher.route')
 const loginRoutes = require('./routes/login.route')
-const principleRoutes = require('./routes/principal.route')
-const { verifyToken, isAdmin, isStudent, isTeacher, isPrinciple } = require('./middlewares/authorization')
+const principalRoutes = require('./routes/principal.route')
+const { verifyToken, isAdmin, isStudent, isTeacher, isprincipal } = require('./middlewares/authorization')
 
 //mongDB connection
 const mongoose = require('mongoose')
@@ -66,7 +66,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use('/login', loginRoutes)
 app.use('/student', verifyToken, isStudent, studentRoutes)
 app.use('/teacher', verifyToken, isTeacher, teacherRoutes)
-app.use('/principle', verifyToken, isPrinciple, principleRoutes)
+app.use('/principal', verifyToken, isprincipal, principalRoutes)
 app.use('/admin', verifyToken, isAdmin, adminRoutes)
 
 app.get('/', (req, res) => {

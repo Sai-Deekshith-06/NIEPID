@@ -54,7 +54,7 @@ function Login() {
           password: password
         }
       );
-      if (response.data.status === "success") {
+      if (response.data?.status === "success") {
         const data = response.data
         console.log(response);
         console.log(data.role);
@@ -84,7 +84,7 @@ function Login() {
       }
     } catch (ex) {
       console.log(ex.response);
-      if(ex.response.status === 501){
+      if (ex.response?.status === 501) {
         alert('Invalid Device')
       }
     }
@@ -196,9 +196,9 @@ const styles = {
     width: '150px',
     marginBottom: '1rem',
   },
-  logoContainer:{
-    display : 'flex',
-    justifyContent : 'space-between'
+  logoContainer: {
+    display: 'flex',
+    justifyContent: 'space-between'
   },
   instituteName: {
     fontSize: '1.5rem',

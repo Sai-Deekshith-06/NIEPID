@@ -12,7 +12,7 @@ export default function Home() {
   const [cookies, setCookie, removeCookie] = useCookies([]);
   const [students, setStudents] = useState({});
   const [teacher, setTeacher] = useState({})
-  const teacherName = "John Doe"
+  // const teacherName = "John Doe"
 
   useEffect(() => {
 
@@ -25,7 +25,6 @@ export default function Home() {
     localStorage.removeItem("studentId")
 
     const teacherId = localStorage.getItem("userId")
-    console.log("hiiii")
     axios.get('http://localhost:4000/teacher/getStudents', {
       headers: {
         id: teacherId,
@@ -75,7 +74,7 @@ export default function Home() {
   const replacePrimaryLabels = (text) => {
     console.log(text)
     if (!text) return '';
-    
+
     return text
       .replace(/preprimary_1/gi, 'Preprimary-1')
       .replace(/preprimary_2/gi, 'Preprimary-2')
@@ -86,7 +85,7 @@ export default function Home() {
       .replace(/primary2_1/gi, 'Primary-II-1')
       .replace(/primary2_2/gi, 'Primary-II-2')
       .replace(/primary2_3/gi, 'Primary-II-3')
-      
+
   };
 
   const Header = () => (

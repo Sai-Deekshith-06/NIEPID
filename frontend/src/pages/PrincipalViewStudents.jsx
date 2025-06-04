@@ -60,7 +60,7 @@ const PrincipalViewStudents = () => {
     const fetchStudentDetails = async () => {
         setLoading(true);
         try {
-            const response = await axios.get('http://localhost:4000/principle/viewstudents', {
+            const response = await axios.get('http://localhost:4000/principal/viewstudents', {
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${localStorage.getItem("token")}`
@@ -81,7 +81,7 @@ const PrincipalViewStudents = () => {
     const fetchTeacherDetails = async (classId) => {
         try {
             console.log("Hello")
-            const response = await axios.get(`http://localhost:4000/principle/teacher/${classId}`, {
+            const response = await axios.get(`http://localhost:4000/principal/teacher/${classId}`, {
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${localStorage.getItem("token")}`
@@ -124,19 +124,19 @@ const PrincipalViewStudents = () => {
     const replacePrimaryLabels = (text) => {
         console.log(text)
         if (!text) return '';
-        
+
         return text
-          .replace(/preprimary_1/gi, 'Preprimary-1')
-          .replace(/preprimary_2/gi, 'Preprimary-2')
-          .replace(/preprimary_3/gi, 'Preprimary-3')
-          .replace(/primary1_1/gi, 'Primary-I-1')
-          .replace(/primary1_2/gi, 'Primary-I-2')
-          .replace(/primary1_3/gi, 'Primary-I-3')
-          .replace(/primary2_1/gi, 'Primary-II-1')
-          .replace(/primary2_2/gi, 'Primary-II-2')
-          .replace(/primary2_3/gi, 'Primary-II-3')
-          
-      };
+            .replace(/preprimary_1/gi, 'Preprimary-1')
+            .replace(/preprimary_2/gi, 'Preprimary-2')
+            .replace(/preprimary_3/gi, 'Preprimary-3')
+            .replace(/primary1_1/gi, 'Primary-I-1')
+            .replace(/primary1_2/gi, 'Primary-I-2')
+            .replace(/primary1_3/gi, 'Primary-I-3')
+            .replace(/primary2_1/gi, 'Primary-II-1')
+            .replace(/primary2_2/gi, 'Primary-II-2')
+            .replace(/primary2_3/gi, 'Primary-II-3')
+
+    };
 
     const toggleSearch = (column) => {
 
@@ -162,12 +162,12 @@ const PrincipalViewStudents = () => {
         console.log(studentId)
         localStorage.setItem("studentId", studentId)
 
-        navigate(`/principle/viewstudents/history/${studentId}`);
+        navigate(`/principal/viewstudents/history/${studentId}`);
     };
 
     const showDetails = (studentId) => {
         localStorage.setItem("regNo", studentId)
-        navigate(`/principle/viewstudents/details/${studentId}`);
+        navigate(`/principal/viewstudents/details/${studentId}`);
 
     }
 
@@ -181,7 +181,7 @@ const PrincipalViewStudents = () => {
                 <span style={styles.logoLabel}>NIEPID</span>
             </div>
             <nav style={styles.navLinks}>
-                <button onClick={() => navigate('/principle')} style={styles.backButton}>
+                <button onClick={() => navigate('/principal')} style={styles.backButton}>
                     Back
                 </button>
             </nav>
@@ -270,11 +270,13 @@ const PrincipalViewStudents = () => {
 const styles = {
     div: {
         display: 'flex',
+        justifyContent: 'space-evenly'
     },
     container: {
         padding: '20px',
         margin: '20px auto',
-        maxWidth: '900px',
+        width: "96%",
+        // maxWidth: '3000px',
         backgroundColor: '#ffffff',
         border: '1px solid #ddd',
         borderRadius: '10px',

@@ -90,7 +90,7 @@ const evaluateStudent = async (req, res) => {
     const section = student.section.find(sec => sec.sec === req.headers.section)
     const yearReport = section.yearReport.find(year => year.year === req.headers.year)
     const termReport = yearReport.termReport.find(term => term.term === req.headers.term)
-    console.log(termReport)
+    // console.log(termReport)
     let questions;
     if (req.headers.type === "personalQA")
         questions = termReport.report.personalQA

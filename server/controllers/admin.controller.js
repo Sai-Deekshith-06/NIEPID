@@ -53,13 +53,14 @@ const editTeacher = async (req, res) => {
 const registerStudent = async (req, res) => {
     const session = mongoose.startSession()
     try {
-            ; (await session).startTransaction()
+        (await session).startTransaction()
         const val1 = {}
         const data = req.body
         // console.log(data)
         const arr1 = await studentDetailsModel.findOne({ 'info.regNo': data.formData.details.info.regNo })
         const arr2 = await studentModel.findOne({ regNo: data.formData.details.info.regNo })
-
+        console.log(arr1)
+        console.log(arr2)
         lable1: if (!arr1 && !arr2) {
             let flag = false
 
@@ -139,8 +140,8 @@ const registerStudent = async (req, res) => {
         else {
             // console.log(arr1)
             // console.log(arr2)
-            console.log("Error-401")
-            res.status(401).json({ failure: "true" })
+            console.log("Error-401: Student regNo already exists")
+            res.status(401).json("Student regNo already exists")
         }
     }
     catch (error) {

@@ -25,7 +25,7 @@ const Front = () => {
         recreationalPercent: ''
     })
 
-    const [termEvaluated,setTermEvaluated] = useState(false);
+    const [termEvaluated, setTermEvaluated] = useState(false);
 
     const [comments, setComments] = useState(["", "", "", "", "", ""]);
     const [terms, setTerms] = useState([]);
@@ -39,22 +39,22 @@ const Front = () => {
     const replacePrimaryLabels = (text) => {
         console.log(text)
         if (!text) return '';
-        
+
         return text
-          .replace(/preprimary_1/gi, 'Preprimary-1')
-          .replace(/preprimary_2/gi, 'Preprimary-2')
-          .replace(/preprimary_3/gi, 'Preprimary-3')
-          .replace(/primary1_1/gi, 'Primary-I-1')
-          .replace(/primary1_2/gi, 'Primary-I-2')
-          .replace(/primary1_3/gi, 'Primary-I-3')
-          .replace(/primary2_1/gi, 'Primary-II-1')
-          .replace(/primary2_2/gi, 'Primary-II-2')
-          .replace(/primary2_3/gi, 'Primary-II-3')
-          .replace(/preprimary/gi, 'Preprimary')
-          .replace(/primary1/gi, 'Primary-I')
-          .replace(/primary2/gi, 'Primary-II')
-          
-      };
+            .replace(/preprimary_1/gi, 'Preprimary-1')
+            .replace(/preprimary_2/gi, 'Preprimary-2')
+            .replace(/preprimary_3/gi, 'Preprimary-3')
+            .replace(/primary1_1/gi, 'Primary-I-1')
+            .replace(/primary1_2/gi, 'Primary-I-2')
+            .replace(/primary1_3/gi, 'Primary-I-3')
+            .replace(/primary2_1/gi, 'Primary-II-1')
+            .replace(/primary2_2/gi, 'Primary-II-2')
+            .replace(/primary2_3/gi, 'Primary-II-3')
+            .replace(/preprimary/gi, 'Preprimary')
+            .replace(/primary1/gi, 'Primary-I')
+            .replace(/primary2/gi, 'Primary-II')
+
+    };
 
     const Header = () => (
         <header style={styles.header}>
@@ -98,6 +98,20 @@ const Front = () => {
                 const t = []
                 yearData.termReport.map(term => {
                     t.push(term.term)
+                })
+                console.log(
+                    "personalPercent" + yearData.percent.personalPercent,
+                    "\nsocialPercent" + yearData.percent.socialPercent,
+                    "\nacademicPercent" + yearData.percent.academicPercent,
+                    "\noccupationalPercent" + yearData.percent.occupationalPercent,
+                    "\nrecreationalMode" + yearData.percent.mode
+                )
+                setPercent({
+                    personalPercent: yearData.percent.personalPercent,
+                    socialPercent: yearData.percent.socialPercent,
+                    academicPercent: yearData.percent.academicPercent,
+                    occupationalPercent: yearData.percent.occupationalPercent,
+                    recreationalMode: yearData.percent.mode
                 })
 
                 setoldYearComment(yearData.comment.yearComment)
@@ -161,7 +175,7 @@ const Front = () => {
                             <button key={term} onClick={() => {
                                 localStorage.setItem("term", term)
                                 navigate('/teacher/eval')
-                            }} style={styles.termButton}>Term{term}</button>
+                            }} style={styles.termButton}>Term {term}</button>
                         ))
                     }
                 </div>
@@ -172,7 +186,7 @@ const Front = () => {
             <div style={styles.box}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <label>Enter your comments for Year</label>
-                    <label>Year Percent : {(percent.personalPercent + percent.academicPercent + percent.occupationalPercent + percent.socialPercent) / 4}</label>
+                    <label>Year Percent : {((percent.personalPercent + percent.academicPercent + percent.occupationalPercent + percent.socialPercent) / 4.00).toFixed(2)}</label>
                 </div>
                 <textarea
                     name="comments1"
@@ -243,7 +257,7 @@ const Front = () => {
             <div style={styles.box}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <label>Enter your comments for recreational</label>
-                    <label>Recreational Percent : {percent.recreationalPercent}</label>
+                    <label>Recreational Mode : {percent.recreationalMode}</label>
                 </div>
                 <textarea
                     name="comments6"

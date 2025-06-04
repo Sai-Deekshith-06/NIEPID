@@ -20,11 +20,11 @@ function Principal() {
     };
 
     const handleViewTeachers = () => {
-        navigate('/principle/viewteachers');
+        navigate('/principal/viewteachers');
     };
 
     const handleViewStudents = () => {
-        navigate('/principle/viewstudents');
+        navigate('/principal/viewstudents');
     };
 
     return (

@@ -60,7 +60,7 @@ const ViewStudents = () => {
     const fetchStudentDetails = async () => {
         setLoading(true);
         try {
-            const response = await axios.get('http://localhost:4000/admin/viewstudents', {//'http://localhost:4000/principle/student1'
+            const response = await axios.get('http://localhost:4000/admin/viewstudents', {//'http://localhost:4000/principal/student1'
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${localStorage.getItem("token")}`
@@ -135,19 +135,19 @@ const ViewStudents = () => {
     const replacePrimaryLabels = (text) => {
         console.log(text)
         if (!text) return '';
-        
+
         return text
-          .replace(/preprimary_1/gi, 'Preprimary-1')
-          .replace(/preprimary_2/gi, 'Preprimary-2')
-          .replace(/preprimary_3/gi, 'Preprimary-3')
-          .replace(/primary1_1/gi, 'Primary-I-1')
-          .replace(/primary1_2/gi, 'Primary-I-2')
-          .replace(/primary1_3/gi, 'Primary-I-3')
-          .replace(/primary2_1/gi, 'Primary-II-1')
-          .replace(/primary2_2/gi, 'Primary-II-2')
-          .replace(/primary2_3/gi, 'Primary-II-3')
-          
-      };
+            .replace(/preprimary_1/gi, 'Preprimary-1')
+            .replace(/preprimary_2/gi, 'Preprimary-2')
+            .replace(/preprimary_3/gi, 'Preprimary-3')
+            .replace(/primary1_1/gi, 'Primary-I-1')
+            .replace(/primary1_2/gi, 'Primary-I-2')
+            .replace(/primary1_3/gi, 'Primary-I-3')
+            .replace(/primary2_1/gi, 'Primary-II-1')
+            .replace(/primary2_2/gi, 'Primary-II-2')
+            .replace(/primary2_3/gi, 'Primary-II-3')
+
+    };
 
     const handleSearchChange = (e) => {
         const { name, value } = e.target;
@@ -273,7 +273,8 @@ const styles = {
     container: {
         padding: '20px',
         margin: '20px auto',
-        maxWidth: '900px',
+        width: '96%',
+        // maxWidth: '3004px',
         backgroundColor: '#ffffff',
         border: '1px solid #ddd',
         borderRadius: '10px',
