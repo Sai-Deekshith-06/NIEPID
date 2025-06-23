@@ -434,11 +434,11 @@ const historyStudent = async (req, res) => {//expecting student details form req
 
 const getStudents = async (req, res) => {
     try {
-        console.log("Hiii")
+        console.log("/getStudents")
         const id = req.headers.id
         // console.log(req.headers.id)
         const teacher = await teacherModel.findOne({ "teacherId": id })
-        // console.log(teacher)
+        console.log(teacher)
         const students = []
         if (teacher) {
             for (let index = 0; index < teacher.classId.length; index++) {
@@ -454,11 +454,11 @@ const getStudents = async (req, res) => {
                 res.status(200).json({ students })
             }
             else {
-                res.status(405).send(false)
+                res.status(405).send(false).json({ msg: `TeacherID: ${id}: no student found` })
             }
         }
         else {
-            res.status(406).send(false)
+            res.status(406).json({ msg: `TeacherID: ${id} not found` })
         }
     }
     catch (error) {

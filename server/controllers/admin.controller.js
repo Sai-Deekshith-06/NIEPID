@@ -295,7 +295,9 @@ const registerTeacher = async (req, res) => {
         });
         const data = data1.slice(1);
 
-        console.log(data)
+        console.log("registerTeacher(): ", data)
+        const regexEmail = /^[a-zA-Z0-9._%+-]+@(gmail)\.(com)$/;
+        const regexClassId = /^(preprimary|primary[1-2])_[1-3]$/;
 
         for (const row of data) {
             const isTeacher = await teacherModel.find({ 'teacherId': row.teacherId });
@@ -305,19 +307,18 @@ const registerTeacher = async (req, res) => {
 
             if (isTeacher.length === 0 && isUser.length === 0) {
                 if (row.teacherMNo.length === 10 && row.teacherId && row.teacherName && row.classId) {
-                    const regex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
-                    if (!regex.test(row.email)) {
+                    if (!regexEmail.test(row.email)) {
                         return res.status(400).json({ msg: `Invalid email: ${row.email}` });
                     }
 
                     const cid = row.classId.includes(',') ? row.classId.split(',') : [row.classId];
-
                     for (const cls of cid) {
                         const isClass = await classModel.findOne({ 'classId': cls });
                         if (isClass) {
                             return res.status(400).json({ msg: `Class ${cls} already exists` });
-                        } else if (!['preprimary_1', 'preprimary_2', 'preprimary_3', 'primary1_1', 'primary1_2', 'primary1_3', 'primary2_1', 'primary2_2', 'primary2_3'].includes(cls)) {
-                            return res.status(400).json({ msg: `Invalid classId: ${cls}` });
+                            // } else if (!['preprimary_1', 'preprimary_2', 'preprimary_3', 'primary1_1', 'primary1_2', 'primary1_3', 'primary2_1', 'primary2_2', 'primary2_3'].includes(cls)) {
+                        } else if (!regexClassId.test(cls)) {
+                            return res.status(400).json({ msg: `Invalid classId: '${cls}', Valid class ID's : [ preprimary_(1,2,3), primary(1,2)_(1,2,3) ]` });
                         }
                     }
 
@@ -350,7 +351,7 @@ const registerTeacher = async (req, res) => {
                     await userModel.create(user);
 
                 } else {
-                    return res.status(400).json({ msg: `Missing or invalid data: MNo: ${row.teacherMNo}, Name: ${row.teacherName}, Id: ${row.teacherId}, classId: ${row.classId}` });
+                    return res.status(400).json({ msg: `Missing or invalid data: MNo:\n ${row.teacherMNo}, Name: ${row.teacherName}, Id: ${row.teacherId}, classId: ${row.classId}` });
                 }
             }
             else {
@@ -360,8 +361,8 @@ const registerTeacher = async (req, res) => {
 
         res.json({ success: true });
     } catch (error) {
-        console.error('Error reading file:', error);
-        res.status(500).json({ success: false, error: 'Error reading file' });
+        console.error('registerTeacher(): Error reading file:', error);
+        res.status(500).json({ success: false, msg: `Error reading file:\n ${error}` });
     }
 };
 
