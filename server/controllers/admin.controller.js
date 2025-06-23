@@ -307,8 +307,8 @@ const registerTeacher = async (req, res) => {
 
             if (isTeacher.length === 0 && isUser.length === 0) {
                 if (row.MobileNo.length === 10 && row.TeacherId && row.Name && row.ClassId) {
-                    if (!regex.test(row.Email)) {
-                        return res.status(400).json({ msg: `Invalid email: ${row.Email}` });
+                    if (!regexEmail.test(row.Email)) {  //regex -> regexEmail
+                        return res.status(400).json({ msg: `${row.TeacherId}: Invalid email: ${row.Email}` });
                     }
 
                     const cid = row.ClassId.includes(',') ? row.ClassId.split(',') : [row.ClassId];
@@ -316,10 +316,10 @@ const registerTeacher = async (req, res) => {
                     for (const cls of cid) {
                         const isClass = await classModel.findOne({ 'classId': cls });
                         if (isClass) {
-                            return res.status(400).json({ msg: `Class ${cls} already exists` });
+                            return res.status(400).json({ msg: `${row.TeacherId}: Class ${cls} already exists` });
                             // } else if (!['preprimary_1', 'preprimary_2', 'preprimary_3', 'primary1_1', 'primary1_2', 'primary1_3', 'primary2_1', 'primary2_2', 'primary2_3'].includes(cls)) {
                         } else if (!regexClassId.test(cls)) {
-                            return res.status(400).json({ msg: `Invalid classId: '${cls}', Valid class ID's : [ preprimary_(1,2,3), primary(1,2)_(1,2,3) ]` });
+                            return res.status(400).json({ msg: `${row.TeacherId}: Invalid classId: '${cls}', Valid class ID's : [ preprimary_(1,2,3), primary(1,2)_(1,2,3) ]` });
                         }
                     }
 
@@ -353,12 +353,12 @@ const registerTeacher = async (req, res) => {
 
                 } else {
 
-                    return res.status(400).json({ msg: `Missing or invalid data: MNo: ${row.MobileNo}, Name: ${row.Name}, Id: ${row.TeacherId}, classId: ${row.ClassId}` });
+                    return res.status(400).json({ msg: `${row.TeacherId}: Missing or invalid data: MNo: ${row.MobileNo}, Name: ${row.Name}, Id: ${row.TeacherId}, classId: ${row.ClassId}` });
 
                 }
             }
             else {
-                return res.status(400).json({ msg: "TeacherId already exist" });
+                return res.status(400).json({ msg: `${row.TeacherId}: TeacherId already exist` });
             }
         }
 
