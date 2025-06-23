@@ -438,7 +438,7 @@ const getStudents = async (req, res) => {
         const id = req.headers.id
         // console.log(req.headers.id)
         const teacher = await teacherModel.findOne({ "teacherId": id })
-        // console.log(teacher)
+        console.log(teacher+id)
         const students = []
         if (teacher) {
             for (let index = 0; index < teacher.classId.length; index++) {
