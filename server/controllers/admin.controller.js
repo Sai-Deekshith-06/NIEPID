@@ -286,32 +286,33 @@ const registerTeacher = async (req, res) => {
         const workbook = xlsx.read(req.file.buffer, { type: 'buffer' });
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
-        const headers = ['teacherId', 'teacherName', 'teacherMNo', 'email', 'classId'];
+        const headers = ['TeacherId', 'Name', 'MobileNo', 'Email', 'ClassId'];
 
         const data1 = xlsx.utils.sheet_to_json(worksheet, {
             header: headers,
             defval: '',
             range: 0
         });
-        const data = data1.slice(1);
+        const data = data1.slice(2);
 
         console.log("registerTeacher(): ", data)
         const regexEmail = /^[a-zA-Z0-9._%+-]+@(gmail)\.(com)$/;
         const regexClassId = /^(preprimary|primary[1-2])_[1-3]$/;
 
         for (const row of data) {
-            const isTeacher = await teacherModel.find({ 'teacherId': row.teacherId });
-            const isUser = await userModel.find({ 'id': row.teacherId });
+            const isTeacher = await teacherModel.find({ 'teacherId': row.TeacherId });
+            const isUser = await userModel.find({ 'id': row.TeacherId });
 
-            row.teacherMNo = String(row.teacherMNo);
+            row.MobileNo = String(row.MobileNo);
 
             if (isTeacher.length === 0 && isUser.length === 0) {
-                if (row.teacherMNo.length === 10 && row.teacherId && row.teacherName && row.classId) {
-                    if (!regexEmail.test(row.email)) {
-                        return res.status(400).json({ msg: `Invalid email: ${row.email}` });
+                if (row.MobileNo.length === 10 && row.TeacherId && row.Name && row.ClassId) {
+                    if (!regex.test(row.Email)) {
+                        return res.status(400).json({ msg: `Invalid email: ${row.Email}` });
                     }
 
-                    const cid = row.classId.includes(',') ? row.classId.split(',') : [row.classId];
+                    const cid = row.ClassId.includes(',') ? row.ClassId.split(',') : [row.ClassId];
+
                     for (const cls of cid) {
                         const isClass = await classModel.findOne({ 'classId': cls });
                         if (isClass) {
@@ -323,10 +324,10 @@ const registerTeacher = async (req, res) => {
                     }
 
                     const teacher = {
-                        teacherId: row.teacherId,
-                        teacherName: row.teacherName,
-                        teacherMNo: row.teacherMNo,
-                        email: row.email,
+                        teacherId: row.TeacherId,
+                        teacherName: row.Name,
+                        teacherMNo: row.MobileNo,
+                        email: row.Email,
                         classId: cid,
                     };
 
@@ -344,14 +345,16 @@ const registerTeacher = async (req, res) => {
                     await teacherModel.create(teacher);
 
                     const user = {
-                        id: row.teacherId,
-                        password: row.teacherId,
+                        id: row.TeacherId,
+                        password: row.TeacherId,
                         role: 'teacher'
                     };
                     await userModel.create(user);
 
                 } else {
-                    return res.status(400).json({ msg: `Missing or invalid data: MNo:\n ${row.teacherMNo}, Name: ${row.teacherName}, Id: ${row.teacherId}, classId: ${row.classId}` });
+
+                    return res.status(400).json({ msg: `Missing or invalid data: MNo: ${row.MobileNo}, Name: ${row.Name}, Id: ${row.TeacherId}, classId: ${row.ClassId}` });
+
                 }
             }
             else {
