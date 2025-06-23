@@ -40,17 +40,18 @@ function App() {
             })
                 .catch(err => {
                     console.log(err.response)
-                    setUploadStatus(`Error uploading file : `);
+                    setUploadStatus(`Error uploading file : ${err.response.data.msg}`);
                 })
 
             if (response) {
                 console.log(response)
                 navigate('/admin');
                 setUploadStatus('File uploaded successfully');
+                toast.success("Teachers registered successfully..!")
             }
         } catch (error) {
-            setUploadStatus(`Error uploading file : `);
-            console.error(error.response);
+            setUploadStatus(`Error uploading file : ${error.response}`);
+            console.error(error);
         }
     };
 
