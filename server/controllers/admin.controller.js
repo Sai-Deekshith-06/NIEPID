@@ -1,6 +1,7 @@
 // const loginModel=require('../model/login.model')
 const userModel = require('../models/user.model')
 const teacherModel = require('../models/teacher.model')
+const pendingTeacherModel = require('../models/pendingTeacher.model')
 const studentModel = require('../models/student.model')
 const studentDetailsModel = require('../models/studentDetails.model')
 const classModel = require('../models/class.model')
@@ -20,8 +21,8 @@ const editTeacher = async (req, res) => {
     console.log(req.body)
     const { teacherId, teacherName, email, teacherMNo, classId } = req.body;
     const mno = String(teacherMNo)
-    const regex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
-    if (!regex.test(email)) {
+    const regexEmail = /^[a-zA-Z0-9._%+-]+@(gmail.com)$/;
+    if (!regexEmail.test(email)) {
         return res.status(400).json({ message: `Invalid email: ${email}` });
     } else if (mno.length !== 10) {
         return res.status(400).json({ message: `Invalid Mobile No. : ${teacherMNo}` });
@@ -153,133 +154,46 @@ const registerStudent = async (req, res) => {
     }
 }
 
-// const registerTeacher = async (req, res) => {
-//     try {
-//         // console.log('File buffer:', req.file.buffer);
-//         const workbook = xlsx.read(req.file.buffer, { type: 'buffer' });
-//         // console.log('Workbook:', workbook);
+const vaildateTeacherDetails = async (row) => {
+    msg = "";
+    const isTeacher = await teacherModel.find({ 'teacherId': row.TeacherId });
+    const isUser = await userModel.find({ 'id': row.TeacherId });
+    if (isTeacher.length === 0 && isUser.length === 0) {
+        const regexEmail = /^[a-zA-Z0-9._%+-]+@(gmail.com)$/;
+        const regexClassId = /^(preprimary|primary[1-2])_[1-3]$/;
+        if (row.MobileNo.length !== 10) {
+            msg += `Invalid Mobile No, `;
+        }
+        if (!row.Name || row.Name.trim() === "") {
+            msg += `Invalid Name, `;
+        }
+        if (!row.TeacherId) {
+            msg += `Invalid TeacherId, `;
+        }
+        if (!regexEmail.test(row.Email)) {  //regex -> regexEmail
+            msg += `Invalid email, `;
+        }
 
-//         const sheetName = workbook.SheetNames[0];
-//         // console.log("sheetnames:", workbook.Sheets[sheetName])
-//         const worksheet = workbook.Sheets[sheetName];
-//         // console.log("worksheet:", worksheet)
-//         const headers = ['teacherId', 'teacherName', 'teacherMNo', 'email', 'classId'];
+        const cid = row.ClassId.includes(',') ? row.ClassId.split(',') : [row.ClassId];
+        for (const cls of cid) {
+            const isClass = await classModel.findOne({ 'classId': cls });
+            if (isClass) {
+                msg += `Class ${cls} already exists, `;
+            } else if (!regexClassId.test(cls)) {
+                msg += `Invalid classId: '${cls}', `;
+            }
+        }
 
-//         const data1 = xlsx.utils.sheet_to_json(worksheet, {
-//             header: headers,
-//             defval: '',
-//             range: 0
-//         });
-//         const data = data1.slice(1)
-//         // console.log('Extracted data:', data);
-//         let flag = true;
+    } else {
+        msg += `${row.TeacherId}: TeacherId already exists `;
+    }
 
-//         const newData = data.map(async (row) => {
-
-//             const isTeacher = await teacherModel.find({ 'teacherId': row.teacherId })
-//             const isUser = await userModel.find({ 'id': row.teacherId })
-
-//             // console.log(isTeacher,"----->----->----->----->",isUser);
-//             row.teacherMNo = String(row.teacherMNo)
-
-
-//             if (isTeacher.length == 0 && isUser.length == 0) {
-//                 if (row.teacherMNo.length == 10 && row.teacherId && row.teacherName && row.classId) {
-//                     const regex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
-//                     if (regex.test(row.email)) {
-//                         const no = row.classId.indexOf(",");
-//                         const cid = []
-//                         if (no != -1) {
-//                             row.classId.split(',').map((id) => {
-//                                 cid.push(id);
-//                             })
-//                         }
-//                         else {
-//                             cid.push(row.classId);
-//                         }
-
-//                         cid.map(async (cls) => {
-//                             const isClass = await classModel.findOne({ 'classId': cls });
-//                             if (isClass) {
-//                                 res.status(400).json({ msg: `Class ${cid}//${cls} already Exist` })
-//                                 return
-//                             }
-//                             else if (cls != "preprimary_1" && cls != "preprimary_2" && cls != "preprimary_3" && cls != "primary1_1" && cls != "primary1_2" && cls != "primary1_3" && cls != "primary2_1" && cls != "primary2_2" && cls != "primary2_3") {
-//                                 flag = false
-//                                 console.log("Error-1")
-//                                 res.status(400).json({ msg: `Invalid classId : ${cid}` })
-//                             }
-//                         })
-
-//                         const teacher = {
-//                             teacherId: row.teacherId,
-//                             teacherName: row.teacherName,
-//                             teacherMNo: row.teacherMNo,
-//                             email: row.email,
-//                             classId: cid,
-//                         }
-
-//                         teacher.classId.map(async (classid) => {
-//                             const demoClass = {
-//                                 classId: classid,
-//                                 teacherId: teacher.teacherId,
-//                                 section: classid.split('_')[0],
-//                                 year: classid.split('_')[1],
-//                                 student: []
-//                             }
-//                             await classModel.create(demoClass)
-//                         })
-//                         await teacherModel.create(teacher)
-
-//                         const user = {
-//                             id: row.teacherId,
-//                             password: row.teacherId,
-//                             role: 'teacher'
-//                         }
-//                         await userModel.create(user)
-//                     }
-//                     else {
-//                         flag = false
-//                         console.log("Error-2")
-//                         res.status(400).json({ msg: `Invalid email : ${row.email}` })
-//                     }
-//                 }
-//                 else {
-//                     flag = false
-//                     console.log("Error-3")
-//                     res.status(400).json({ msg: "Error-3" })
-//                 }
-//             }
-//             else {
-//                 flag = false
-//                 console.log("Error-4")
-//             }
-//         })
-
-//         // console.log(newData)
-//         if (flag)
-//             res.json({ success: true });
-//     }
-//     catch (error) {
-//         console.error('Error reading file:', error);
-//         res.status(500).json({ success: false, error: 'Error reading file' });
-//     }
-// }
-
-// const viewStudent = async (req, res) => {
-//     try {
-//         console.log("---------")
-//         const students = await studentModel.find({});
-//         if (students.length) {
-//             res.status(200).json({ status: "success", data: students });
-//         } else {
-//             res.status(200).json({ status: "success", data: [] });
-//         }
-//     } catch (error) {
-//         console.error("Error fetching students:", error);
-//         res.status(500).json({ status: "error", message: "Internal server error" });
-//     }
-// };
+    if (msg === "") {
+        return { status: true, msg: "Valid" };
+    } else {
+        return { status: false, msg: msg };
+    }
+}
 
 const registerTeacher = async (req, res) => {
     try {
@@ -296,72 +210,57 @@ const registerTeacher = async (req, res) => {
         const data = data1.slice(2);
 
         console.log("registerTeacher(): ", data)
-        const regexEmail = /^[a-zA-Z0-9._%+-]+@(gmail)\.(com)$/;
-        const regexClassId = /^(preprimary|primary[1-2])_[1-3]$/;
 
         for (const row of data) {
-            const isTeacher = await teacherModel.find({ 'teacherId': row.TeacherId });
-            const isUser = await userModel.find({ 'id': row.TeacherId });
-
             row.MobileNo = String(row.MobileNo);
+            const vaildateTeacherDetailsRow = await vaildateTeacherDetails(row)
+            const cid = row.ClassId.includes(',') ? row.ClassId.split(',') : [row.ClassId];
+            if (vaildateTeacherDetailsRow.status) {
+                const teacher = {
+                    teacherId: row.TeacherId,
+                    teacherName: row.Name,
+                    teacherMNo: row.MobileNo,
+                    email: row.Email,
+                    classId: cid,
+                };
 
-            if (isTeacher.length === 0 && isUser.length === 0) {
-                if (row.MobileNo.length === 10 && row.TeacherId && row.Name && row.ClassId) {
-                    if (!regexEmail.test(row.Email)) {  //regex -> regexEmail
-                        return res.status(400).json({ msg: `${row.TeacherId}: Invalid email: ${row.Email}` });
-                    }
-
-                    const cid = row.ClassId.includes(',') ? row.ClassId.split(',') : [row.ClassId];
-
-                    for (const cls of cid) {
-                        const isClass = await classModel.findOne({ 'classId': cls });
-                        if (isClass) {
-                            return res.status(400).json({ msg: `${row.TeacherId}: Class ${cls} already exists` });
-                            // } else if (!['preprimary_1', 'preprimary_2', 'preprimary_3', 'primary1_1', 'primary1_2', 'primary1_3', 'primary2_1', 'primary2_2', 'primary2_3'].includes(cls)) {
-                        } else if (!regexClassId.test(cls)) {
-                            return res.status(400).json({ msg: `${row.TeacherId}: Invalid classId: '${cls}', Valid class ID's : [ preprimary_(1,2,3), primary(1,2)_(1,2,3) ]` });
-                        }
-                    }
-
-                    const teacher = {
-                        teacherId: row.TeacherId,
-                        teacherName: row.Name,
-                        teacherMNo: row.MobileNo,
-                        email: row.Email,
-                        classId: cid,
+                for (const classid of cid) {
+                    const demoClass = {
+                        classId: classid,
+                        teacherId: teacher.teacherId,
+                        section: classid.split('_')[0],
+                        year: classid.split('_')[1],
+                        student: []
                     };
-
-                    for (const classid of cid) {
-                        const demoClass = {
-                            classId: classid,
-                            teacherId: teacher.teacherId,
-                            section: classid.split('_')[0],
-                            year: classid.split('_')[1],
-                            student: []
-                        };
-                        await classModel.create(demoClass);
-                    }
-
-                    await teacherModel.create(teacher);
-
-                    const user = {
-                        id: row.TeacherId,
-                        password: row.TeacherId,
-                        role: 'teacher'
-                    };
-                    await userModel.create(user);
-
-                } else {
-
-                    return res.status(400).json({ msg: `${row.TeacherId}: Missing or invalid data: MNo: ${row.MobileNo}, Name: ${row.Name}, Id: ${row.TeacherId}, classId: ${row.ClassId}` });
-
+                    await classModel.create(demoClass);
                 }
-            }
-            else {
-                return res.status(400).json({ msg: `${row.TeacherId}: TeacherId already exist` });
+
+                await teacherModel.create(teacher);
+
+                const user = {
+                    id: row.TeacherId,
+                    password: row.TeacherId,
+                    role: 'teacher'
+                };
+                await userModel.create(user);
+
+            } else {
+
+                const pendingTeacher = {
+                    teacherId: row.TeacherId,
+                    teacherName: row.Name,
+                    teacherMNo: row.MobileNo,
+                    email: row.Email,
+                    classId: cid,
+                    msg: vaildateTeacherDetailsRow.msg
+                };
+                await pendingTeacherModel.create(pendingTeacher);
+                // return res.status(400).json({ msg: `${row.TeacherId}: Missing or invalid data: MNo: ${row.MobileNo}, Name: ${row.Name}, Id: ${row.TeacherId}, classId: ${row.ClassId}` });
             }
         }
-
+        //             else {
+        //     return res.status(400).json({ msg: `${row.TeacherId}: TeacherId already exist` });
+        // }
         res.json({ success: true });
     } catch (error) {
         console.error('registerTeacher(): Error reading file:', error);
@@ -400,6 +299,20 @@ const viewTeacher = async (req, res) => {
     }
     catch (error) {
         res.status(404).send(false)
+    }
+}
+
+const pendingTeacher = async (req, res) => {
+    try {
+        const pendingteachers = await pendingTeacherModel.find({});
+        if (pendingteachers) {
+            res.status(200).json({ status: "success", data: pendingteachers, count: pendingteachers.length })
+        }
+        else {
+            res.status(405).json({ status: "success", data: [], count: 0 })
+        }
+    } catch (error) {
+        res.status(404).json("Error")
     }
 }
 
@@ -458,6 +371,7 @@ module.exports = {
     registerTeacher,
     viewStudent,
     viewTeacher,
+    pendingTeacher,
     downloadExcel,
     editTeacher,
     getTeacher,

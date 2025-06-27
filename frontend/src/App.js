@@ -11,6 +11,7 @@ import Principal from "./pages/Principal";
 import Student from "./pages/Student";
 import StudentEval from "./pages/StudentEval";
 import ViewTeachers from "./pages/ViewTeachers";
+import EditTeachers from "./pages/EditTeachers";
 import ViewStudents from "./pages/ViewStudents";
 import PrincipalViewStudents from "./pages/PrincipalViewStudents";
 import Front from "./pages/evaluate/Front";
@@ -54,6 +55,7 @@ export default function App() {
             <Route exact path="/admin" element={<Admin />} />
             <Route exact path="/admin/addstudents" element={<AddStudents />} />
             <Route exact path="/admin/viewteachers" element={<ViewTeachers />} />
+            <Route exact path="/admin/editteachers" element={<EditTeachers />} />
             <Route exact path="/admin/viewstudents" element={<ViewStudents />} />
             <Route exact path="/admin/viewstudents/details/:studentId" element={<StudentDetails />} />
             <Route exact path="/admin/viewstudents/history/:studentId" element={<History />} />

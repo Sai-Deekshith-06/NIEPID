@@ -540,13 +540,13 @@ const styles = {
     cursor: "pointer",
     borderRadius: "5px",
   },
-  input: {
-    width: "100%",
-    padding: "8px",
-    border: "1px solid #ddd",
-    borderRadius: "4px",
-    boxSizing: "border-box",
-  },
+  // input: {
+  //   width: "100%",
+  //   padding: "8px",
+  //   border: "1px solid #ddd",
+  //   borderRadius: "4px",
+  //   boxSizing: "border-box",
+  // },
   header: {
     display: "flex",
     justifyContent: "space-between",
@@ -594,7 +594,7 @@ const styles = {
     cursor: "pointer",
   },
   modal: {
-    display: "block",
+    // display: "block",
     position: "fixed",
     zIndex: 1,
     left: 0,

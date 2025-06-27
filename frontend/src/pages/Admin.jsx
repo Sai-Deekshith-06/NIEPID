@@ -45,9 +45,9 @@ function App() {
 
             if (response) {
                 console.log(response)
-                navigate('/admin');
                 setUploadStatus('File uploaded successfully');
-                toast.success("Teachers registered successfully..!")
+                toast.success('File uploaded successfully')
+                navigate('/admin/editteachers');
             }
         } catch (error) {
             setUploadStatus(`Error uploading file : ${error.response}`);
@@ -116,6 +116,9 @@ function App() {
     const handleViewTeachers = () => {
         navigate('/admin/viewteachers');
     };
+    const handleViewPendingTeachers = () => {
+        navigate('/admin/editteachers');
+    };
 
     const handleViewStudents = () => {
         navigate('/admin/viewstudents');
@@ -154,6 +157,16 @@ function App() {
                                     View
                                 </button>
                                 <p style={styles.buttonDescription}>View registered teachers.</p>
+                                {/* </div>
+                            <div style={styles.buttonWrapper}> */}
+                                <button
+                                    type="button"
+                                    onClick={() => handleViewPendingTeachers()}
+                                    style={styles.button}
+                                >
+                                    View Pending Teachers
+                                </button>
+                                <p style={styles.buttonDescription}>View unregistered teachers.</p>
                             </div>
                             <div style={styles.buttonWrapper}>
                                 <button
