@@ -80,30 +80,6 @@ const styles = {
     },
 };
 
-// const Header = () => (
-//     <header style={styles.header}>
-//         <div style={styles.logo}>
-//             <img src={image} alt="Logo" style={styles.logoImage} />
-//             <span style={styles.logoLabel}>NIEPID</span>
-//         </div>
-//         <button onClick={() => {
-//                 const role = localStorage.getItem("role");
-//                 if (role === "student")
-//                     navigate('/student')
-//                 if (role === "teacher")
-//                     navigate('/teacher')
-//                 if (role === "principal")
-//                     navigate('/principal/viewstudents')
-//                 if (role === "admin")
-//                     navigate('/admin/viewstudents')
-//             }} style={styles.backButton}>Back</button>
-//     </header>
-// );
-
-// const Footer = () => (
-//     <footer style={styles.footer}>&copy; 2024 Student History Portal</footer>
-// );
-
 const StudentPerformance = () => {
     const navigate = useNavigate()
     const id = localStorage.getItem("studentId")
@@ -161,330 +137,198 @@ const StudentPerformance = () => {
     const Footer = () => (
         <footer style={styles.footer}>&copy; 2024 Student History Portal</footer>
     );
-    useEffect(async () => {
-        console.log("hello")
-        if (role === "teacher") {
+    useEffect(() => { // Changed to async function for async/await
+        const fetchData = async () => {
             console.log("hello")
-            await axios.get("http://localhost:4000/teacher/abc", {
-                headers: {
-                    id: id,
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            })
-                .then(res => {
-                    // console.log(res)
-                    if (res.status != 200) {
-                        toast.error("Student is still in 1st Year", {
-                            position: "top-right",
-                        });
-                        navigate('/teacher')
+            if (role === "teacher") {
+                console.log("hello")
+                await axios.get("http://localhost:4000/teacher/abc", {
+                    headers: {
+                        id: id,
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${localStorage.getItem("token")}`
                     }
-                    console.log(res)
-                    setStudentInfo(res.data)
+                })
+                    .then(res => {
+                        if (res.status !== 200) { // Corrected != to !== for strict comparison
+                            toast.error("Student is still in 1st Year", {
+                                position: "top-right",
+                            });
+                            navigate('/teacher')
+                        }
+                        console.log(res)
+                        setStudentInfo(res.data)
+                        // Initialize selectedSection and selectedYear based on fetched data
+                        if (res.data.section && res.data.section.length > 0) {
+                            setSelectedSection(res.data.section[0].sec);
+                            if (res.data.section[0].yearReport && res.data.section[0].yearReport.length > 0) {
+                                setSelectedYear(res.data.section[0].yearReport[0].year);
+                            }
+                        }
 
-                })
-                .catch(err => {
-                    console.log(err)
-                    console.log(err.response)
-                })
-        }
-        else if (role === "principal") {
-            console.log(role)
-            console.log(id)
-            axios.get("http://localhost:4000/principal/student/viewHistory", {
-                headers: {
-                    id: id,
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            })
-                .then(res => {
-                    // console.log(res)
-                    if (res.status != 200) {
-                        toast.error("Student is still in 1st Year", {
-                            position: "top-right",
-                        });
-                        navigate('/principal/viewStudents')
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        console.log(err.response)
+                        if (err.response && err.response.status === 404) {
+                            toast.error("Student data not found or still in 1st Year", {
+                                position: "top-right",
+                            });
+                            navigate('/teacher');
+                        }
+                    })
+            }
+            else if (role === "principal") {
+                console.log(role)
+                console.log(id)
+                axios.get("http://localhost:4000/principal/student/viewHistory", {
+                    headers: {
+                        id: id,
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${localStorage.getItem("token")}`
                     }
-                    setStudentInfo(res.data)
+                })
+                    .then(res => {
+                        if (res.status !== 200) {
+                            toast.error("Student is still in 1st Year", {
+                                position: "top-right",
+                            });
+                            navigate('/principal/viewStudents')
+                        }
+                        setStudentInfo(res.data)
+                        if (res.data.section && res.data.section.length > 0) {
+                            setSelectedSection(res.data.section[0].sec);
+                            if (res.data.section[0].yearReport && res.data.section[0].yearReport.length > 0) {
+                                setSelectedYear(res.data.section[0].yearReport[0].year);
+                            }
+                        }
+                    })
+                    .catch(err => {
+                        console.log(err.response)
+                        if (err.response && err.response.status === 404) {
+                            toast.error("Student data not found or still in 1st Year", {
+                                position: "top-right",
+                            });
+                            navigate('/principal/viewStudents');
+                        }
+                    })
+            }
+            else if (role === "admin") {
+                axios.get("http://localhost:4000/admin/student/viewHistory", {
+                    headers: {
+                        id: id,
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${localStorage.getItem("token")}`
+                    }
+                })
+                    .then(res => {
+                        if (res.status !== 200) {
+                            toast.error("Student is still in 1st Year", {
+                                position: "top-right",
+                            });
+                            navigate('/admin/viewStudents')
+                        }
+                        setStudentInfo(res.data)
+                        if (res.data.section && res.data.section.length > 0) {
+                            setSelectedSection(res.data.section[0].sec);
+                            if (res.data.section[0].yearReport && res.data.section[0].yearReport.length > 0) {
+                                setSelectedYear(res.data.section[0].yearReport[0].year);
+                            }
+                        }
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        if (err.response && err.response.status === 404) {
+                            toast.error("Student data not found or still in 1st Year", {
+                                position: "top-right",
+                            });
+                            navigate('/admin/viewStudents');
+                        }
+                    })
+            } else if (role === "student") {
+                console.log("student")
+                const id1 = localStorage.getItem('regNo')
+                console.log(id1)
+                axios.get("http://localhost:4000/student/viewHistory", {
+                    headers: {
+                        id: id1,
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${localStorage.getItem("token")}`
+                    }
+                })
+                    .then(res => {
+                        if (res.status !== 200) {
+                            toast.error("Student is still in 1st Year", {
+                                position: "top-right",
+                            });
+                            navigate('/student')
+                        }
+                        setStudentInfo(res.data)
+                        if (res.data.section && res.data.section.length > 0) {
+                            setSelectedSection(res.data.section[0].sec);
+                            if (res.data.section[0].yearReport && res.data.section[0].yearReport.length > 0) {
+                                setSelectedYear(res.data.section[0].yearReport[0].year);
+                            }
+                        }
+                    })
+                    .catch(err => {
+                        console.log(err.response)
+                        if (err.response && err.response.status === 404) {
+                            toast.error("Student data not found or still in 1st Year", {
+                                position: "top-right",
+                            });
+                            navigate('/student');
+                        }
+                    })
+            }
+        };
 
-                })
-                .catch(err => {
-                    console.log(err.response)
-                })
-        }
-        else if (role === "admin") {
-            axios.get("http://localhost:4000/admin/student/viewHistory", {
-                headers: {
-                    id: id,
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            })
-                .then(res => {
-                    // console.log(res)
-                    if (res.status != 200) {
-                        toast.error("Student is still in 1st Year", {
-                            position: "top-right",
-                        });
-                        navigate('/admin/viewStudents')
-                    }
-                    setStudentInfo(res.data)
-                })
-                .catch(err => {
-                    //console.log(err.response)
-                })
-        } else if (role === "student") {
-            console.log("student")
-            const id1 = localStorage.getItem('regNo')
-            console.log(id1)
-            axios.get("http://localhost:4000/student/viewHistory", {
-                headers: {
-                    id: id1,
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            })
-                .then(res => {
-                    // console.log(res)
-                    if (res.status != 200) {
-                        toast.error("Student is still in 1st Year", {
-                            position: "top-right",
-                        });
-                        navigate('/student')
-                    }
-                    setStudentInfo(res.data)
-
-                })
-                .catch(err => {
-                    console.log(err.response)
-                })
-        }
+        fetchData();
     }, [])
 
     const [studentInfo, setStudentInfo] = useState({
-        name: "rohanKrishna",
-        regNo: "22B81A6599",
-        currYear: "3",
-        currSection: "primary",
-        classId: "primary_3",
-        section: [
-            {
-                sec: "preprimary",
-                yearReport: [
-                    {
-                        year: "1",
-                        termReport: [
-                            {
-                                term: "Entry",
-                                percent: {
-                                    personalPercent: 75,
-                                    socialPercent: 60,
-                                    academicPercent: 85,
-                                    occupationalPercent: 70,
-                                    recreationalPercent: 80,
-                                    mode: "A"
-                                },
-                                comment: {
-                                    termComment: "Good progress overall.",
-                                    personalComment: "Needs improvement in behavior.",
-                                    occupationalComment: "Not interested in occupational activities.",
-                                    recreationalComment: "Active participation in recreational activities.",
-                                    academicComment: "Shows potential in academics.",
-                                    socialComment: "Could improve social interaction."
-                                }
-                            },
-                            {
-                                term: "I",
-                                percent: {
-                                    personalPercent: 70,
-                                    socialPercent: 70,
-                                    academicPercent: 90,
-                                    occupationalPercent: 60,
-                                    recreationalPercent: 85,
-                                    mode: "B"
-                                },
-                                comment: {
-                                    termComment: "Steady progress observed.",
-                                    personalComment: "Showing improvement in behavior.",
-                                    occupationalComment: "Not interested in occupational activities.",
-                                    recreationalComment: "Enjoying recreational activities.",
-                                    academicComment: "Consistent performance in academics.",
-                                    socialComment: "Good interaction with peers."
-                                }
-                            },
-                            {
-                                term: "II",
-                                percent: {
-                                    personalPercent: 80,
-                                    socialPercent: 75,
-                                    academicPercent: 88,
-                                    occupationalPercent: 80,
-                                    recreationalPercent: 70,
-                                    mode: "C"
-                                },
-                                comment: {
-                                    termComment: "Excellent start to the year.",
-                                    personalComment: "Behavior has improved significantly.",
-                                    occupationalComment: "Not interested in occupational activities.",
-                                    recreationalComment: "Engaging in recreational activities.",
-                                    academicComment: "Improving consistently in academics.",
-                                    socialComment: "Good interaction with peers."
-                                }
-                            },
-                            {
-                                term: "III",
-                                percent: {
-                                    personalPercent: 85,
-                                    socialPercent: 80,
-                                    academicPercent: 90,
-                                    occupationalPercent: 90,
-                                    recreationalPercent: 65,
-                                    mode: "D"
-                                },
-                                comment: {
-                                    termComment: "Strong finish to the year.",
-                                    personalComment: "Consistently good behavior.",
-                                    occupationalComment: "Not interested in occupational activities.",
-                                    recreationalComment: "Participating in recreational activities.",
-                                    academicComment: "Excellent performance in academics.",
-                                    socialComment: "Excellent interaction with peers."
-                                }
-                            }
-                        ],
-                        percent: {
-                            personalPercent: 75,
-                            socialPercent: 60,
-                            academicPercent: 85,
-                            occupationalPercent: 80,
-                            recreationalPercent: 80,
-                            mode: "A"
-                        },
-                        comment: {
-                            termComment: "Good progress overall.",
-                            personalComment: "Needs improvement in behavior.",
-                            occupationalComment: "Not interested in occupational activities.",
-                            recreationalComment: "Active participation in recreational activities.",
-                            academicComment: "Shows potential in academics.",
-                            socialComment: "Could improve social interaction."
-                        }
-                    },
-                ]
-            },
-            {
-                sec: "primary",
-                yearReport: [
-                    {
-                        year: "1",
-                        termReport: [
-                            {
-                                term: "Entry",
-                                percent: {
-                                    personalPercent: 82,
-                                    socialPercent: 78,
-                                    academicPercent: 89,
-                                    occupationalPercent: 40,
-                                    recreationalPercent: 75,
-                                    mode: "A"
-                                },
-                                comment: {
-                                    termComment: "Strong start to the year.",
-                                    personalComment: "Consistently good behavior.",
-                                    occupationalComment: "Not interested in occupational activities.",
-                                    recreationalComment: "Active participation in recreational activities.",
-                                    academicComment: "Excellent performance in academics.",
-                                    socialComment: "Excellent interaction with peers."
-                                }
-                            },
-                            {
-                                term: "I",
-                                percent: {
-                                    personalPercent: 85,
-                                    socialPercent: 80,
-                                    academicPercent: 92,
-                                    occupationalPercent: 60,
-                                    recreationalPercent: 80,
-                                    mode: "B"
-                                },
-                                comment: {
-                                    termComment: "Consistently strong performance.",
-                                    personalComment: "Excellent behavior throughout the term.",
-                                    occupationalComment: "Not interested in occupational activities.",
-                                    recreationalComment: "Enjoying recreational activities.",
-                                    academicComment: "Outstanding academic achievements.",
-                                    socialComment: "Excellent interaction with peers."
-                                }
-                            },
-                            {
-                                term: "II",
-                                percent: {
-                                    personalPercent: 88,
-                                    socialPercent: 82,
-                                    academicPercent: 95,
-                                    occupationalPercent: 90,
-                                    recreationalPercent: 85,
-                                    mode: "C"
-                                },
-                                comment: {
-                                    termComment: "Exceptional progress this term.",
-                                    personalComment: "Excellent behavior and attitude.",
-                                    occupationalComment: "Not interested in occupational activities.",
-                                    recreationalComment: "Participating actively in recreational activities.",
-                                    academicComment: "Consistently outstanding academic performance.",
-                                    socialComment: "Excellent interaction with peers."
-                                }
-                            },
-                            {
-                                term: "III",
-                                percent: {
-                                    personalPercent: 90,
-                                    socialPercent: 85,
-                                    academicPercent: 98,
-                                    occupationalPercent: 80,
-                                    recreationalPercent: 90,
-                                    mode: "D"
-                                },
-                                comment: {
-                                    termComment: "Outstanding end to the year.",
-                                    personalComment: "Exemplary behavior and dedication.",
-                                    occupationalComment: "Not interested in occupational activities.",
-                                    recreationalComment: "Actively participates in recreational activities.",
-                                    academicComment: "Outstanding academic achievements.",
-                                    socialComment: "Exceptional interaction with peers."
-                                }
-                            }
-                        ],
-                        percent: {
-                            personalPercent: 75,
-                            socialPercent: 60,
-                            academicPercent: 85,
-                            occupationalPercent: 70,
-                            recreationalPercent: 80,
-                            mode: "A"
-                        },
-                        comment: {
-                            termComment: "Good progress overall.",
-                            personalComment: "Needs improvement in behavior.",
-                            occupationalComment: "Not interested in occupational activities.",
-                            recreationalComment: "Active participation in recreational activities.",
-                            academicComment: "Shows potential in academics.",
-                            socialComment: "Could improve social interaction."
-                        }
-                    },
-                ]
-            }
-        ]
+        name: "Loading...",
+        regNo: "Loading...",
+        currYear: "Loading...",
+        currSection: "Loading...",
+        classId: "Loading...",
+        section: [] // Initialize as empty array to prevent issues before data loads
     });
 
-    const [selectedSection, setSelectedSection] = useState(studentInfo.section[0].sec);
-    const [selectedYear, setSelectedYear] = useState("1");
+    // Initialize selectedSection and selectedYear with valid defaults or based on fetched data
+    const [selectedSection, setSelectedSection] = useState("");
+    const [selectedYear, setSelectedYear] = useState("");
+
+    useEffect(() => {
+        if (studentInfo.section && studentInfo.section.length > 0) {
+            // Only set initial section and year if they haven't been set or if the fetched data is different
+            if (!selectedSection || !studentInfo.section.some(sec => sec.sec === selectedSection)) {
+                setSelectedSection(studentInfo.section[0].sec);
+            }
+            const currentSelectedSectionData = studentInfo.section.find(sec => sec.sec === (selectedSection || studentInfo.section[0].sec));
+            if (currentSelectedSectionData && currentSelectedSectionData.yearReport && currentSelectedSectionData.yearReport.length > 0) {
+                if (!selectedYear || !currentSelectedSectionData.yearReport.some(yr => yr.year === selectedYear)) {
+                    setSelectedYear(currentSelectedSectionData.yearReport[0].year);
+                }
+            } else {
+                setSelectedYear(""); // Reset year if no reports are available for the section
+            }
+        }
+    }, [studentInfo, selectedSection]); // Depend on studentInfo and selectedSection
 
     const selectedSectionData = studentInfo.section.find(section => section.sec === selectedSection);
-    const selectedYearData = selectedSectionData.yearReport.find(year => year.year === selectedYear);
+    console.log(selectedSectionData)
+    // Removed the toast here, as it can be triggered on initial render when data is not yet loaded
+    // if (!selectedSectionData) {
+    //     toast.info("No tests are evaluated yet")
+    //     // navigate('/admin/viewstudents')
+    // }
+
+    const selectedYearData = selectedSectionData?.yearReport.find(year => year.year === selectedYear);
     //console.log(studentInfo)
 
-    const chartData = {
+    // Conditional rendering for chartData to prevent error if selectedYearData or termReport is undefined
+    const chartData = selectedYearData && selectedYearData.termReport ? {
         labels: ['Personal', 'Social', 'Academic', 'Occupational'],
         datasets: [
             ...selectedYearData.termReport.map(termData => ({
@@ -494,7 +338,6 @@ const StudentPerformance = () => {
                     termData.percent.socialPercent,
                     termData.percent.academicPercent,
                     termData.percent.occupationalPercent,
-                    //termData.percent.recreationalPercent
                 ],
                 backgroundColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.5)`
             })),
@@ -507,7 +350,6 @@ const StudentPerformance = () => {
                         selectedYearData.termReport.reduce((acc, termData) => acc + termData.percent.socialPercent, 0) / selectedYearData.termReport.length,
                         selectedYearData.termReport.reduce((acc, termData) => acc + termData.percent.academicPercent, 0) / selectedYearData.termReport.length,
                         selectedYearData.termReport.reduce((acc, termData) => acc + termData.percent.occupationalPercent, 0) / selectedYearData.termReport.length,
-                        //selectedYearData.termReport.reduce((acc, termData) => acc + termData.percent.recreationalPercent, 0) / selectedYearData.termReport.length
                     ],
                     backgroundColor: 'rgba(255, 99, 132, 0.5)',
                     borderWidth: 1
@@ -515,7 +357,7 @@ const StudentPerformance = () => {
                 : []
             )
         ]
-    };
+    } : { labels: [], datasets: [] }; // Provide empty data if no selectedYearData or termReport
 
     const options = {
         scales: {
@@ -543,21 +385,29 @@ const StudentPerformance = () => {
                     <label style={styles.label}>
                         Section:
                         <select value={selectedSection} onChange={(e) => setSelectedSection(e.target.value)} style={styles.select}>
-                            {studentInfo.section.map(sec => (
-                                <option key={sec.sec} value={sec.sec}>{replacePrimaryLabels(sec.sec)}</option>
-                            ))}
+                            {studentInfo.section.length > 0 ? (
+                                studentInfo.section.map(sec => (
+                                    <option key={sec.sec} value={sec.sec}>{replacePrimaryLabels(sec.sec)}</option>
+                                ))
+                            ) : (
+                                <option value="">No sections available</option>
+                            )}
                         </select>
                     </label>
                     <label style={styles.label}>
                         Year:
                         <select value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)} style={styles.select}>
-                            {selectedSectionData.yearReport.map(year => (
-                                <option key={year.year} value={year.year}>{year.year}</option>
-                            ))}
+                            {selectedSectionData && selectedSectionData.yearReport.length > 0 ? (
+                                selectedSectionData.yearReport.map(year => (
+                                    <option key={year.year} value={year.year}>{year.year}</option>
+                                ))
+                            ) : (
+                                <option value="">No years available</option>
+                            )}
                         </select>
                     </label>
                 </div>
-                {selectedYearData ? (
+                {selectedYearData && selectedYearData.termReport && selectedYearData.termReport.length > 0 ? (
                     <>
                         <div className="chart-container">
                             <h2>Percentage Breakdown by Term</h2>
@@ -586,22 +436,23 @@ const StudentPerformance = () => {
                                     <p><strong>Social:</strong> {selectedYearData.percent.socialPercent}%</p>
                                     <p><strong>Academic:</strong> {selectedYearData.percent.academicPercent}%</p>
                                     <p><strong>Occupational:</strong> {selectedYearData.percent.occupationalPercent}%</p>
-                                    <p><strong>Recreational:</strong> {selectedYearData.percent.mode}%</p>
+                                    <p><strong>Recreational:</strong> {selectedYearData.percent.mode}%</p> {/* This was recreationalPercent in the initial state, check model */}
                                 </div>
                                 <div className="year-summary-box">
                                     <h3>Year Comments</h3>
-                                    <p><strong>Year Comment:</strong>{selectedYearData.comment.yearComment}</p>
-                                    <p><strong>Personal Comment:</strong>{selectedYearData.comment.yearPersonalComment}</p>
-                                    <p><strong>Social Comment:</strong>{selectedYearData.comment.yearSocialComment}</p>
-                                    <p><strong>Academic Comment:</strong>{selectedYearData.comment.yearAcademicComment}</p>
-                                    <p><strong>Occupational Comment:</strong>{selectedYearData.comment.yearOccupationalComment}</p>
-                                    <p><strong>Recreational Comment:</strong>{selectedYearData.comment.yearRecreationalComment}</p>
+                                    {/* These year comments are not present in the initial state `studentInfo` or `student.model.js` structure for `comment` inside `yearReport`. You might need to adjust your model and fetched data to include these. For now, assuming they exist or rendering empty if not. */}
+                                    <p><strong>Year Comment:</strong>{selectedYearData.comment?.yearComment}</p>
+                                    <p><strong>Personal Comment:</strong>{selectedYearData.comment?.yearPersonalComment}</p>
+                                    <p><strong>Social Comment:</strong>{selectedYearData.comment?.yearSocialComment}</p>
+                                    <p><strong>Academic Comment:</strong>{selectedYearData.comment?.yearAcademicComment}</p>
+                                    <p><strong>Occupational Comment:</strong>{selectedYearData.comment?.yearOccupationalComment}</p>
+                                    <p><strong>Recreational Comment:</strong>{selectedYearData.comment?.yearRecreationalComment}</p>
                                 </div>
                             </div>
                         </div>
                     </>
                 ) : (
-                    <p>No data available for the selected year.</p>
+                    <p>No data available for the selected year or term reports.</p>
                 )}
             </div>
             <Footer />

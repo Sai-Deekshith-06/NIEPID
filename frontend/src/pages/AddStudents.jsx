@@ -12,7 +12,6 @@ const useStyles = createUseStyles({
         display: 'flex',
         flexDirection: 'column',
         maxWidth: '900px',
-        width: '100%',
         margin: 'auto',
         padding: '28px',
         border: '1px solid #e0e0e0',
@@ -57,10 +56,10 @@ const useStyles = createUseStyles({
         color: '#f00',
     },
     textInput: {
-        padding: '8px',
+        padding: '8px 0px 8px 8px',
         marginTop: '5px',
         marginBottom: '20px',
-        marginRight: '20px',
+        marginRight: '24px',
         width: '100%',
         borderRadius: '6px',
         border: '1px solid #ccc',
@@ -75,10 +74,10 @@ const useStyles = createUseStyles({
         },
     },
     requiredtextInput: {
-        padding: '8px',
+        padding: '8px 0px 8px 8px',
         marginTop: '5px',
         marginBottom: '20px',
-        marginRight: '20px',
+        marginRight: '24px',
         width: '100%',
         borderRadius: '6px',
         border: '1px solid #f00',
@@ -119,6 +118,8 @@ const useStyles = createUseStyles({
     },
     tableContainer: {
         marginTop: '40px',
+        marginRight: '30px',
+        padding: '10px'
     },
     tableTitle: {
         fontSize: '30px',
@@ -611,7 +612,7 @@ function AddStudents() {
                                     navigate('/admin/viewstudents')
                                 })
                                 .catch(err => {
-                                    toast.error("Error");
+                                    toast.error("Error: " + err.response.data);
                                     console.log(err.response)
                                     return;
                                 })

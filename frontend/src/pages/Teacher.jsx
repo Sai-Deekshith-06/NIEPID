@@ -120,9 +120,9 @@ export default function Home() {
           {Object.keys(students).length > 0 ? (
             Object.keys(students).map((classId) => (
               <div key={classId} style={styles.classContainer}>
-                <h3>{replacePrimaryLabels(students[classId][0].classId)}</h3>
+                <h3>{replacePrimaryLabels(students[classId][0]?.classId)}</h3>
                 {students[classId].map((student) => (
-                  <div key={student.id} style={styles.student}>
+                  <div key={student.regNo} style={styles.student}>
                     <p>{student.regNo} __ {student.name}</p>
                     <div>
                       <button

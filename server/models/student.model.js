@@ -28,18 +28,18 @@ const StudentReport = new mongoose.Schema({
     },
     classId: {
         type: String,
-        required : true
+        required: true
     },
     section: [{
         status: {
             type: String,
-            enum: ['pass','promote','ongoing'],
-            default : "ongoing"
+            enum: ['pass', 'promoted', 'ongoing'],
+            default: "ongoing"
         },
         sec: {
             type: String,
             required: true,
-            enum: ['preprimary', 'primary1','primary2']
+            enum: ['preprimary', 'primary1', 'primary2']
         },
         yearReport: [{
             year: {
@@ -116,55 +116,55 @@ const StudentReport = new mongoose.Schema({
                 },
                 percent: {//Term Performance
                     personalPercent: {
-                        type : Number,
-                        default : null
+                        type: Number,
+                        default: null
                     },
                     socialPercent: {
-                        type : Number,
-                        default : null
+                        type: Number,
+                        default: null
                     },
                     academicPercent: {
-                        type : Number,
-                        default : null
+                        type: Number,
+                        default: null
                     },
                     occupationalPercent: {
-                        type : Number,
-                        default : null
+                        type: Number,
+                        default: null
                     },
                     recreationalPercent: {
-                        type : Number,
-                        default : null
+                        type: Number,
+                        default: null
                     },
                     mode: {
                         type: String,
                         enum: ["", "A", "B", "C", "D", "E"],
-                        default : ""
+                        default: ""
                     },
                 },
                 comment: {//Term Comments
                     termComment: {
-                        type : String,
-                        default : ""
+                        type: String,
+                        default: ""
                     },
                     personalComment: {
-                        type : String,
-                        default : ""
+                        type: String,
+                        default: ""
                     },
                     occupationalComment: {
-                        type : String,
-                        default : ""
+                        type: String,
+                        default: ""
                     },
                     recreationalComment: {
-                        type : String,
-                        default : ""
+                        type: String,
+                        default: ""
                     },
                     academicComment: {
-                        type : String,
-                        default : ""
+                        type: String,
+                        default: ""
                     },
                     socialComment: {
-                        type : String,
-                        default : ""
+                        type: String,
+                        default: ""
                     },
                 }
             }],
@@ -220,6 +220,10 @@ const StudentReport = new mongoose.Schema({
                     enum: ["", "A", "B", "C", "D", "E"],
                     default: ""
                 },
+                total: {
+                    type: Number,
+                    default: null
+                }
             },
         }]
     }]

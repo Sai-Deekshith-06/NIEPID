@@ -123,7 +123,7 @@ const Front = () => {
       .catch(err => {
         console.log(err)
       })
-  })
+  }, [id])
 
   const handleSubmit = async () => {
     await axios.post("http://localhost:4000/teacher/termTypeComment", {

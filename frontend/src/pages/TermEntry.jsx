@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import image from './th.jpeg';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const Front = () => {
     const navigate = useNavigate();
@@ -149,7 +150,11 @@ const Front = () => {
                 },
             })
                 .then(res => {
+                    toast.success("Comments saved successfully..!")
                     console.log(res.data)
+                }).catch(err => {
+                    console.log(err)
+                    toast.error(`Error saving comments: ${err.response.data.msg}`)
                 })
         } catch (err) {
             console.log(err.response);

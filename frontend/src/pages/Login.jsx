@@ -25,8 +25,8 @@ function Login() {
       window.open('/student', '_self');
       return;
     }
-    else if (role === "principle") {
-      window.open('/principle', '_self');
+    else if (role === "principal") {
+      window.open('/principal', '_self');
       return;
     }
     else {

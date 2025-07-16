@@ -164,7 +164,7 @@ function App() {
                                     onClick={() => handleViewPendingTeachers()}
                                     style={styles.button}
                                 >
-                                    View Pending Teachers
+                                    View Upload Errors
                                 </button>
                                 <p style={styles.buttonDescription}>View unregistered teachers.</p>
                             </div>
