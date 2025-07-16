@@ -12,33 +12,30 @@ const jwt = require('jsonwebtoken')
 
 const checkUser = async (req, res) => {
     try {
-        console.log(req.body)
         const { id, password } = req.body;
+        console.log(`[checkingUser] - id: '${id}'`)
 
         const user = await userModel.findOne({ "id": id })
-        // const username=user.username
-        console.log("[checkingUser]" + user)
         if (user && user.password === password) {
             const userId = user.id
             const role = user.role
-            console.log(user)
 
             jwt.sign({ user }, "secret", (err, token) => {
                 if (!err) {
-                    console.log(token)
+                    console.log(`[checkingUser] - token allocated to ${id}`)
                     res.json({ status: "success", token, role, userId })
                 }
                 else
-                    res.json("jwt error")
+                    res.json({ status: "error", msg: "jwt error" })
             })
         }
         else {
-            res.json("invalid credentials")
+            console.log(`[checkingUser] - ${id}: "Invalid credentials"`)
+            res.json({ status: "error", msg: "Invalid credentials" }).status(401)
         }
-
     }
     catch (error) {
-        res.json("error ")
+        res.json({ status: "error", msg: "Unexpected Server Error" }).status(500)
     }
 }
 
@@ -48,7 +45,7 @@ const saveUser = async (req, res) => {
     console.log(user)
     try {
         const existingUser = await userModel.findOne({ "email": user.email })
-        console.log("hello")
+        console.log(`[saveUser] - ${user}`)
         if (existingUser) {
             res.status(409).send({ "message": "user already exists !" })
         }

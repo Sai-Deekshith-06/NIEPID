@@ -113,7 +113,6 @@ const editPendingTeacher = async (req, res) => {
             }
 
             // Check for existing teacher to prevent duplicates
-            // No .session(session) here
             const existingTeacher = await teacherModel.findOne({ $or: [{ teacherId: teacher.teacherId }, { email: teacher.email }] });
             if (existingTeacher) {
                 // IMPORTANT: Since findOneAndDelete has already occurred (and is not rolled back),
@@ -143,7 +142,6 @@ const editPendingTeacher = async (req, res) => {
             }
 
             // Operation 2: Create new teacher in teacherModel
-            // No { session: session } here
             await teacherModel.create(newTeacher);
 
             const user = {
@@ -158,7 +156,6 @@ const editPendingTeacher = async (req, res) => {
 
         } else {
             // Update the pendingTeacherModel with validation message
-            // No { session: session } here
             await pendingTeacherModel.findOneAndUpdate(
                 { _id: teacher._id },
                 { msg: validationResult.msg }
@@ -167,11 +164,9 @@ const editPendingTeacher = async (req, res) => {
             res.status(400).json({ status: "error", msg: `Invalid teacher details: ${validationResult.msg}` });
         }
     } catch (error) {
-        console.error("Error in editPendingTeacher (standalone mode):", error); // Use error for better visibility
-        // No session.abortTransaction() as there's no transaction
+        console.error("Error in editPendingTeacher (standalone mode):", error);
         res.status(500).json({ status: "error", msg: error.message });
     }
-    // No finally block for session.endSession() as no session is started
 };
 
 

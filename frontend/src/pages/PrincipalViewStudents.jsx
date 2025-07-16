@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
+import { toast } from "react-toastify";
 import axios from 'axios';
 import image from './th.jpeg'
 
@@ -90,6 +91,7 @@ const PrincipalViewStudents = () => {
             //console.log(classId)
             setTeacherDetails(prevState => ({ ...prevState, [classId]: response.data.teacher }));
         } catch (error) {
+            toast.error('Error fetching teacher details')
             console.error('Error fetching teacher details:', error.response);
         }
     };

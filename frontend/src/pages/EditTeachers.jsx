@@ -14,7 +14,7 @@ const EditTeachers = () => {
         teacherMNo: "",
         classId: [],
     });
-    const [count, setCount] = useState(-1);
+    const [refresh, needRefresh] = useState(0);
 
     // Fetch the role from localStorage
     const role = localStorage.getItem("role");
@@ -35,23 +35,22 @@ const EditTeachers = () => {
             )
             console.log(response.data)
             setTeacherDetails(response.data.data.reverse());
-            setCount(response.data.count)
         } catch (error) {
             console.error("Error fetching teacher details:", error.response);
         }
-    }, []);
+    }, [refresh]);
 
     useEffect(() => {
         fetchData();
     }, [fetchData]);
 
     useEffect(() => {
-        console.log(count, teacherDetails)
-        if (count === 0) {
+        console.log(refresh, teacherDetails, teacherDetails.count, teacherDetails.length)
+        if (teacherDetails.count === 0) {
             toast.info("No pending teacher registrations found.");
             navigate('/admin/viewTeachers');
         }
-    }, [count]);
+    }, [refresh]);
 
     const handleEditClick = (teacher) => {
         setEditMode(teacher.teacherId);
@@ -73,7 +72,6 @@ const EditTeachers = () => {
             ).then((res) => {
                 console.log(res);
                 toast.success(res.data.msg);
-                fetchData(); // Refetch data to ensure it reflects changes immediately
             }).catch((err) => {
                 console.log(err);
                 toast.error(err.response.data.msg);
@@ -82,6 +80,7 @@ const EditTeachers = () => {
             console.log(err.response);
             toast.error(err.response.data.message);
         }
+        needRefresh((refresh + 1) % 2)
     };
 
     const handleSaveClick = async (id) => {
@@ -136,6 +135,7 @@ const EditTeachers = () => {
             console.error("Error updating teacher details:", error.response);
             toast.error(error.response.data.message);
         }
+        needRefresh((refresh + 1) % 2)
     };
 
     const handleInputChange = (e) => {

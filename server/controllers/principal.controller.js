@@ -4,7 +4,7 @@ const studentModel = require('../models/student.model')
 const viewTeacher = async (req, res) => {
     try {
         const teachers = await teacherModel.find({})
-        console.log(teachers)
+        console.log(`[viewTeacher] - Fetched ${Array.isArray(teachers) ? teachers.length : 0} Teachers`)
         if (teachers) {
             res.status(200).json({ status: "success", data: teachers })
         }
@@ -13,25 +13,23 @@ const viewTeacher = async (req, res) => {
         }
     }
     catch (error) {
-        res.status(404).send(false)
+        res.status(404).json({ status: "error", msg: "Unexpected Server Error" })
     }
 }
 
 const getTeacher = async (req, res) => {
     const { classId } = req.params;
-    console.log(classId)
+    console.log(`[getTeacher] - ${classId}`)
     try {
         const teacherDetails = await teacherModel.findOne({ classId }).populate('teacherId');
         if (!teacherDetails) {
-            return res.status(404).json({ message: 'teacher not found' });
-        }else{
+            return res.status(404).json({ status: "error", msg: 'teacher not found' });
+        } else {
             res.json({ teacher: teacherDetails.teacherName });
-
         }
-
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ status: "error", msg: 'Unexpected Server Error' });
     }
 }
 
@@ -113,4 +111,4 @@ const viewHistory = async (req, res) => {//expecting student details form req
         res.status(404).send(false)
     }
 }
-module.exports = { viewTeacher, viewStudent, getTeacher, searchStudent,viewHistory }
+module.exports = { viewTeacher, viewStudent, getTeacher, searchStudent, viewHistory }

@@ -74,7 +74,7 @@ function Login() {
           return;
         }
         else {
-          navigate("/principle");
+          navigate("/principal");
           return;
         }
       }
