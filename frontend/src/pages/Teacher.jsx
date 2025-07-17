@@ -4,64 +4,72 @@ import { useCookies } from "react-cookie";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import image from './th.jpeg';
+import image from "./th.jpeg";
 
 export default function Home() {
-
   const navigate = useNavigate();
   const [cookies, setCookie, removeCookie] = useCookies([]);
   const [students, setStudents] = useState({});
-  const [teacher, setTeacher] = useState({})
+  const [teacher, setTeacher] = useState({});
   // const teacherName = "John Doe"
+  const handleChangePasswordPage = () => {
+    navigate("/teacher/changepassword");
+  };
 
   useEffect(() => {
+    localStorage.removeItem("currTerm");
+    localStorage.removeItem("currYear");
+    localStorage.removeItem("currSection");
+    localStorage.removeItem("section");
+    localStorage.removeItem("year");
+    localStorage.removeItem("term");
+    localStorage.removeItem("studentId");
 
-    localStorage.removeItem("currTerm")
-    localStorage.removeItem("currYear")
-    localStorage.removeItem("currSection")
-    localStorage.removeItem("section")
-    localStorage.removeItem("year")
-    localStorage.removeItem("term")
-    localStorage.removeItem("studentId")
-
-    const teacherId = localStorage.getItem("userId")
-    axios.get('http://localhost:4000/teacher/getStudents', {
-      headers: {
-        id: teacherId,
-        // id:"t2",
-        "Content-Type": "application/json",
-        authorization: `Bearer ${localStorage.getItem("token")}`,
-      }
-    }, { withCredentials: true })
-      .then(res => {
-        console.log(res.data.students)
-        setStudents(res.data.students)
-
+    const teacherId = localStorage.getItem("userId");
+    axios
+      .get(
+        "http://localhost:4000/teacher/getStudents",
+        {
+          headers: {
+            id: teacherId,
+            // id:"t2",
+            "Content-Type": "application/json",
+            authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        },
+        { withCredentials: true }
+      )
+      .then((res) => {
+        console.log(res.data.students);
+        setStudents(res.data.students);
       })
-      .catch(err => {
-        console.log(err.response)
-      })
-
+      .catch((err) => {
+        console.log(err.response);
+      });
 
     // setStudents(groupedStudents);
     // console.log(students)
 
-    axios.get('http://localhost:4000/teacher/getTeacher', {
-      headers: {
-        id: teacherId,
-        // id:"t2",
-        "Content-type": "application/json",
-        authorization: `Bearer ${localStorage.getItem("token")}`,
-      }
-    }, { withCredentials: true })
+    axios
+      .get(
+        "http://localhost:4000/teacher/getTeacher",
+        {
+          headers: {
+            id: teacherId,
+            // id:"t2",
+            "Content-type": "application/json",
+            authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        },
+        { withCredentials: true }
+      )
       .then((res) => {
         // console.log(res)
-        setTeacher(res.data.data)
+        setTeacher(res.data.data);
       })
-      .catch(err => {
-        console.log("Error", err)
-      })
-
+      .catch((err) => {
+        console.log("Error", err);
+      });
   }, []);
 
   const logOut = () => {
@@ -72,20 +80,19 @@ export default function Home() {
   };
 
   const replacePrimaryLabels = (text) => {
-    console.log(text)
-    if (!text) return '';
+    console.log(text);
+    if (!text) return "";
 
     return text
-      .replace(/preprimary_1/gi, 'Preprimary-1')
-      .replace(/preprimary_2/gi, 'Preprimary-2')
-      .replace(/preprimary_3/gi, 'Preprimary-3')
-      .replace(/primary1_1/gi, 'Primary-I-1')
-      .replace(/primary1_2/gi, 'Primary-I-2')
-      .replace(/primary1_3/gi, 'Primary-I-3')
-      .replace(/primary2_1/gi, 'Primary-II-1')
-      .replace(/primary2_2/gi, 'Primary-II-2')
-      .replace(/primary2_3/gi, 'Primary-II-3')
-
+      .replace(/preprimary_1/gi, "Preprimary-1")
+      .replace(/preprimary_2/gi, "Preprimary-2")
+      .replace(/preprimary_3/gi, "Preprimary-3")
+      .replace(/primary1_1/gi, "Primary-I-1")
+      .replace(/primary1_2/gi, "Primary-I-2")
+      .replace(/primary1_3/gi, "Primary-I-3")
+      .replace(/primary2_1/gi, "Primary-II-1")
+      .replace(/primary2_2/gi, "Primary-II-2")
+      .replace(/primary2_3/gi, "Primary-II-3");
   };
 
   const Header = () => (
@@ -97,6 +104,9 @@ export default function Home() {
       <nav style={styles.navLinks}>
         <button onClick={logOut} style={styles.button}>
           Log out
+        </button>
+        <button onClick={handleChangePasswordPage} style={styles.button}>
+          Change Password
         </button>
       </nav>
     </header>
@@ -123,13 +133,15 @@ export default function Home() {
                 <h3>{replacePrimaryLabels(students[classId][0].classId)}</h3>
                 {students[classId].map((student) => (
                   <div key={student.id} style={styles.student}>
-                    <p>{student.regNo} __ {student.name}</p>
+                    <p>
+                      {student.regNo} __ {student.name}
+                    </p>
                     <div>
                       <button
                         style={styles.studentButton}
                         onClick={() => {
-                          localStorage.setItem("studentId", student.regNo)
-                          navigate(`term/`)
+                          localStorage.setItem("studentId", student.regNo);
+                          navigate(`term/`);
                         }}
                       >
                         Eval
@@ -137,8 +149,8 @@ export default function Home() {
                       <button
                         style={styles.studentButton}
                         onClick={() => {
-                          localStorage.setItem("studentId", student.regNo)
-                          navigate(`hist/`)
+                          localStorage.setItem("studentId", student.regNo);
+                          navigate(`hist/`);
                         }}
                       >
                         Hist
@@ -176,16 +188,16 @@ const styles = {
     boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
   },
   logo: {
-    display: 'flex',
-    alignItems: 'center',
+    display: "flex",
+    alignItems: "center",
   },
   logoImage: {
-    width: '40px',
-    height: '40px',
-    marginRight: '0.5rem',
+    width: "40px",
+    height: "40px",
+    marginRight: "0.5rem",
   },
   logoLabel: {
-    fontSize: '1.5rem',
+    fontSize: "1.5rem",
   },
   navLinks: {
     display: "flex",
