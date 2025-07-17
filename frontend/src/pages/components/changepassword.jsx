@@ -51,7 +51,7 @@ const styles = {
     formTitle: {
         fontSize: '2rem',
         fontWeight: 'bold',
-        color: '#007bff',
+        color: '# rgba(0, 0, 0, 0.12)',
         marginBottom: '1.5rem',
         textAlign: 'center',
     },
