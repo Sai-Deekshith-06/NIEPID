@@ -1,16 +1,17 @@
-import React, { useEffect } from "react";
-import Register from "./pages/Register";
+// import React, { useEffect } from "react";
+// import Register from "./pages/Register";
 import AddStudents from "./pages/AddStudents";
 
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 import Login from "./pages/Login";
-import Home from "./pages/Home";
+// import Home from "./pages/Home";
 import Admin from "./pages/Admin";
 import Teacher from "./pages/Teacher";
 import Principal from "./pages/Principal";
 import Student from "./pages/Student";
 import StudentEval from "./pages/StudentEval";
 import ViewTeachers from "./pages/ViewTeachers";
+import EditTeachers from "./pages/EditTeachers";
 import ViewStudents from "./pages/ViewStudents";
 import PrincipalViewStudents from "./pages/PrincipalViewStudents";
 import Front from "./pages/evaluate/Front";
@@ -35,7 +36,7 @@ import TeacherPrivateRoute from "./routes/TeacherPrivateRoute";
 
 //import pages for stdent 
 import StudentDetails from "./pages/StudentDetails";
-import ChangePassword from "./pages/components/changepassword";
+import ChangePassword from "./components/changepassword";
 
 export default function App() {
   // useEffect(()=>{
@@ -50,14 +51,13 @@ export default function App() {
         <Route exact path="/" element={<Login />} />
 
         <Route element={<PrivateRoute />}>
-
           <Route exact path="/" element={<Login />} />
-
-        <Route path="/changepassword" element={<ChangePassword />} />
+          <Route path="/changepassword" element={<ChangePassword />} />
           <Route element={<AdminPrivateRoute />}>
             <Route exact path="/admin" element={<Admin />} />
             <Route exact path="/admin/addstudents" element={<AddStudents />} />
             <Route exact path="/admin/viewteachers" element={<ViewTeachers />} />
+            <Route exact path="/admin/editteachers" element={<EditTeachers />} />
             <Route exact path="/admin/viewstudents" element={<ViewStudents />} />
             <Route exact path="/admin/viewstudents/details/:studentId" element={<StudentDetails />} />
             <Route exact path="/admin/viewstudents/history/:studentId" element={<History />} />

@@ -7,6 +7,8 @@ const studentDetailsModel = require('../models/studentDetails.model')
 const classModel = require('../models/class.model')
 const deriveHistory = require('../deriving/deriveHistory')
 const findQAs = require('../deriving/deriveQAs')
+
+
 const jwt = require('jsonwebtoken')
 
 const submitYearTypeComment = async (req, res) => {
@@ -80,43 +82,6 @@ const evaluateYearStudent = async (req, res) => {
     }
 }
 
-const nextSection = (presentSection) => {
-    const sections = ['preprimary', 'primary1', 'primary2', 'passedOut']
-    const idx = sections.indexOf(presentSection);
-    if (idx !== -1 && idx < sections.length - 1) {
-        return sections[idx + 1];
-    }
-    return null;
-}
-
-// Remove student from previous class and allocate to new class
-const updateStudentClassAllocation = async (student, prevClassId, newClassId) => {
-    // Remove student from previous class
-    console.log(student.regNo)
-    console.log(">>> update classes(): from " + prevClassId + " to " + newClassId)
-    await classModel.updateMany(
-        { classId: prevClassId },
-        { $pull: { student: student.regNo } }
-    ).then(async (res) => {
-        console.log("removed from prevClass")
-        // Add student to new class (if not already present)
-        await classModel.updateOne(
-            { classId: newClassId },
-            { $addToSet: { student: student.regNo } }
-        )
-            .then(async (res1) => {
-                console.log("added to newClass")
-                return res1
-            }).catch((err) => {
-                console.log(err)
-                return err
-            })
-    }).catch((err) => {
-        console.log(err)
-        return err
-    })
-};
-
 const evaluateStudent = async (req, res) => {
     // try {
     const id = req.headers.id
@@ -125,10 +90,7 @@ const evaluateStudent = async (req, res) => {
     const section = student.section.find(sec => sec.sec === req.headers.section)
     const yearReport = section.yearReport.find(year => year.year === req.headers.year)
     const termReport = yearReport.termReport.find(term => term.term === req.headers.term)
-    if (yearReport.year !== student.currYear || section.sec !== student.currSection) {
-        console.log("[evaluateStudent] - Evaluation not allowed for previous year/section paper")
-        return res.status(400).json({ status: "invalid", msg: "Evaluation not allowed for previous year/section paper" })
-    }    // console.log(termReport)
+    // console.log(termReport)
     let questions;
     if (req.headers.type === "personalQA")
         questions = termReport.report.personalQA
@@ -169,109 +131,97 @@ const evaluateStudent = async (req, res) => {
         termReport.evaluated.recreational = true
     }
 
-
-    let prevClassId = student.classId;
-    let nxtClassId = "";
-    let transfer = false
+    let newTermReport = {
+        evaluated: {
+            personal: false,
+            academic: false,
+            social: false,
+            occupational: false,
+            recreational: false
+        },
+        term: '',
+        report: findQAs(req.headers.section),
+        percent: {//Term Performance
+            personalPercent: 0,
+            socialPercent: 0,
+            academicPercent: 0,
+            occupationalPercent: 0,
+            recreationalPercent: 0,
+            mode: ""
+        },
+        comment: {//Term Comments
+            termComment: "",
+            personalComment: "",
+            occupationalComment: "",
+            recreationalComment: "",
+            academicComment: "",
+            socialComment: ""
+        }
+    }
     if (termReport.evaluated.academic && termReport.evaluated.occupational && termReport.evaluated.personal && termReport.evaluated.recreational && termReport.evaluated.social) {
         if (termReport.term !== "III") {
-            // Efficiently determine the next term based on the current term and termReport length
-            let newTermReport = {
-                evaluated: {
-                    personal: false,
-                    academic: false,
-                    social: false,
-                    occupational: false,
-                    recreational: false
-                },
-                term: '',
-                report: findQAs(req.headers.section),
-                percent: {//Term Performance
-                    personalPercent: 0,
-                    socialPercent: 0,
-                    academicPercent: 0,
-                    occupationalPercent: 0,
-                    recreationalPercent: 0,
-                    mode: ""
-                },
-                comment: {//Term Comments
-                    termComment: "",
-                    personalComment: "",
-                    occupationalComment: "",
-                    recreationalComment: "",
-                    academicComment: "",
-                    socialComment: ""
-                }
-            }
-            const termOrder = ['Entry', 'I', 'II', 'III'];
-            const currIdx = termOrder.indexOf(termReport.term);
-            if (
-                currIdx !== -1 && currIdx < termOrder.length - 1 &&
-                yearReport.termReport.length === currIdx + 1
-            ) {
-                newTermReport.term = termOrder[currIdx + 1];
-            }
+            if (termReport.term === 'Entry' && yearReport.termReport.length == 1)
+                newTermReport.term = 'I'
+            else if (termReport.term === 'I' && yearReport.termReport.length == 2)
+                newTermReport.term = "II"
+            else if (termReport.term === 'II' && yearReport.termReport.length == 3)
+                newTermReport.term = "III"
             if (newTermReport.term) {
-                yearReport.termReport.push(newTermReport);
-                student.currTerm = newTermReport.term;
+                yearReport.termReport.push(newTermReport)
+                student.currTerm = newTermReport.term
             }
         }
         else {
-            // Efficiently accumulate sums and mode counts
-            let sumPersonal = 0, sumSocial = 0, sumAcademic = 0, sumOccupational = 0, sumRecreational = 0;
-            let modeCounts = [0, 0, 0, 0, 0]; // A, B, C, D, E
-            let len = 0;
-            transfer = true;
-            for (const term of yearReport.termReport) {
-                len++;
-                sumPersonal += Number(term.percent.personalPercent) || 0;
-                sumSocial += Number(term.percent.socialPercent) || 0;
-                sumAcademic += Number(term.percent.academicPercent) || 0;
-                sumOccupational += Number(term.percent.occupationalPercent) || 0;
-                sumRecreational += Number(term.percent.recreationalPercent) || 0;
-                if (term.percent.mode === 'A') modeCounts[0]++;
-                else if (term.percent.mode === 'B') modeCounts[1]++;
-                else if (term.percent.mode === 'C') modeCounts[2]++;
-                else if (term.percent.mode === 'D') modeCounts[3]++;
-                else if (term.percent.mode === 'E') modeCounts[4]++;
-            }
-            let personalPercent = len ? (sumPersonal / len).toFixed(2) : "0.00";
-            let socialPercent = len ? (sumSocial / len).toFixed(2) : "0.00";
-            let academicPercent = len ? (sumAcademic / len).toFixed(2) : "0.00";
-            let occupationalPercent = len ? (sumOccupational / len).toFixed(2) : "0.00";
-            let recreationalPercent = len ? (sumRecreational / len).toFixed(2) : "0.00";
-            let modeIdx = modeCounts.indexOf(Math.max(...modeCounts));
-            let mode = ['A', 'B', 'C', 'D', 'E'][modeIdx] || '';
-            let total = (parseFloat(personalPercent) + parseFloat(socialPercent) + parseFloat(academicPercent) + parseFloat(occupationalPercent)) / 4
+            let personalPercent = 0, socialPercent = 0, academicPercent = 0, occupationalPercent = 0, recreationalPercent = 0, mode = ''
+            let count_A = 0, count_B = 0, count_C = 0, count_D = 0, count_E = 0
+            yearReport.termReport.map(term => {
+                personalPercent = personalPercent + term.percent.personalPercent
+                socialPercent = socialPercent + term.percent.socialPercent
+                academicPercent = academicPercent + term.percent.academicPercent
+                occupationalPercent = occupationalPercent + term.percent.occupationalPercent
+                recreationalPercent = recreationalPercent + term.percent.recreationalPercent
+                if (term.percent.mode === 'A') count_A++
+                else if (term.percent.mode === 'B') count_B++
+                else if (term.percent.mode === 'C') count_C++
+                else if (term.percent.mode === 'D') count_D++
+                else if (term.percent.mode === 'E') count_E++
+            })
+            if (Math.max(count_A, count_B, count_C, count_D, count_E) == count_A) mode = 'A'
+            else if (Math.max(count_A, count_B, count_C, count_D, count_E) == count_B) mode = 'B'
+            else if (Math.max(count_A, count_B, count_C, count_D, count_E) == count_C) mode = 'C'
+            else if (Math.max(count_A, count_B, count_C, count_D, count_E) == count_D) mode = 'D'
+            else if (Math.max(count_A, count_B, count_C, count_D, count_E) == count_E) mode = 'E'
+            personalPercent = personalPercent / 4
+            socialPercent = socialPercent / 4
+            academicPercent = academicPercent / 4
+            occupationalPercent = occupationalPercent / 4
+            recreationalPercent = recreationalPercent / 4
+
+            personalPercent = personalPercent.toFixed(2)
+            socialPercent = socialPercent.toFixed(2)
+            academicPercent = academicPercent.toFixed(2)
+            occupationalPercent = occupationalPercent.toFixed(2)
+            recreationalPercent = recreationalPercent.toFixed(2)
 
             const data = {
-                personalPercent,
-                socialPercent,
-                academicPercent,
-                occupationalPercent,
-                recreationalPercent,
-                mode,
-                total
-            };
+                personalPercent: personalPercent,
+                socialPercent: socialPercent,
+                academicPercent: academicPercent,
+                occupationalPercent: occupationalPercent,
+                recreationalPercent: recreationalPercent,
+                mode: mode
+            }
 
             yearReport.percent = data
-            await student.save();
-            console.log("saved: " + data)
 
             const newSection = {
                 status: 'ongoing',
-                sec: '',
+                sec: '',// 
                 yearReport: [{
                     year: '1',
                     termReport: [{
                         term: 'Entry',
-                        report: {
-                            personalQA: [{}],
-                            socialQA: [{}],
-                            academicQA: [{}],
-                            occupationalQA: [{}],
-                            recreationalQA: [{}]
-                        },
+                        report: {},
                         comment: {
                             termComment: "",
                             personalComment: "",
@@ -309,86 +259,18 @@ const evaluateStudent = async (req, res) => {
                 }],
             }
 
-
-            // const result = (parseFloat(personalPercent) + parseFloat(socialPercent) + parseFloat(academicPercent) + parseFloat(occupationalPercent)) / 4;
-            //console.log(typeof(parseFloat(personalPercent)),typeof(socialPercent),typeof(academicPercent),typeof(occupationalPercent))
-            console.log(total)
-            if (    // if the student is passed
-                total >= 60 && yearReport.year === student.currYear &&
-                section.sec === student.currSection
-            ) {
-                section.status = "pass"
-                //create new Section
-                let nxtSec = nextSection(student.currSection)
-                console.log(">60: " + nxtSec + "\t")
-                if (nxtSec && nxtSec == 'passedOut') {
-                    student.currYear = nxtSec
-                    transfer = false
-                    // await student.save()
-                    //     .then(async (res) => {
-                    //         console.log("updated student")
-                    //     })
-                    //     .catch((err) => {
-                    //         console.log(">>" + err);
-                    //         res.status(404).json({ status: "error", msg: `unable to save the student details` })
-                    //     })
-                } else if (nxtSec) {
-                    nxtClassId = `${nxtSec}_1`
-                    console.log(nxtClassId)
-                    await classModel.find({ classId: nxtClassId })
-                        .then((res1) => {
-                            newSection.sec = student.currSection = nxtSec
-                            student.currYear = '1'
-                            student.currTerm = 'Entry'
-                            student.classId = nxtClassId
-                            newSection.yearReport[0].termReport[0].report = findQAs(nxtSec)
-                            student.section.push(newSection)
-                        })
-                        .catch((err) => {
-                            console.log(err);
-                            res.status(404).json({ status: "error", msg: `Next Class with id ${nxtClassId} not found..!!` })
-                        })
-                }
-            }
-            else if (
-                section.yearReport.length < 3 && yearReport.year === student.currYear &&
-                section.sec === student.currSection
-            ) {
-                const newYear = {
-                    year: '1',
-                    termReport: [{
-                        term: 'Entry',
-                        report: {
-                            personalQA: [{}],
-                            socialQA: [{}],
-                            academicQA: [{}],
-                            occupationalQA: [{}],
-                            recreationalQA: [{}]
-                        },
-                        comment: {
-                            termComment: "",
-                            personalComment: "",
-                            occupationalComment: "",
-                            recreationalComment: "",
-                            academicComment: "",
-                            socialComment: ""
-                        },
-                        percent: {
-                            personalPercent: null,
-                            socialPercent: null,
-                            academicPercent: null,
-                            occupationalPercent: null,
-                            recreationalPercent: null,
-                            mode: ""
-                        }
-                    }],
+            const newYear = {
+                year: '',
+                termReport: [{
+                    term: 'Entry',
+                    report: findQAs(section.sec),
                     comment: {
-                        yearPersonalComment: "",
-                        yearOccupationalComment: "",
-                        yearRecreationalComment: "",
-                        yearAcademicComment: "",
-                        yearSocialComment: "",
-                        yearComment: ""
+                        termComment: "",
+                        personalComment: "",
+                        occupationalComment: "",
+                        recreationalComment: "",
+                        academicComment: "",
+                        socialComment: ""
                     },
                     percent: {
                         personalPercent: null,
@@ -396,53 +278,70 @@ const evaluateStudent = async (req, res) => {
                         academicPercent: null,
                         occupationalPercent: null,
                         recreationalPercent: null,
-                        mode: "",
-                        result: 0
+                        mode: ""
                     }
+                }],
+                comment: {
+                    yearPersonalComment: "",
+                    yearOccupationalComment: "",
+                    yearRecreationalComment: "",
+                    yearAcademicComment: "",
+                    yearSocialComment: "",
+                    yearComment: ""
+                },
+                percent: {
+                    personalPercent: null,
+                    socialPercent: null,
+                    academicPercent: null,
+                    occupationalPercent: null,
+                    recreationalPercent: null,
+                    mode: "",
+                    result: 0
                 }
+            }
+
+            const result = (parseFloat(personalPercent) + parseFloat(socialPercent) + parseFloat(academicPercent) + parseFloat(occupationalPercent)) / 4;
+            //console.log(typeof(parseFloat(personalPercent)),typeof(socialPercent),typeof(academicPercent),typeof(occupationalPercent))
+            console.log(result)
+            if (result >= 80 && yearReport.year === student.currYear && section.sec === student.currSection) {
+                section.status = "pass"
+                //create new Section
+                newSection.sec = 'primary1'
+                student.currSection = 'primary1'
+                student.currYear = '1'
+                student.currTerm = 'Entry'
+                student.classId = 'primary1_1'
+                newSection.yearReport[0].termReport[0].report = findQAs('primary1')
+                student.section.push(newSection)
+            }
+            else if (section.yearReport.length < 3 && yearReport.year === student.currYear && section.sec === student.currSection) {
                 section.status = "ongoing"
                 //create new year
-                let nxtYear = (1 + section.yearReport.length).toString();
-                const currSec = student.currSection
-                nxtClassId = currSec + `_${nxtYear}`
-                console.log(currSec + '<80%--<3years\tNew ClassID: ' + nxtClassId)
-                await classModel.find({ classId: nxtClassId })
-                    .then((res1) => {
-                        newYear.year = student.currYear = nxtYear
-                        student.classId = nxtClassId
-                        student.currTerm = 'Entry'
-                        newYear.termReport[0].report = findQAs(currSec)
-                        console.log(newYear.termReport[0].report.personalQA.length)
-                        section.yearReport.push(newYear)
-                    })
-                    .catch((err) => {
-                        console.log(err);
-                        res.status(404).json({ status: "error", msg: `Next Class with id ${nxtClassId} not found..!!` })
-                    })
-
-            }
-            else if (
-                yearReport.year === student.currYear && section.sec === student.currSection
-            ) {
-                section.status = "promoted"
-                //create new section after failing 3 years
-                let nxtSec = nextSection(student.currSection)
-                if (nxtSec) {
-                    nxtClassId = `${nxtSec}_1`
-                    await classModel.find({ classId: nxtClassId })
-                        .then((res1) => {
-                            newSection.sec = student.currSection = nxtSec
-                            student.classId = nxtClassId
-                            student.currYear = '1'
-                            student.currTerm = 'Entry'
-                            newSection.yearReport[0].termReport[0].report = findQAs(nxtSec)
-                            student.section.push(newSection)
-                        })
-                        .catch((err) => {
-                            console.log(err);
-                            res.status(404).json({ status: "error", msg: `Next Class with id ${nxtClassId} not found..!!` })
-                        })
+                if (section.yearReport.length === 1) {
+                    newYear.year = '2'
+                    student.currYear = '2'
+                    const currSec = student.currSection
+                    student.classId = currSec + '_2'
                 }
+                else {
+                    newYear.year = '3'
+                    student.currYear = '3'
+                    const currSec = student.currSection
+                    student.classId = currSec + '_3'
+                }
+                student.currTerm = 'Entry'
+                section.yearReport.push(newYear)
+            }
+            else if (yearReport.year === student.currYear && section.sec === student.currSection) {
+                section.status = "promote"
+                //create new section after failing 3 years
+                newSection.sec = 'primary2'
+                student.currSection = 'primary2'
+                student.currYear = '1'
+                student.currTerm = 'Entry'
+                student.classId = 'primary2_1'
+                newSection.yearReport[0].termReport[0].report = findQAs('primary2')
+                student.section.push(newSection)
             }
             else {
                 // //trying to evaluate previous evaluated year/section
@@ -452,26 +351,14 @@ const evaluateStudent = async (req, res) => {
             }
         }
     }
-    if (transfer) {
-        console.log("evaluateStudent(): updatingStudentClassAllocation called")
-        await updateStudentClassAllocation(student, prevClassId, nxtClassId)
-            .then(async (res1) => {
-                console.log("updated classes")
-            })
-            .catch((err) => {
-                console.log(">>" + err);
-                return res.status(404).json({ status: "error", msg: `unable to allocate/deallocate the class` })
-            })
-    }
-    await student.save()
-        .then(async (res1) => {
-            console.log("updated student")
-        })
-        .catch((err) => {
-            console.log(">>" + err);
-            return res.status(404).json({ status: "error", msg: `unable to save the student details` })
-        })
+
+    student.save()
     res.status(200).json({ result })
+    // }
+    // catch (err) {
+    //     console.log(err)
+    //     res.status(400).send(false)
+    // }
 }
 
 const findPercent = (arr) => {
@@ -546,6 +433,7 @@ const historyStudent = async (req, res) => {//expecting student details form req
         res.status(404).send(false)
     }
 }
+
 
 /**
  * @desc Retrieves students grouped by classId for a given teacher.
@@ -770,6 +658,8 @@ const submitTermTypeComment = async (req, res) => {
         res.status(400).send(false)
     }
 }
+
+
 
 module.exports = {
     historyStudent,

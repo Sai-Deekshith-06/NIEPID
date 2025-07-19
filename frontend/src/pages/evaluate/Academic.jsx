@@ -2,9 +2,9 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { createUseStyles } from 'react-jss';
 import { useLocation } from 'react-router-dom';
-import image from './th.jpeg'
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { ScrollToButton, Header, Footer } from '../../components/components';
 // import flattenStudentData from '../helpers/flattenStudentData';
 
 const useStyles = createUseStyles({
@@ -158,55 +158,6 @@ const useStyles = createUseStyles({
         },
     },
 });
-const styles = {
-    header: {
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '1rem 2rem',
-        backgroundColor: '#007bff',
-        color: '#ffffff',
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-        marginBottom: '1rem'
-    },
-    logo: {
-        display: 'flex',
-        alignItems: 'center',
-    },
-    logoImage: {
-        width: '40px',
-        height: '40px',
-        marginRight: '0.5rem',
-    },
-    logoLabel: {
-        fontSize: '1.5rem',
-    },
-    backButton: {
-        padding: "0.8rem 1.5rem",
-        fontSize: "1rem",
-        backgroundColor: "#000000",
-        color: "#ffffff",
-        border: "none",
-        borderRadius: "5px",
-        cursor: "pointer",
-        transition: "background-color 0.3s, transform 0.3s",
-    },
-};
-
-const footerStyles = {
-    footer: {
-        backgroundColor: '#007bff',
-        padding: '1rem',
-        textAlign: 'center',
-        color: '#ffffff',
-        position: 'relative',
-        bottom: 0,
-        width: '100%',
-    },
-    text: {
-        margin: 0,
-    }
-};
 
 const Academic = () => {
     const classes = useStyles();
@@ -229,19 +180,11 @@ const Academic = () => {
     const currYear = localStorage.getItem("currYear")
     const currSection = localStorage.getItem("currSection")
     const id = localStorage.getItem("studentId")
+    const name = localStorage.getItem("studentName")
     // const term = "I"
     // const year = "2023"
 
     const navigate = useNavigate()
-    const Header = () => (
-        <header style={styles.header}>
-            <div style={styles.logo}>
-                <img src={image} alt="Logo" style={styles.logoImage} />
-                <span style={styles.logoLabel}>NIEPID</span>
-            </div>
-            <button onClick={() => navigate('/teacher/eval')} style={styles.backButton}>Back</button>
-        </header>
-    )
 
     useEffect(async () => {
         console.log(term, currTerm)
@@ -284,7 +227,9 @@ const Academic = () => {
                 else
                     setOldComments("Enter your comments")
             })
-            .catch()
+            .catch((err) => {
+                toast.error(err)
+            })
     }, [username]);
 
     const handleChange = (event) => {
@@ -318,7 +263,6 @@ const Academic = () => {
         });
         setNewQuestion("");
         setNewAnswer("");
-        // console.log(answer)
     };
 
     const handleEvaluate = async (event) => {
@@ -370,6 +314,7 @@ const Academic = () => {
             })
             .catch((err) => {
                 console.log(err)
+                toast.error(err.response.data.msg)
             })
 
         const commentsElements = document.getElementsByName("comments");
@@ -414,7 +359,7 @@ const Academic = () => {
 
     return (
         <>
-            <Header />
+            <Header id={id} name={name} backButtonPath={'/teacher/eval'} />
             <form className={classes.registrationForm} onSubmit={handleSubmit}>
                 <div className={classes.title}>Functional Assessment Checklist For Programming</div>
                 <div className={classes.title}>Academic</div>
@@ -497,9 +442,8 @@ const Academic = () => {
                 />
                 <button id="submit" className={classes.button} disabled={true} type="submit" >Submit</button>
             </form>
-            <footer style={footerStyles.footer}>
-                <p style={footerStyles.text}>© 2024 NIEPID. All rights reserved.</p>
-            </footer>
+            <Footer />
+            <ScrollToButton />
         </>
     );
 };

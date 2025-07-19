@@ -4,6 +4,7 @@ import image from "../th.jpeg";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
+import { Footer, Header } from "./components";
 
 const styles = {
     container: {
@@ -12,32 +13,6 @@ const styles = {
         minHeight: '100vh',
         fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
         background: 'linear-gradient(135deg, #e0e7ff 0%, #f0f8ff 100%)',
-    },
-    header: {
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '1.5rem 3rem',
-        backgroundColor: '#007bff',
-        color: '#ffffff',
-        boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-    },
-    logo: {
-        display: 'flex',
-        alignItems: 'center',
-    },
-    logoImage: {
-        width: '48px',
-        height: '48px',
-        marginRight: '0.75rem',
-        borderRadius: '8px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-    },
-    logoLabel: {
-        fontSize: '2rem',
-        fontWeight: 'bold',
-        letterSpacing: '2px',
     },
     formWrapper: {
         backgroundColor: '#ffffff',
@@ -112,15 +87,6 @@ const styles = {
         fontWeight: '500',
         fontSize: '1rem',
     },
-    footer: {
-        textAlign: 'center',
-        padding: '1.5rem',
-        backgroundColor: '#007bff',
-        color: '#ffffff',
-        marginTop: 'auto',
-        fontSize: '1rem',
-        letterSpacing: '1px',
-    }
 };
 
 const ChangePassword = () => {
@@ -190,12 +156,7 @@ const ChangePassword = () => {
 
     return (
         <div style={styles.container}>
-            <header style={styles.header}>
-                <div style={styles.logo}>
-                    <img src={image} alt="Logo" style={styles.logoImage} />
-                    <span style={styles.logoLabel}>NIEPID</span>
-                </div>
-            </header>
+            <Header backButtonPath={"/"} />
             <div style={styles.formWrapper}>
                 <div style={styles.formTitle}>Change Password</div>
                 <form onSubmit={handleSubmit} style={{ width: '100%' }}>
@@ -244,9 +205,7 @@ const ChangePassword = () => {
                     </button>
                 </form>
             </div>
-            <footer style={styles.footer}>
-                <p>&copy; 2025 NIEPID. All rights reserved.</p>
-            </footer>
+            <Footer />
         </div>
     );
 };
