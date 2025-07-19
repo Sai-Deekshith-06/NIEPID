@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
-import image from "../th.jpeg";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
@@ -141,7 +140,7 @@ const ChangePassword = () => {
                 localStorage.removeItem("role");
                 localStorage.removeItem("token");
                 navigate("/");
-                  
+
             } else {
                 setError(res.data.message || "Failed to change password.");
             }
