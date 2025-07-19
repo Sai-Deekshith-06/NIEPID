@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import "react-toastify/dist/ReactToastify.css";
 import image from "./th.jpeg";
-import ChangePassword from "./components/changepassword";
+import ChangePassword from "../components/changepassword";
 
 function App() {
   const [isAdmin, setIsAdmin] = useState(false); // This state will determine whether to show Admin or Home component
