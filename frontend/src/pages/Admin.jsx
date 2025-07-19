@@ -23,7 +23,7 @@ function App() {
   };
 
   const handleChangePasswordPage = () => {
-    navigate("/admin/changepassword");
+    navigate("/changepassword");
   };
 
   const handleUpload = async (e) => {

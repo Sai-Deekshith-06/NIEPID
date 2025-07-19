@@ -26,7 +26,7 @@ function Principal() {
    * Typically used as an event handler for a button or link.
    */
   const handleChangePasswordPage = () => {
-    navigate("/principal/changepassword");
+    navigate("/changepassword");
   };
 
   const handleViewStudents = () => {

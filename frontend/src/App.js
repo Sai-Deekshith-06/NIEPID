@@ -50,10 +50,12 @@ export default function App() {
         <Route exact path="/" element={<Login />} />
 
         <Route element={<PrivateRoute />}>
+
           <Route exact path="/" element={<Login />} />
+
+        <Route path="/changepassword" element={<ChangePassword />} />
           <Route element={<AdminPrivateRoute />}>
             <Route exact path="/admin" element={<Admin />} />
-            <Route path="/admin/changepassword" element={<ChangePassword />} />
             <Route exact path="/admin/addstudents" element={<AddStudents />} />
             <Route exact path="/admin/viewteachers" element={<ViewTeachers />} />
             <Route exact path="/admin/viewstudents" element={<ViewStudents />} />
@@ -77,7 +79,6 @@ export default function App() {
             <Route exact path="/teacher/term/termEntry/eval/academic" element={<Academic />} />
             <Route exact path="/teacher/term" element={<Term />} />
             <Route exact path="/teacher/term/termEntry" element={<TermEntry />} />
-            <Route path="/teacher/changepassword" element={<ChangePassword />} />
           </Route>
           <Route element={<PrincipalPrivateRoute />}>
             <Route exact path="/principal" element={<Principal />} />
@@ -85,7 +86,6 @@ export default function App() {
             <Route exact path="/principal/viewstudents" element={<PrincipalViewStudents />} />
             <Route exact path="/principal/viewstudents/history/:stdentId" element={<History />} />
             <Route exact path="/principal/viewstudents/details/:studentId" element={<StudentDetails />} />
-            <Route path="/principal/changepassword" element={<ChangePassword />} />
           </Route>
 
         </Route>
