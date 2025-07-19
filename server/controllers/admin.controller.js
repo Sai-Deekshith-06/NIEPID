@@ -289,7 +289,6 @@ const viewStudent = async (req, res) => {
 const viewTeacher = async (req, res) => {
     try {
         const teachers = await teacherModel.find({})
-        console.log(teachers)
         if (teachers) {
             res.status(200).json({ status: "success", data: teachers })
         }

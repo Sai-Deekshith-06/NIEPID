@@ -81,7 +81,7 @@ const evaluateYearStudent = async (req, res) => {
 }
 
 const nextSection = (presentSection) => {
-    const sections = ['preprimary', 'primary1', 'primary2']
+    const sections = ['preprimary', 'primary1', 'primary2', 'passedOut']
     const idx = sections.indexOf(presentSection);
     if (idx !== -1 && idx < sections.length - 1) {
         return sections[idx + 1];
@@ -125,7 +125,10 @@ const evaluateStudent = async (req, res) => {
     const section = student.section.find(sec => sec.sec === req.headers.section)
     const yearReport = section.yearReport.find(year => year.year === req.headers.year)
     const termReport = yearReport.termReport.find(term => term.term === req.headers.term)
-    // console.log(termReport)
+    if (yearReport.year !== student.currYear || section.sec !== student.currSection) {
+        console.log("[evaluateStudent] - Evaluation not allowed for previous year/section paper")
+        return res.status(400).json({ status: "invalid", msg: "Evaluation not allowed for previous year/section paper" })
+    }    // console.log(termReport)
     let questions;
     if (req.headers.type === "personalQA")
         questions = termReport.report.personalQA
@@ -168,7 +171,8 @@ const evaluateStudent = async (req, res) => {
 
 
     let prevClassId = student.classId;
-    let nxtClassId = ""
+    let nxtClassId = "";
+    let transfer = false
     if (termReport.evaluated.academic && termReport.evaluated.occupational && termReport.evaluated.personal && termReport.evaluated.recreational && termReport.evaluated.social) {
         if (termReport.term !== "III") {
             // Efficiently determine the next term based on the current term and termReport length
@@ -217,6 +221,7 @@ const evaluateStudent = async (req, res) => {
             let sumPersonal = 0, sumSocial = 0, sumAcademic = 0, sumOccupational = 0, sumRecreational = 0;
             let modeCounts = [0, 0, 0, 0, 0]; // A, B, C, D, E
             let len = 0;
+            transfer = true;
             for (const term of yearReport.termReport) {
                 len++;
                 sumPersonal += Number(term.percent.personalPercent) || 0;
@@ -316,11 +321,22 @@ const evaluateStudent = async (req, res) => {
                 //create new Section
                 let nxtSec = nextSection(student.currSection)
                 console.log(">60: " + nxtSec + "\t")
-                if (nxtSec) {
+                if (nxtSec && nxtSec == 'passedOut') {
+                    student.currYear = nxtSec
+                    transfer = false
+                    // await student.save()
+                    //     .then(async (res) => {
+                    //         console.log("updated student")
+                    //     })
+                    //     .catch((err) => {
+                    //         console.log(">>" + err);
+                    //         res.status(404).json({ status: "error", msg: `unable to save the student details` })
+                    //     })
+                } else if (nxtSec) {
                     nxtClassId = `${nxtSec}_1`
                     console.log(nxtClassId)
                     await classModel.find({ classId: nxtClassId })
-                        .then((res) => {
+                        .then((res1) => {
                             newSection.sec = student.currSection = nxtSec
                             student.currYear = '1'
                             student.currTerm = 'Entry'
@@ -391,7 +407,7 @@ const evaluateStudent = async (req, res) => {
                 nxtClassId = currSec + `_${nxtYear}`
                 console.log(currSec + '<80%--<3years\tNew ClassID: ' + nxtClassId)
                 await classModel.find({ classId: nxtClassId })
-                    .then((res) => {
+                    .then((res1) => {
                         newYear.year = student.currYear = nxtYear
                         student.classId = nxtClassId
                         student.currTerm = 'Entry'
@@ -414,7 +430,7 @@ const evaluateStudent = async (req, res) => {
                 if (nxtSec) {
                     nxtClassId = `${nxtSec}_1`
                     await classModel.find({ classId: nxtClassId })
-                        .then((res) => {
+                        .then((res1) => {
                             newSection.sec = student.currSection = nxtSec
                             student.classId = nxtClassId
                             student.currYear = '1'
@@ -436,26 +452,24 @@ const evaluateStudent = async (req, res) => {
             }
         }
     }
-    // await classModel.find({ classId: nxtClassId })
-    //         // ...existing code for updating student...
-    //         // Update class allocations
-    //     // ...rest of your logic...
-    console.log("evaluateStudent(): updatingStudentClassAllocation called")
-    await updateStudentClassAllocation(student, prevClassId, nxtClassId)
-        .then(async (res) => {
-            console.log("updated classes")
-            await student.save()
-                .then(async (res) => {
-                    console.log("updated student")
-                })
-                .catch((err) => {
-                    console.log(">>" + err);
-                    res.status(404).json({ status: "error", msg: `unable to save the student details` })
-                })
+    if (transfer) {
+        console.log("evaluateStudent(): updatingStudentClassAllocation called")
+        await updateStudentClassAllocation(student, prevClassId, nxtClassId)
+            .then(async (res1) => {
+                console.log("updated classes")
+            })
+            .catch((err) => {
+                console.log(">>" + err);
+                return res.status(404).json({ status: "error", msg: `unable to allocate/deallocate the class` })
+            })
+    }
+    await student.save()
+        .then(async (res1) => {
+            console.log("updated student")
         })
         .catch((err) => {
             console.log(">>" + err);
-            res.status(404).json({ status: "error", msg: `unable to allocate/deallocate the class` })
+            return res.status(404).json({ status: "error", msg: `unable to save the student details` })
         })
     res.status(200).json({ result })
 }

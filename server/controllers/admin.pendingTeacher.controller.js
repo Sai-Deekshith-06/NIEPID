@@ -83,11 +83,12 @@ const validateTeacherDetails = async (row) => {
 // Be aware of potential data inconsistencies if an error occurs between operations.
 const editPendingTeacher = async (req, res) => {
     try {
-        console.log("editPendingTeacher(): ", req.body.updatedTeacher); // For debugging, remove in production
+        //console.log("editPendingTeacher(): ", req.body.updatedTeacher); // For debugging, remove in production
         const teacher = req.body.updatedTeacher;
 
         // Ensure validateTeacherDetails handles errors internally and returns consistent structure
         const validationResult = await validateTeacherDetails(teacher);
+        teacher.msg = validationResult.msg
         console.log(validationResult); // For debugging, remove in production
 
         if (validationResult.status) {
@@ -156,12 +157,16 @@ const editPendingTeacher = async (req, res) => {
 
         } else {
             // Update the pendingTeacherModel with validation message
+            //console.log(teacher)
             await pendingTeacherModel.findOneAndUpdate(
                 { _id: teacher._id },
-                { msg: validationResult.msg }
-            );
-            console.log("pending teacher details updated with validation error (without transaction)"); // For debugging, remove in production
-            res.status(400).json({ status: "error", msg: `Invalid teacher details: ${validationResult.msg}` });
+                teacher
+            ).then((response) => {
+                console.log("pending teacher details updated with validation error"); // For debugging, remove in production
+                res.status(400).json({ status: "error", msg: `Invalid teacher details: ${validationResult.msg}` });
+            }).catch((err) => {
+                console.log(err.message)
+            });
         }
     } catch (error) {
         console.error("Error in editPendingTeacher (standalone mode):", error);
