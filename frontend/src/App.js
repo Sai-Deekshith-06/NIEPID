@@ -1,10 +1,10 @@
-import React, { useEffect } from "react";
-import Register from "./pages/Register";
+// import React, { useEffect } from "react";
+// import Register from "./pages/Register";
 import AddStudents from "./pages/AddStudents";
 
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 import Login from "./pages/Login";
-import Home from "./pages/Home";
+// import Home from "./pages/Home";
 import Admin from "./pages/Admin";
 import Teacher from "./pages/Teacher";
 import Principal from "./pages/Principal";

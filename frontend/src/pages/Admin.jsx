@@ -4,7 +4,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import 'react-toastify/dist/ReactToastify.css';
-import image from './th.jpeg';
+import { Header, Footer } from '../helpers/components';
 
 function App() {
     const [isAdmin, setIsAdmin] = useState(false); // This state will determine whether to show Admin or Home component
@@ -103,12 +103,12 @@ function App() {
         setGroup(event.target.value);
     };
 
-    const handleLogout = () => {
-        removeCookie('jwt');
-        localStorage.removeItem("role");
-        localStorage.removeItem("token");
-        navigate('/');
-    };
+    // const handleLogout = () => {
+    //     removeCookie('jwt');
+    //     localStorage.removeItem("role");
+    //     localStorage.removeItem("token");
+    //     navigate('/');
+    // };
 
     const handleNavigateToStudentRegistration = () => {
         navigate('/admin/addstudents');
@@ -126,7 +126,7 @@ function App() {
 
     return (
         <div style={styles.container}>
-            <header style={styles.header}>
+            {/* <header style={styles.header}>
                 <div style={styles.logo}>
                     <img src={image} alt="Logo" style={styles.logoImage} />
                     <span style={styles.logoLabel}>NIEPID</span>
@@ -134,7 +134,8 @@ function App() {
                 <button onClick={handleLogout} style={styles.logoutButton}>
                     Logout
                 </button>
-            </header>
+            </header> */}
+            <Header logout={true} removeCookie={removeCookie} />
 
             <div style={styles.hero}>
                 <h1 style={styles.heroTitle}>Welcome to Our Website</h1>
@@ -225,11 +226,7 @@ function App() {
                     </div>
                 </div>
             </div>
-
-            <footer style={styles.footer}>
-                <p>&copy; 2023 Our Website. All rights reserved.</p>
-            </footer>
-
+            <Footer />
             <ToastContainer />
         </div>
     );
@@ -241,27 +238,6 @@ const styles = {
         minHeight: '100vh',
         fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
         backgroundColor: '#f0f8ff',
-    },
-    header: {
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'right',
-        padding: '1rem 2rem',
-        backgroundColor: '#007bff',
-        color: '#ffffff',
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-    },
-    logo: {
-        display: 'flex',
-        alignItems: 'center',
-    },
-    logoImage: {
-        width: '40px',
-        height: '40px',
-        marginRight: '0.5rem',
-    },
-    logoLabel: {
-        fontSize: '1.5rem',
     },
     navLinks: {
         display: 'flex',
@@ -310,12 +286,6 @@ const styles = {
     buttonHover: {
         backgroundColor: '#0056b3',
         transform: 'scale(1.05)',
-    },
-    footer: {
-        textAlign: 'center',
-        padding: '1rem',
-        backgroundColor: '#007bff',
-        color: '#ffffff',
     },
     adminContainer: {
         display: 'flex',
@@ -386,18 +356,6 @@ const styles = {
         marginTop: '0.5rem',
 
     },
-    logoutButton: {
-        padding: '10px 15px',
-        backgroundColor: '#ff4d4d',
-        color: '#fff',
-        border: 'none',
-        borderRadius: '5px',
-        cursor: 'pointer',
-        transition: 'background-color 0.3s ease',
-    },
-    logoutButtonHover: {
-        backgroundColor: '#e60000',
-    }
 };
 
 

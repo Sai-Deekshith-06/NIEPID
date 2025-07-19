@@ -7,12 +7,12 @@ const Term = () => {
   const navigate = useNavigate();
   const [sections, setSections] = useState([]);
   const [years, setYears] = useState([]);
-
+  const id = localStorage.getItem("studentId");
+  const name = localStorage.getItem("studentName")
 
   useEffect(() => {
     const fetchStudentData = async () => {
       try {
-        const id = localStorage.getItem("studentId");
         const res = await axios.get("http://localhost:4000/teacher/getStudentbyId", {
           headers: {
             id: id,
@@ -83,7 +83,7 @@ const Term = () => {
   const replacePrimaryLabels = (text) => {
     console.log(text)
     if (!text) return '';
-    
+
     return text
       .replace(/preprimary_1/gi, 'Preprimary-1')
       .replace(/preprimary_2/gi, 'Preprimary-2')
@@ -97,7 +97,7 @@ const Term = () => {
       .replace(/preprimary/gi, 'Preprimary')
       .replace(/primary1/gi, 'Primary-I')
       .replace(/primary2/gi, 'Primary-II')
-      
+
   };
 
   return (
@@ -106,6 +106,9 @@ const Term = () => {
         <div style={styles.logo}>
           <img src={image} alt="Logo" style={styles.logoImage} />
           <span style={styles.logoLabel}>NIEPID</span>
+        </div>
+        <div>
+          <b>{id} - {name}</b>
         </div>
         <button onClick={() => navigate('/teacher')} style={styles.backButton} >Back</button>
       </header>

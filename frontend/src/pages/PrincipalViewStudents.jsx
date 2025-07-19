@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from "react-toastify";
 import axios from 'axios';
 import image from './th.jpeg'
+import { Footer, Header } from '../helpers/components';
 
 
 // Add the icons to the library
@@ -156,10 +157,6 @@ const PrincipalViewStudents = () => {
         setSearchValues(searchValues => ({ ...searchValues, [name]: value }));
     };
 
-    const handlePrint = (e) => {
-        window.print()
-    }
-
     const showHistory = (studentId) => {
         console.log(studentId)
         localStorage.setItem("studentId", studentId)
@@ -176,23 +173,23 @@ const PrincipalViewStudents = () => {
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error: {error}</div>;
 
-    const Header = () => (
-        <header style={styles.header}>
-            <div style={styles.logo}>
-                <img src={image} alt="Logo" style={styles.logoImage} />
-                <span style={styles.logoLabel}>NIEPID</span>
-            </div>
-            <nav style={styles.navLinks}>
-                <button onClick={() => navigate('/principal')} style={styles.backButton}>
-                    Back
-                </button>
-            </nav>
-        </header>
-    );
+    // const Header = () => (
+    //     <header style={styles.header}>
+    //         <div style={styles.logo}>
+    //             <img src={image} alt="Logo" style={styles.logoImage} />
+    //             <span style={styles.logoLabel}>NIEPID</span>
+    //         </div>
+    //         <nav style={styles.navLinks}>
+    //             <button onClick={() => navigate('/principal')} style={styles.backButton}>
+    //                 Back
+    //             </button>
+    //         </nav>
+    //     </header>
+    // );
 
     return (
         <div>
-            <Header />
+            <Header backButtonPath={'/principal'} print={true} />
             <div style={styles.container}>
                 <h1 style={styles.heading}>Student Details</h1>
                 <table style={styles.table}>
@@ -257,14 +254,7 @@ const PrincipalViewStudents = () => {
                     </tbody>
                 </table>
             </div>
-            <div style={styles.print}>
-                <button onClick={handlePrint} style={styles.backButton}>
-                    Print
-                </button>
-            </div>
-            <footer style={footerStyles.footer}>
-                <p>&copy; 2023 Our Website. All rights reserved.</p>
-            </footer>
+            <Footer />
         </div>
     );
 };
@@ -278,6 +268,7 @@ const styles = {
         padding: '20px',
         margin: '20px auto',
         width: "96%",
+        minHeight: "70vh",
         // maxWidth: '3000px',
         backgroundColor: '#ffffff',
         border: '1px solid #ddd',
@@ -361,58 +352,6 @@ const styles = {
             backgroundColor: '#e9ecef'
         }
     },
-    header: {
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '1rem 2rem',
-        backgroundColor: '#007bff',
-        color: '#ffffff',
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-        marginBottom: '1rem'
-    },
-    logo: {
-        display: 'flex',
-        alignItems: 'center',
-    },
-    logoImage: {
-        width: '40px',
-        height: '40px',
-        marginRight: '0.5rem',
-    },
-    logoLabel: {
-        fontSize: '1.5rem',
-    },
-    backButton: {
-        padding: "0.8rem 1.5rem",
-        fontSize: "1rem",
-        backgroundColor: "#000000",
-        color: "#ffffff",
-        border: "none",
-        borderRadius: "5px",
-        cursor: "pointer",
-        transition: "background-color 0.3s, transform 0.3s",
-    },
-    print: {
-        display: "flex",
-        justifyContent: "center",
-        marginBottom: "1rem",
-    }
-};
-
-const footerStyles = {
-    footer: {
-        backgroundColor: '#007bff',
-        padding: '1rem',
-        textAlign: 'center',
-        color: '#ffffff',
-        position: 'relative',
-        bottom: 0,
-        width: '100%',
-    },
-    text: {
-        margin: 0,
-    }
 };
 
 export default PrincipalViewStudents;

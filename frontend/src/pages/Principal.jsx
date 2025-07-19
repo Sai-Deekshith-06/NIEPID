@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import image from './th.jpeg';
+import { Footer, Header } from '../helpers/components';
 
 
 
@@ -29,15 +30,7 @@ function Principal() {
 
     return (
         <div style={styles.container}>
-            <header style={styles.header}>
-                <div style={styles.logo}>
-                    <img src={image} alt="Logo" style={styles.logoImage} />
-                    <span style={styles.logoLabel}>NIEPID</span>
-                </div>
-                <button onClick={handleLogout} style={styles.logoutButton}>
-                    Logout
-                </button>
-            </header>
+            <Header logout={true} removeCookie={removeCookie} />
 
             <div style={styles.hero}>
                 <h1 style={styles.heroTitle}>Welcome to Principal Dashboard</h1>
@@ -80,9 +73,7 @@ function Principal() {
                 </div>
             </div>
 
-            <footer style={styles.footer}>
-                <p>&copy; 2023 Our Website. All rights reserved.</p>
-            </footer>
+            <Footer />
         </div>
     );
 }
@@ -94,52 +85,6 @@ const styles = {
         minHeight: '100vh',
         fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
         backgroundColor: '#f0f8ff',
-    },
-    header: {
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'right',
-        padding: '1rem 2rem',
-        backgroundColor: '#007bff',
-        color: '#ffffff',
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-    },
-    logo: {
-        display: 'flex',
-        alignItems: 'center',
-    },
-    logoImage: {
-        width: '40px',
-        height: '40px',
-        marginRight: '0.5rem',
-    },
-    logoLabel: {
-        fontSize: '1.5rem',
-    },
-    logoutButton: {
-        padding: '10px 15px',
-        backgroundColor: '#ff4d4d',
-        color: '#fff',
-        border: 'none',
-        borderRadius: '5px',
-        cursor: 'pointer',
-        transition: 'background-color 0.3s ease',
-    },
-    logoutButtonHover: {
-        backgroundColor: '#e60000',
-    },
-    navLinks: {
-        display: 'flex',
-        gap: '1.5rem',
-    },
-    navLink: {
-        color: '#ffffff',
-        textDecoration: 'none',
-        fontSize: '1rem',
-        transition: 'color 0.3s',
-    },
-    navLinkHover: {
-        color: '#cccccc',
     },
     hero: {
         display: 'flex',

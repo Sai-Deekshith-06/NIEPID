@@ -12,6 +12,7 @@ export default function Home() {
   const [cookies, setCookie, removeCookie] = useCookies([]);
   const [students, setStudents] = useState({});
   const [teacher, setTeacher] = useState({})
+  const teacherId = localStorage.getItem("userId")
   // const teacherName = "John Doe"
 
   useEffect(() => {
@@ -23,8 +24,8 @@ export default function Home() {
     localStorage.removeItem("year")
     localStorage.removeItem("term")
     localStorage.removeItem("studentId")
+    localStorage.removeItem("studentName")
 
-    const teacherId = localStorage.getItem("userId")
     axios.get('http://localhost:4000/teacher/getStudents', {
       headers: {
         id: teacherId,
@@ -94,6 +95,9 @@ export default function Home() {
         <img src={image} alt="Logo" style={styles.logoImage} />
         <span style={styles.logoLabel}>NIEPID</span>
       </div>
+      <div>
+        <b>{teacherId}</b>
+      </div>
       <nav style={styles.navLinks}>
         <button onClick={logOut} style={styles.button}>
           Log out
@@ -129,6 +133,7 @@ export default function Home() {
                         style={styles.studentButton}
                         onClick={() => {
                           localStorage.setItem("studentId", student.regNo)
+                          localStorage.setItem("studentName", student.name)
                           navigate(`term/`)
                         }}
                       >

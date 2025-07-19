@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import image from './th.jpeg';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { Header, Footer } from '../../helpers/components';
 
 const Front = () => {
   const navigate = useNavigate();
 
   const id = localStorage.getItem("studentId")
+  const name = localStorage.getItem("studentName")
   const term = localStorage.getItem("term")
   const year = localStorage.getItem("year")
   const section = localStorage.getItem("section")
@@ -45,20 +46,6 @@ const Front = () => {
       .replace(/primary2/gi, 'Primary-II')
 
   };
-
-  const Header = () => (
-    <header style={styles.header}>
-      <div style={styles.logo}>
-        <img src={image} alt="Logo" style={styles.logoImage} />
-        <span style={styles.logoLabel}>NIEPID</span>
-      </div>
-      <nav style={styles.navLinks}>
-        <button onClick={() => navigateTo('/teacher/term/termEntry')} style={styles.backButton}>
-          Back
-        </button>
-      </nav>
-    </header>
-  );
 
   useEffect(async () => {
     const data = await axios.get("http://localhost:4000/teacher/evaluate/questions", {
@@ -159,7 +146,7 @@ const Front = () => {
 
   return (
     <div style={styles.pageContainer}>
-      <Header />
+      <Header id={id} name={name} backButtonPath='/teacher/term/termEntry' />
       <main style={styles.main}>
         <h1 style={styles.heading}>Functional Assessment Checklist for Programming</h1>
         <h1 style={styles.subHeading}>{replacePrimaryLabels(section)} -- Year {year} -- Term {term}</h1>
@@ -198,9 +185,7 @@ const Front = () => {
       />
       <button id="submit" style={styles.submitButton} onClick={handleSubmit}>Submit</button>
 
-      <footer style={styles.footer}>
-        <p style={styles.footerText}>&copy; 2024 Functional Assessment. All rights reserved.</p>
-      </footer>
+      <Footer />
     </div>
   );
 };
@@ -222,18 +207,6 @@ const styles = {
     backgroundColor: '#007bff',
     color: '#ffffff',
     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-  },
-  logo: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-  logoImage: {
-    width: '40px',
-    height: '40px',
-    marginRight: '0.5rem',
-  },
-  logoLabel: {
-    fontSize: '1.5rem',
   },
   main: {
     flex: '1',
@@ -301,26 +274,6 @@ const styles = {
       backgroundColor: '#cccccc',
       cursor: 'not-allowed',
     },
-  },
-  footer: {
-    textAlign: 'center',
-    padding: '14px',
-    backgroundColor: '#007bff',
-    color: '#fff',
-  },
-  navLinks: {
-    display: "flex",
-    gap: "1.5rem",
-  },
-  backButton: {
-    padding: "0.8rem 1.5rem",
-    fontSize: "1rem",
-    backgroundColor: "#000000",
-    color: "#ffffff",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-    transition: "background-color 0.3s, transform 0.3s",
   },
   textArea: {
     padding: '12px',

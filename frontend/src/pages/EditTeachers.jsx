@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import image from "./th.jpeg";
 import { toast } from "react-toastify";
+import { Header, Footer } from '../helpers/components'
 
 const EditTeachers = () => {
     const [teacherDetails, setTeacherDetails] = useState([]);
@@ -15,6 +16,7 @@ const EditTeachers = () => {
         classId: [],
     });
     const [refresh, needRefresh] = useState(0);
+    const [count, setCount] = useState(-1);
 
     // Fetch the role from localStorage
     const role = localStorage.getItem("role");
@@ -34,6 +36,7 @@ const EditTeachers = () => {
                 }
             )
             console.log(response.data)
+            setCount(response.data.count)
             setTeacherDetails(response.data.data.reverse());
         } catch (error) {
             console.error("Error fetching teacher details:", error.response);
@@ -45,12 +48,13 @@ const EditTeachers = () => {
     }, [fetchData]);
 
     useEffect(() => {
-        console.log(refresh, teacherDetails, teacherDetails.count, teacherDetails.length)
-        if (teacherDetails.count === 0) {
+        console.log(teacherDetails)
+        console.log(teacherDetails.length, count)
+        if (count === 0) {
             toast.info("No pending teacher registrations found.");
             navigate('/admin/viewTeachers');
         }
-    }, [refresh]);
+    }, [count]);
 
     const handleEditClick = (teacher) => {
         setEditMode(teacher.teacherId);
@@ -104,16 +108,23 @@ const EditTeachers = () => {
                     },
                 },
                 { withCredentials: true }
-            ).then((res) => {
-                console.log(res);
-                toast.success(res.data.msg);
-                fetchData(); // Refetch data to ensure it reflects changes immediately
-                setEditMode(null); // Exit edit mode after saving
-                setEditedTeacher({}); // Reset editedTeacher state
-            }).catch((err) => {
-                console.log(err);
-                toast.error(err);
-            });
+            )
+                .then((res) => {
+                    // Check for non-2xx response status
+                    if (res.status < 200 || res.status >= 300) {
+                        // Manually throw an error if the status is not 2xx
+                        throw new Error(res.data.msg || 'An error occurred while updating the teacher');
+                    }
+                    console.log(res);
+                    toast.success(res.data.msg);
+                    fetchData(); // Refetch data to ensure it reflects changes immediately
+                    setEditMode(null); // Exit edit mode after saving
+                    setEditedTeacher({}); // Reset editedTeacher state
+                })
+                .catch((err) => {
+                    setEditMode(null); // Exit edit mode after saving
+                    toast.error(err.response.data.msg);
+                });
 
             // if (response.status === 200) {
             //     // Update teacherDetails with the updated teacher
@@ -133,7 +144,7 @@ const EditTeachers = () => {
             // }
         } catch (error) {
             console.error("Error updating teacher details:", error.response);
-            toast.error(error.response.data.message);
+            toast.error(error);
         }
         needRefresh((refresh + 1) % 2)
     };
@@ -155,28 +166,6 @@ const EditTeachers = () => {
 
 
     const navigate = useNavigate();
-    const handleNavigate = () => {
-        navigate("/admin");
-    };
-
-    const Header = () => (
-        <header style={styles.header}>
-            <div style={styles.logo}>
-                <img src={image} alt="Logo" style={styles.logoImage} />
-                <span style={styles.logoLabel}>NIEPID</span>
-            </div>
-            <nav style={styles.navLinks}>
-                <button
-                    onClick={() => {
-                        handleNavigate();
-                    }}
-                    style={styles.backButton}
-                >
-                    Back
-                </button>
-            </nav>
-        </header>
-    );
 
     // render the edit button
     const renderActionButton = (teacher) => {
@@ -224,7 +213,7 @@ const EditTeachers = () => {
 
     return (
         <>
-            <Header />
+            <Header backButtonPath={'/admin'} />
             <div style={styles.container}>
                 <h1 style={styles.heading}>Pending Teacher Registrations</h1>
                 <p style={{ color: "red", textAlign: "center" }}>NOTE: Only use one of the following values for classId: 'preprimary_1', 'preprimary_2', 'preprimary_3', 'primary1_1', 'primary1_2', 'primary1_3', 'primary2_1', 'primary2_2', 'primary2_3'
@@ -328,13 +317,11 @@ const EditTeachers = () => {
                 </table>
             </div>
             <div style={styles.print}>
-                <button onClick={handlePrint} style={styles.backButton}>
+                <button onClick={handlePrint} style={styles.printButton}>
                     Print
                 </button>
             </div>
-            <footer style={footerStyles.footer}>
-                <p>&copy; 2025 Our Website. All rights reserved.</p>
-            </footer>
+            <Footer />
         </>
     );
 };
@@ -344,6 +331,7 @@ const styles = {
         padding: "20px",
         margin: "20px auto",
         maxWidth: "3000px",
+        minHeight: "70vh",
         backgroundColor: "#ffffff",
         border: "1px solid #ddd",
         borderRadius: "10px",
@@ -419,29 +407,7 @@ const styles = {
         borderRadius: "4px",
         boxSizing: "border-box",
     },
-    header: {
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        padding: "1rem 2rem",
-        backgroundColor: "#007bff",
-        color: "#ffffff",
-        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-        marginBottom: "1rem",
-    },
-    logo: {
-        display: "flex",
-        alignItems: "center",
-    },
-    logoImage: {
-        width: "40px",
-        height: "40px",
-        marginRight: "0.5rem",
-    },
-    logoLabel: {
-        fontSize: "1.5rem",
-    },
-    backButton: {
+    printButton: {
         padding: "0.8rem 1.5rem",
         fontSize: "1rem",
         backgroundColor: "#000000",
@@ -520,21 +486,6 @@ const styles = {
         color: "white",
         border: "none",
         borderRadius: "4px",
-    },
-};
-
-const footerStyles = {
-    footer: {
-        backgroundColor: "#007bff",
-        padding: "1rem",
-        textAlign: "center",
-        color: "#ffffff",
-        position: "relative",
-        bottom: 0,
-        width: "100%",
-    },
-    text: {
-        margin: 0,
     },
 };
 

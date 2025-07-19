@@ -2,9 +2,9 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { createUseStyles } from 'react-jss';
 import { useLocation } from 'react-router-dom';
-import image from './th.jpeg'
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { ScrollToButton, Header, Footer } from '../../helpers/components';
 // import flattenStudentData from '../helpers/flattenStudentData';
 
 const useStyles = createUseStyles({
@@ -180,19 +180,9 @@ const Social = () => {
     const currYear = localStorage.getItem("currYear")
     const currSection = localStorage.getItem("currSection")
     const id = localStorage.getItem("studentId")
-    // const term = "I"
-    // const year = "2023"
+    const name = localStorage.getItem("studentName")
 
     const navigate = useNavigate()
-    const Header = () => (
-        <header style={styles.header}>
-            <div style={styles.logo}>
-                <img src={image} alt="Logo" style={styles.logoImage} />
-                <span style={styles.logoLabel}>NIEPID</span>
-            </div>
-            <button onClick={() => navigate('/teacher/eval')} style={styles.backButton}>Back</button>
-        </header>
-    )
 
     useEffect(async () => {
         console.log(term, currTerm)
@@ -364,7 +354,7 @@ const Social = () => {
 
     return (
         <>
-            <Header />
+            <Header id={id} name={name} backButtonPath={'/teacher/eval'} />
             <form className={classes.registrationForm} onSubmit={handleSubmit}>
                 <div className={classes.title}>Functional Assessment Checklist For Programming</div>
                 <div className={classes.title}>Social</div>
@@ -447,9 +437,8 @@ const Social = () => {
                 />
                 <button id="submit" className={classes.button} disabled={true} type="submit">Submit</button>
             </form>
-            <footer style={footerStyles.footer}>
-                <p style={footerStyles.text}>© 2024 NIEPID. All rights reserved.</p>
-            </footer>
+            <Footer />
+            <ScrollToButton />
         </>
     );
 };

@@ -5,6 +5,7 @@ import 'chart.js/auto';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { ScrollToButton } from '../helpers/components';
 
 const styles = {
     header: {
@@ -68,15 +69,17 @@ const styles = {
         borderColor: "#007bff",
     },
     backButton: {
-        padding: "0.8rem 1.5rem",
-        fontSize: "1rem",
-        backgroundColor: "#000000",
-        color: "#ffffff",
-        border: "none",
-        borderRadius: "5px",
-        cursor: "pointer",
-        transition: "background-color 0.3s, transform 0.3s",
+        padding: '8px 12px',
+        backgroundColor: 'white',
+        border: '1px solid #ccc',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        color: '#007bff',
+        fontWeight: 'bold',
         marginLeft: "1rem",
+        '&:hover': {
+            backgroundColor: '#e6e6e6',
+        },
     },
 };
 
@@ -371,6 +374,7 @@ const StudentPerformance = () => {
     return (
         <div>
             <Header />
+            <ScrollToButton scrollDown={true} />
             <div className="container">
                 <h1>Student Information</h1>
                 <div className="student-info">
@@ -456,6 +460,7 @@ const StudentPerformance = () => {
                 )}
             </div>
             <Footer />
+            <ScrollToButton />
             <style>
                 {`
                     .student-info, .year-selector {

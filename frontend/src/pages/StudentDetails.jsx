@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { createUseStyles } from 'react-jss';
 import { useNavigate } from 'react-router-dom';
 import image from './th.jpeg'
+import { ScrollToButton } from '../helpers/components';
 
 
 const useStyles = createUseStyles({
@@ -116,15 +117,17 @@ const styles = {
         fontSize: '1.5rem',
     },
     backButton: {
-        padding: "0.8rem 1.5rem",
-        fontSize: "1rem",
-        backgroundColor: "#000000",
-        color: "#ffffff",
-        border: "none",
-        borderRadius: "5px",
-        cursor: "pointer",
-        transition: "background-color 0.3s, transform 0.3s",
-        marginLeft: "1rem"
+        backgroundColor: 'white',
+        border: '1px solid #ccc',
+        padding: '8px 12px',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        color: '#007bff',
+        fontWeight: 'bold',
+        marginLeft: '1rem',
+        '&:hover': {
+            backgroundColor: '#e6e6e6',
+        },
     },
 }
 const footerStyles = {
@@ -400,6 +403,7 @@ const Student = () => {
     return (
         <>
             <Header />
+            <ScrollToButton scrollDown={true} />
             <form className={classes.registrationForm}>
                 <div className={classes.title}>Student Details</div>
                 <table className={classes.table}>
@@ -976,6 +980,7 @@ const Student = () => {
             <footer style={footerStyles.footer}>
                 <p style={footerStyles.text}>© 2024 NIEPID. All rights reserved.</p>
             </footer>
+            <ScrollToButton />
         </>
     );
 };

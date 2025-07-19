@@ -180,6 +180,9 @@ const ViewStudents = () => {
                 <span style={styles.logoLabel}>NIEPID</span>
             </div>
             <nav style={styles.navLinks}>
+                <button onClick={() => handlePrint()} style={styles.backButton}>
+                    Print
+                </button>
                 <button onClick={() => navigate('/admin')} style={styles.backButton}>
                     Back
                 </button>
@@ -254,11 +257,6 @@ const ViewStudents = () => {
                     </tbody>
                 </table>
             </div>
-            <div style={styles.print}>
-                <button onClick={handlePrint} style={styles.backButton}>
-                    Print
-                </button>
-            </div>
             <footer style={footerStyles.footer}>
                 <p>&copy; 2023 Our Website. All rights reserved.</p>
             </footer>
@@ -274,6 +272,7 @@ const styles = {
         padding: '20px',
         margin: '20px auto',
         width: '96%',
+        minHeight: '60vh',
         // maxWidth: '3004px',
         backgroundColor: '#ffffff',
         border: '1px solid #ddd',
@@ -380,20 +379,18 @@ const styles = {
         fontSize: '1.5rem',
     },
     backButton: {
-        padding: "0.8rem 1.5rem",
-        fontSize: "1rem",
-        backgroundColor: "#000000",
-        color: "#ffffff",
-        border: "none",
-        borderRadius: "5px",
-        cursor: "pointer",
-        transition: "background-color 0.3s, transform 0.3s",
+        backgroundColor: 'white',
+        border: '1px solid #ccc',
+        padding: '8px 12px',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        color: '#007bff',
+        fontWeight: 'bold',
+        marginLeft: '1rem',
+        '&:hover': {
+            backgroundColor: '#e6e6e6',
+        },
     },
-    print: {
-        display: "flex",
-        justifyContent: "center",
-        marginBottom: "1rem",
-    }
 };
 
 const footerStyles = {

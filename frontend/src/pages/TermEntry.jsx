@@ -10,6 +10,7 @@ const Front = () => {
     const id = localStorage.getItem("studentId");
     const year = localStorage.getItem("year");
     const section = localStorage.getItem("section");
+    const name = localStorage.getItem("studentName")
 
     const [oldyearComment, setoldYearComment] = useState('')
     const [oldYearPersonalComment, setoldYearPersonalComment] = useState('')
@@ -62,6 +63,9 @@ const Front = () => {
             <div style={styles.logo}>
                 <img src={image} alt="Logo" style={styles.logoImage} />
                 <span style={styles.logoLabel}>NIEPID</span>
+            </div>
+            <div>
+                <b>{id} - {name}</b>
             </div>
             <nav style={styles.navLinks}>
                 <button onClick={() => navigateTo('/teacher/term')} style={styles.backButton}>

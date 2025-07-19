@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import image from "./th.jpeg";
 import { toast } from "react-toastify";
+import { Footer } from '../helpers/components'
 
 const TeacherTable = () => {
   const [teacherDetails, setTeacherDetails] = useState([]);
@@ -218,6 +219,14 @@ const TeacherTable = () => {
       <nav style={styles.navLinks}>
         <button
           onClick={() => {
+            handlePrint();
+          }}
+          style={styles.backButton}
+        >
+          Print
+        </button>
+        <button
+          onClick={() => {
             handleNavigate();
           }}
           style={styles.backButton}
@@ -250,7 +259,7 @@ const TeacherTable = () => {
       );
     } else if (role === "admin") {
       return (
-        <>
+        <div style={{ display: "flex", gap: "10px", width: "fit-content" }}>
           <button
             style={styles.button1}
             onClick={() => handleEditClick(teacher)}
@@ -263,7 +272,7 @@ const TeacherTable = () => {
           >
             Delete
           </button>
-        </>
+        </div>
       );
     } else {
       return null;
@@ -305,74 +314,83 @@ const TeacherTable = () => {
               >
                 {console.log(teacher.classId)}
                 <td style={styles.td}>
-                  <input
-                    type="text"
-                    name="teacherId"
-                    value={
-                      editMode === teacher.teacherId
-                        ? editedTeacher.teacherId
-                        : teacher.teacherId
-                    }
-                    onChange={handleInputChange}
-                    style={styles.input}
-                    readOnly={editMode !== teacher.teacherId}
-                  />
+                  {editMode === teacher.teacherId ? (
+                    <input
+                      type="text"
+                      name="teacherId"
+                      value={editedTeacher.teacherId}
+                      onChange={handleInputChange}
+                      style={styles.input}
+                      readOnly={editMode !== teacher.teacherId}
+                    />
+                  ) : (
+                    <div style={styles.display}>
+                      <p> {teacher.teacherId} </p>
+                    </div>
+                  )}
                 </td>
                 <td style={styles.td}>
-                  <input
-                    type="text"
-                    name="teacherName"
-                    value={
-                      editMode === teacher.teacherId
-                        ? editedTeacher.teacherName
-                        : teacher.teacherName
-                    }
-                    onChange={handleInputChange}
-                    style={styles.input}
-                    readOnly={editMode !== teacher.teacherId}
-                  />
+                  {editMode === teacher.teacherId ? (
+                    <input
+                      type="text"
+                      name="teacherName"
+                      value={editedTeacher.teacherName}
+                      onChange={handleInputChange}
+                      style={styles.input}
+                      readOnly={editMode !== teacher.teacherId}
+                    />
+                  ) : (
+                    <div style={styles.display}>
+                      <p> {teacher.teacherName} </p>
+                    </div>
+                  )}
                 </td>
                 <td style={styles.td}>
-                  <input
-                    type="text"
-                    name="email"
-                    value={
-                      editMode === teacher.teacherId
-                        ? editedTeacher.email
-                        : teacher.email
-                    }
-                    onChange={handleInputChange}
-                    style={styles.input}
-                    readOnly={editMode !== teacher.teacherId}
-                  />
+                  {editMode === teacher.teacherId ? (
+                    <input
+                      type="text"
+                      name="email"
+                      value={editedTeacher.email}
+                      onChange={handleInputChange}
+                      style={styles.input}
+                      readOnly={editMode !== teacher.teacherId}
+                    />
+                  ) : (
+                    <div style={styles.display}>
+                      <p> {teacher.email} </p>
+                    </div>
+                  )}
                 </td>
                 <td style={styles.td}>
-                  <input
-                    type="text"
-                    name="teacherMNo"
-                    value={
-                      editMode === teacher.teacherId
-                        ? editedTeacher.teacherMNo
-                        : teacher.teacherMNo
-                    }
-                    onChange={handleInputChange}
-                    style={styles.input}
-                    readOnly={editMode !== teacher.teacherId}
-                  />
+                  {editMode === teacher.teacherId ?
+                    (
+                      <input
+                        type="text"
+                        name="teacherMNo"
+                        value={editedTeacher.teacherMNo}
+                        onChange={handleInputChange}
+                        style={styles.input}
+                        readOnly={editMode !== teacher.teacherId}
+                      />
+                    ) :
+                    (
+                      <div style={styles.display}>
+                        <p> {teacher.teacherMNo} </p>
+                      </div>
+                    )
+                  }
                 </td>
                 <td style={styles.td}>
-                  <input
+                  {editMode === teacher.teacherId ? (<input
                     type="text"
                     name="classId"
-                    value={
-                      editMode === teacher.teacherId
-                        ? editedTeacher.classId.map((classid) => replacePrimaryLabels(classid))
-                        : teacher.classId.map((classid) => replacePrimaryLabels(classid))
-                    }
+                    value={editedTeacher.classId.map((classid) => replacePrimaryLabels(classid))}
                     onChange={handleInputChange}
                     style={styles.input}
                     readOnly={true}
-                  />
+                  />) : (<div style={styles.display}>
+                    <p> {teacher.classId.map((classid) => replacePrimaryLabels(classid)).join(', ')} </p>
+                  </div>)}
                 </td>
                 {role === "admin" ? (
                   <td style={styles.td1}>{renderActionButton(teacher)}</td>
@@ -382,14 +400,7 @@ const TeacherTable = () => {
           </tbody>
         </table>
       </div>
-      <div style={styles.print}>
-        <button onClick={handlePrint} style={styles.backButton}>
-          Print
-        </button>
-      </div>
-      <footer style={footerStyles.footer}>
-        <p>&copy; 2023 Our Website. All rights reserved.</p>
-      </footer>
+      <Footer />
       {isOpen && (
         <div style={styles.modal}>
           <div style={styles.modalContent}>
@@ -532,13 +543,23 @@ const styles = {
     color: "#ffffff",
     border: "none",
     padding: "10px 20px",
-    textAlign: "center",
-    textDecoration: "none",
-    display: "inline-block",
     fontSize: "14px",
-    margin: "4px 2px",
+    margin: "0 8px 0 0", // Adds right spacing only
     cursor: "pointer",
-    borderRadius: "5px",
+    borderRadius: "6px",
+    boxShadow: "0 2px 6px rgba(0, 123, 255, 0.3)",
+    transition: "background-color 0.3s ease, transform 0.2s ease",
+    display: "inline-block",
+
+    '&:hover': {
+      backgroundColor: "#0056b3",
+      transform: "translateY(-1px)",
+    },
+
+    '&:active': {
+      backgroundColor: "#004a9f",
+      transform: "translateY(1px)",
+    },
   },
   // input: {
   //   width: "100%",
@@ -570,14 +591,17 @@ const styles = {
     fontSize: "1.5rem",
   },
   backButton: {
-    padding: "0.8rem 1.5rem",
-    fontSize: "1rem",
-    backgroundColor: "#000000",
-    color: "#ffffff",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-    transition: "background-color 0.3s, transform 0.3s",
+    backgroundColor: 'white',
+    border: '1px solid #ccc',
+    padding: '8px 12px',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    color: '#007bff',
+    fontWeight: 'bold',
+    marginLeft: '1rem',
+    '&:hover': {
+      backgroundColor: '#e6e6e6',
+    },
   },
   print: {
     display: "flex",
@@ -641,6 +665,15 @@ const styles = {
     width: "100%",
     boxSizing: "border-box",
   },
+  display: {
+    // padding: "2px",
+    margin: "5px 0 15px 0",
+    // borderRadius: "4px",
+    // border: "1px solid #ccc",
+    fontSize: "16px",
+    width: "100%",
+    // boxSizing: "border-box",
+  },
   submitButton: {
     padding: "10px 20px",
     fontSize: "16px",
@@ -649,21 +682,6 @@ const styles = {
     color: "white",
     border: "none",
     borderRadius: "4px",
-  },
-};
-
-const footerStyles = {
-  footer: {
-    backgroundColor: "#007bff",
-    padding: "1rem",
-    textAlign: "center",
-    color: "#ffffff",
-    position: "relative",
-    bottom: 0,
-    width: "100%",
-  },
-  text: {
-    margin: 0,
   },
 };
 

@@ -1,11 +1,12 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { createUseStyles } from 'react-jss';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { /*useLocation,*/ useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import image from './th.jpeg';
 import { confirmAlert } from 'react-confirm-alert'
 import 'react-confirm-alert/src/react-confirm-alert.css';
+import { ScrollToButton, Header } from '../helpers/components';
 
 const useStyles = createUseStyles({
     registrationForm: {
@@ -155,18 +156,18 @@ const useStyles = createUseStyles({
 });
 
 function AddStudents() {
-    const location = useLocation();
+    // const location = useLocation();
     const navigate = useNavigate();
-    const { pathname } = location;
-    const username = pathname.split("/")[pathname.split("/").length - 1];
+    // const { pathname } = location;
+    // const username = pathname.split("/")[pathname.split("/").length - 1];
 
-    const [isEditing, setIsEditing] = useState(true);
+    // const [isEditing, setIsEditing] = useState(true);
 
-    const currentDate = new Date()
-    const day = String(currentDate.getDate()).padStart(2, '0'); // Adds leading zero if necessary
-    const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Month is 0-based, so add 1
-    const year = currentDate.getFullYear();
-    const formattedDate = `${day}-${month}-${year}`;
+    // const currentDate = new Date()
+    // const day = String(currentDate.getDate()).padStart(2, '0'); // Adds leading zero if necessary
+    // const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Month is 0-based, so add 1
+    // const year = currentDate.getFullYear();
+    // const formattedDate = `${day}-${month}-${year}`;
     // console.log(formattedDate)
 
     const initialInfo = {
@@ -523,23 +524,23 @@ function AddStudents() {
         }));
     };
 
-    const areAllFieldsFilled = (obj) => {
-        for (const key in obj) {
-            if (Array.isArray(obj[key])) {
-                for (const item of obj[key]) {
-                    if (!areAllFieldsFilled(item)) return false;
-                }
-            } else if (typeof obj[key] === 'object') {
-                if (!areAllFieldsFilled(obj[key])) return false;
-            } else {
-                if (obj[key] === '') return false;
-            }
-        }
-        return true;
-    };
+    // const areAllFieldsFilled = (obj) => {
+    //     for (const key in obj) {
+    //         if (Array.isArray(obj[key])) {
+    //             for (const item of obj[key]) {
+    //                 if (!areAllFieldsFilled(item)) return false;
+    //             }
+    //         } else if (typeof obj[key] === 'object') {
+    //             if (!areAllFieldsFilled(obj[key])) return false;
+    //         } else {
+    //             if (obj[key] === '') return false;
+    //         }
+    //     }
+    //     return true;
+    // };
 
 
-    const [response, setResponse] = useState(false)
+    // const [response, setResponse] = useState(false)
     const handleSubmit = async () => {
         // e.preventDefault();
 
@@ -551,7 +552,7 @@ function AddStudents() {
         // const aadharNo = formData.details.info.aadharNo;
         // const mobileNo = formData.details.info.mobileNo;
         const { regNo, regDate, dob, name, sex, aadharNo, mobileNo } = formData.details.info;
-        const classid = formData.stdCred.class;
+        // const classid = formData.stdCred.class;
         console.log(mobileNo);
         // Final validation check for Aadhar number
         if (aadharNo.length !== 12 || !/^[0-9]{12}$/.test(aadharNo)) {
@@ -639,20 +640,6 @@ function AddStudents() {
         navigate("/admin");
     }
 
-    const Header = () => (
-        <header style={styles.header}>
-            <div style={styles.logo}>
-                <img src={image} alt="Logo" style={styles.logoImage} />
-                <span style={styles.logoLabel}>NIEPID</span>
-            </div>
-            <nav style={styles.navLinks}>
-                <button onClick={() => { handleNavigate() }} style={styles.backButton}>
-                    Back
-                </button>
-            </nav>
-        </header>
-    );
-
     const [activeTab, setActiveTab] = useState(1);
     const endTab = 2
     const handleButton = (e) => {
@@ -669,7 +656,8 @@ function AddStudents() {
 
     return (
         <>
-            <Header />
+            <Header backButtonPath={'/admin'} />
+            <ScrollToButton scrollDown={true} />
             <form onSubmit={handleSubmit} className={classes.registrationForm}>
                 <div className={classes.title} id='title'>Student Details Form</div>
                 {activeTab !== 1 ? (
@@ -2789,6 +2777,7 @@ function AddStudents() {
                     </button>
                 </div>
             </form >
+            <ScrollToButton />
         </>
     );
 }
