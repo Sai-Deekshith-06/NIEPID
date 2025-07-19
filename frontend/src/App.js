@@ -51,9 +51,8 @@ export default function App() {
         <Route exact path="/" element={<Login />} />
 
         <Route element={<PrivateRoute />}>
-          <Route element={<AdminPrivateRoute /> || <StudentPrivateRoute /> || <TeacherPrivateRoute /> || <PrincipalPrivateRoute />} >
-            <Route exact path="/changepassword" element={<ChangePassword />} />
-          </Route>
+          <Route exact path="/" element={<Login />} />
+          <Route path="/changepassword" element={<ChangePassword />} />
           <Route element={<AdminPrivateRoute />}>
             <Route exact path="/admin" element={<Admin />} />
             <Route exact path="/admin/addstudents" element={<AddStudents />} />
@@ -67,6 +66,7 @@ export default function App() {
             <Route exact path="/student" element={<Student />} />
             <Route exact path="/student/details" element={<StudentDetails />} />
             <Route exact path="/student/history" element={<History />} />
+            <Route path="/student/changepassword" element={<ChangePassword />} />
           </Route>
           <Route element={<TeacherPrivateRoute />}>
             <Route exact path="/teacher" element={<Teacher />} />
@@ -79,7 +79,6 @@ export default function App() {
             <Route exact path="/teacher/term/termEntry/eval/academic" element={<Academic />} />
             <Route exact path="/teacher/term" element={<Term />} />
             <Route exact path="/teacher/term/termEntry" element={<TermEntry />} />
-
           </Route>
           <Route element={<PrincipalPrivateRoute />}>
             <Route exact path="/principal" element={<Principal />} />

@@ -23,6 +23,9 @@ function Student() {
         paymentType: '',
         mobile: '',
     });
+    const handleChangePasswordPage = () => {
+        navigate('/student/changepassword');
+    };
     useEffect(() => {
         const fetchStudentData = async () => {
             try {
@@ -94,6 +97,12 @@ function Student() {
                 </div>
                 <div>
                     <button style={styles.logoutButton} onClick={handleLogout}>Logout</button>
+                    <button
+                    onClick={handleChangePasswordPage}
+                    style={styles.logoutButton}
+                    >
+                        Change Password
+                    </button>
                 </div>
             </header>
             <div style={styles.contentContainer}>
@@ -156,6 +165,7 @@ const styles = {
         color: '#fff',
         border: 'none',
         borderRadius: '5px',
+        margin : "10px",
         cursor: 'pointer',
         transition: 'background-color 0.3s ease',
     },

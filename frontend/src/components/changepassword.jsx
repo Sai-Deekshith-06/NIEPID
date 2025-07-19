@@ -1,5 +1,9 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
+import image from "../th.jpeg";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { useCookies } from "react-cookie";
 import { Footer, Header } from "./components";
 
 const styles = {
@@ -92,6 +96,8 @@ const ChangePassword = () => {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [buttonHover, setButtonHover] = useState(false);
+    const [cookies, setCookie, removeCookie] = useCookies([]);
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -112,14 +118,39 @@ const ChangePassword = () => {
         }
 
         try {
-            // Replace with your actual API endpoint
-            setSuccess('Password changed successfully!');
-            toast.success('Password changed successfully!');
-            setCurrentPassword('');
-            setNewPassword('');
-            setConfirmPassword('');
+            // Get userId from localStorage or context
+            const userId = localStorage.getItem("userId");
+            const res = await axios.post(
+                "http://localhost:4000/api/changepassword",
+                { userId, currentPassword, newPassword },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                    withCredentials: true,
+                }
+            );
+            if (res.data.success) {
+                setSuccess(res.data.message);
+                toast.success("Password changed successfully. Please login again.");
+                setCurrentPassword('');
+                setNewPassword('');
+                setConfirmPassword('');
+                removeCookie("jwt");
+                localStorage.removeItem("role");
+                localStorage.removeItem("token");
+                navigate("/");
+                  
+            } else {
+                setError(res.data.message || "Failed to change password.");
+            }
         } catch (err) {
-            setError('Failed to change password.');
+            console.log(err)
+            setError(
+                err.response?.data?.message ||
+                "Failed to change password. Please try again."
+            );
         }
     };
 
