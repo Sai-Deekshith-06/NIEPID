@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import image from './th.jpeg';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { Footer, Header } from '../components/components';
 
 const Front = () => {
     const navigate = useNavigate();
@@ -57,23 +58,6 @@ const Front = () => {
             .replace(/primary2/gi, 'Primary-II')
 
     };
-
-    const Header = () => (
-        <header style={styles.header}>
-            <div style={styles.logo}>
-                <img src={image} alt="Logo" style={styles.logoImage} />
-                <span style={styles.logoLabel}>NIEPID</span>
-            </div>
-            <div>
-                <b>{id} - {name}</b>
-            </div>
-            <nav style={styles.navLinks}>
-                <button onClick={() => navigateTo('/teacher/term')} style={styles.backButton}>
-                    Back
-                </button>
-            </nav>
-        </header>
-    );
 
     useEffect(() => {
         const fetchData = async () => {
@@ -170,11 +154,9 @@ const Front = () => {
         newComments[index] = event.target.value;
         setComments(newComments);
     };
-
     return (
         <div style={styles.pageContainer}>
-            <Header />
-
+            <Header id={id} name={name} backButtonPath={'/teacher/term'} />
             <main style={styles.main}>
                 <h1 style={styles.heading}>Functional Assessment Checklist for Programming</h1>
                 <h1 style={styles.subHeading}>{replacePrimaryLabels(section)} -- Year {year}</h1>
@@ -281,9 +263,7 @@ const Front = () => {
                 Submit
             </button>
 
-            <footer style={styles.footer}>
-                <p style={styles.footerText}>&copy; 2024 Functional Assessment. All rights reserved.</p>
-            </footer>
+            <Footer />
         </div>
     );
 };
@@ -296,27 +276,6 @@ const styles = {
         fontFamily: 'Arial, sans-serif',
         backgroundColor: '#f0f0f0',
         color: '#333',
-    },
-    header: {
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '1rem 2rem',
-        backgroundColor: '#007bff',
-        color: '#ffffff',
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-    },
-    logo: {
-        display: 'flex',
-        alignItems: 'center',
-    },
-    logoImage: {
-        width: '40px',
-        height: '40px',
-        marginRight: '0.5rem',
-    },
-    logoLabel: {
-        fontSize: '1.5rem',
     },
     main: {
         flex: '1',
@@ -398,25 +357,6 @@ const styles = {
         alignSelf: 'center',
         flexDirection: 'column'
     },
-    footer: {
-        textAlign: 'center',
-        padding: '1rem',
-        backgroundColor: '#007bff',
-        color: 'white',
-    },
-    footerText: {
-        margin: '0',
-    },
-    backButton: {
-        padding: "0.8rem 1.5rem",
-        fontSize: "1rem",
-        backgroundColor: "#000000",
-        color: "#ffffff",
-        border: "none",
-        borderRadius: "5px",
-        cursor: "pointer",
-        transition: "background-color 0.3s, transform 0.3s",
-    }
 };
 
 export default Front;

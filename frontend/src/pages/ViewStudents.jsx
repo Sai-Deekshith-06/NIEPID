@@ -5,6 +5,7 @@ import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import image from './th.jpeg'
+import { Footer } from '../components/components';
 
 
 // Add the icons to the library
@@ -257,9 +258,7 @@ const ViewStudents = () => {
                     </tbody>
                 </table>
             </div>
-            <footer style={footerStyles.footer}>
-                <p>&copy; 2023 Our Website. All rights reserved.</p>
-            </footer>
+            <Footer />
         </>
     );
 };
@@ -391,21 +390,6 @@ const styles = {
             backgroundColor: '#e6e6e6',
         },
     },
-};
-
-const footerStyles = {
-    footer: {
-        backgroundColor: '#007bff',
-        padding: '1rem',
-        textAlign: 'center',
-        color: '#ffffff',
-        position: 'relative',
-        bottom: 0,
-        width: '100%',
-    },
-    text: {
-        margin: 0,
-    }
 };
 
 export default ViewStudents;

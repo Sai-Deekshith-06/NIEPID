@@ -5,7 +5,7 @@ import 'chart.js/auto';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { ScrollToButton } from '../helpers/components';
+import { ScrollToButton } from '../components/components';
 
 const styles = {
     header: {

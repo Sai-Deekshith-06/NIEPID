@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import image from './th.jpeg';
-import { Footer, Header } from '../helpers/components';
+import { Footer, Header } from '../components/components';
 
 
 

@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import image from './th.jpeg';
 import { confirmAlert } from 'react-confirm-alert'
 import 'react-confirm-alert/src/react-confirm-alert.css';
-import { ScrollToButton, Header } from '../helpers/components';
+import { ScrollToButton, Header } from '../components/components';
 
 const useStyles = createUseStyles({
     registrationForm: {

@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import image from "./th.jpeg";
 import { toast } from "react-toastify";
-import { Header, Footer } from '../helpers/components'
+import { Header, Footer } from '../components/components'
 
 const EditTeachers = () => {
     const [teacherDetails, setTeacherDetails] = useState([]);

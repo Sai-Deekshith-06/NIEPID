@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import image from "./th.jpeg";
 import { toast } from "react-toastify";
-import { Footer } from '../helpers/components'
+import { Footer } from '../components/components'
 
 const TeacherTable = () => {
   const [teacherDetails, setTeacherDetails] = useState([]);

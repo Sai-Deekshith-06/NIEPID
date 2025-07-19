@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from "react-toastify";
 import axios from 'axios';
 import image from './th.jpeg'
-import { Footer, Header } from '../helpers/components';
+import { Footer, Header } from '../components/components';
 
 
 // Add the icons to the library

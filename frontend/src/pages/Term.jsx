@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import image from './th.jpeg';
 import axios from 'axios';
+import { Footer, Header } from '../components/components';
 
 const Term = () => {
   const navigate = useNavigate();
@@ -102,16 +103,7 @@ const Term = () => {
 
   return (
     <div style={styles.container}>
-      <header style={styles.header}>
-        <div style={styles.logo}>
-          <img src={image} alt="Logo" style={styles.logoImage} />
-          <span style={styles.logoLabel}>NIEPID</span>
-        </div>
-        <div>
-          <b>{id} - {name}</b>
-        </div>
-        <button onClick={() => navigate('/teacher')} style={styles.backButton} >Back</button>
-      </header>
+      <Header id={id} name={name} backButtonPath={'/teacher'} />
       <div style={styles.hero}>
         <h1 style={styles.heroTitle}>Terms</h1>
       </div>
@@ -127,9 +119,7 @@ const Term = () => {
           ))}
         </div>
       </div>
-      <footer style={styles.footer}>
-        <p style={styles.footerText}>&copy; 2024 Functional Assessment. All rights reserved.</p>
-      </footer>
+      <Footer />
     </div>
   );
 };
@@ -141,27 +131,6 @@ const styles = {
     minHeight: '100vh',
     fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
     backgroundColor: '#f0f8ff',
-  },
-  header: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '1rem 2rem',
-    backgroundColor: '#007bff',
-    color: '#ffffff',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-  },
-  logo: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-  logoImage: {
-    width: '40px',
-    height: '40px',
-    marginRight: '0.5rem',
-  },
-  logoLabel: {
-    fontSize: '1.5rem',
   },
   button: {
     padding: '0.8rem 1.5rem',
@@ -206,26 +175,7 @@ const styles = {
     border: 'none',
     borderRadius: '5px',
     cursor: 'pointer',
-  },
-  backButton: {
-    padding: "0.8rem 1.5rem",
-    fontSize: "1rem",
-    backgroundColor: "#000000",
-    color: "#ffffff",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-    transition: "background-color 0.3s, transform 0.3s",
-  },
-  footer: {
-    textAlign: 'center',
-    padding: '1rem',
-    backgroundColor: '#007bff',
-    color: 'white',
-  },
-  footerText: {
-    margin: '0',
-  },
+  }
 };
 
 export default Term;

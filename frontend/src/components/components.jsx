@@ -53,6 +53,7 @@ const useStyles = createUseStyles({
         borderRadius: '5px',
         cursor: 'pointer',
         transition: 'background-color 0.3s ease',
+        marginLeft: '1rem',
     },
     // for footer
     footer: {
@@ -147,9 +148,14 @@ const Header = ({ id, name, backButtonPath, logout, removeCookie, print }) => {
             )}
             <nav className={classes.navLinks}>
                 {logout && removeCookie && (
-                    <button onClick={handleLogout} className={classes.logoutButton}>
-                        Logout
-                    </button>
+                    <div className='home'>
+                        <button onClick={() => navigateTo('/changepassword')} className={classes.logoutButton}>
+                            Change Password
+                        </button>
+                        <button onClick={handleLogout} className={classes.logoutButton}>
+                            Logout
+                        </button>
+                    </div>
                 )}
                 {print && (
                     <button onClick={(e) => window.print()} className={classes.backButton}>

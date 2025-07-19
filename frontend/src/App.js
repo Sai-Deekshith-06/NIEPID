@@ -36,6 +36,7 @@ import TeacherPrivateRoute from "./routes/TeacherPrivateRoute";
 
 //import pages for stdent 
 import StudentDetails from "./pages/StudentDetails";
+import ChangePassword from "./components/changepassword";
 
 export default function App() {
   // useEffect(()=>{
@@ -50,7 +51,9 @@ export default function App() {
         <Route exact path="/" element={<Login />} />
 
         <Route element={<PrivateRoute />}>
-          <Route exact path="/" element={<Login />} />
+          <Route element={<AdminPrivateRoute /> || <StudentPrivateRoute /> || <TeacherPrivateRoute /> || <PrincipalPrivateRoute />} >
+            <Route exact path="/changepassword" element={<ChangePassword />} />
+          </Route>
           <Route element={<AdminPrivateRoute />}>
             <Route exact path="/admin" element={<Admin />} />
             <Route exact path="/admin/addstudents" element={<AddStudents />} />

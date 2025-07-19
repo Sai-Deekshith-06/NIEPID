@@ -4,7 +4,7 @@ import { createUseStyles } from 'react-jss';
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { ScrollToButton, Header, Footer } from '../../helpers/components';
+import { ScrollToButton, Header, Footer } from '../../components/components';
 // import flattenStudentData from '../helpers/flattenStudentData';
 
 const useStyles = createUseStyles({
@@ -227,7 +227,9 @@ const Academic = () => {
                 else
                     setOldComments("Enter your comments")
             })
-            .catch()
+            .catch((err) => {
+                toast.error(err)
+            })
     }, [username]);
 
     const handleChange = (event) => {

@@ -4,7 +4,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import 'react-toastify/dist/ReactToastify.css';
-import { Header, Footer } from '../helpers/components';
+import { Header, Footer } from '../components/components';
 
 function App() {
     const [isAdmin, setIsAdmin] = useState(false); // This state will determine whether to show Admin or Home component

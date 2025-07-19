@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { createUseStyles } from 'react-jss';
 import { useNavigate } from 'react-router-dom';
 import image from './th.jpeg'
-import { ScrollToButton } from '../helpers/components';
+import { ScrollToButton } from '../components/components';
 
 
 const useStyles = createUseStyles({
