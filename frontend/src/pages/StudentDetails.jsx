@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { createUseStyles } from 'react-jss';
 import { useNavigate } from 'react-router-dom';
-import image from './th.jpeg'
+import image from "../images/logo.jpeg";
 import { ScrollToButton } from '../components/components';
 
 
@@ -342,8 +342,7 @@ const Student = () => {
             }
         };
         fetchStudentData();
-    }
-        , [])    //src={image}
+    }, [regNo, token])    //src={image}
     // const navigate = useNavigate()
     // const role = localStorage.getItem("role")
     // const Header = () => (

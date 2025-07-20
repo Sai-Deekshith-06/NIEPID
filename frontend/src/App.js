@@ -1,33 +1,30 @@
 // import React, { useEffect } from "react";
 // import Register from "./pages/Register";
-import AddStudents from "./pages/AddStudents";
+import AddStudents from "./pages/admin/AddStudents";
 
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 import Login from "./pages/Login";
 // import Home from "./pages/Home";
-import Admin from "./pages/Admin";
-import Teacher from "./pages/Teacher";
-import Principal from "./pages/Principal";
-import Student from "./pages/Student";
-import StudentEval from "./pages/StudentEval";
+import Admin from "./pages/admin/Admin";
+import Teacher from "./pages/teacher/Teacher";
+import Principal from "./pages/principal/Principal";
+import Student from "./pages/student/Student";
 import ViewTeachers from "./pages/ViewTeachers";
-import EditTeachers from "./pages/EditTeachers";
-import ViewStudents from "./pages/ViewStudents";
-import PrincipalViewStudents from "./pages/PrincipalViewStudents";
-import Front from "./pages/evaluate/Front";
+import EditTeachers from "./pages/admin/EditTeachers";
+import ViewStudents from "./pages/admin/ViewStudents";
+import PrincipalViewStudents from "./pages/principal/PrincipalViewStudents";
+import Front from "./pages/teacher/evaluate/Front";
 import History from "./pages/History";
-import Personal from "./pages/evaluate/Personal";
-import Social from "./pages/evaluate/Social";
-import Recreational from "./pages/evaluate/Recreational";
-import Occupational from "./pages/evaluate/Occupational";
-import Academic from "./pages/evaluate/Academic";
-import Term from "./pages/Term";
-import TermEntry from "./pages/TermEntry";
+import Personal from "./pages/teacher/evaluate/Personal";
+import Social from "./pages/teacher/evaluate/Social";
+import Recreational from "./pages/teacher/evaluate/Recreational";
+import Occupational from "./pages/teacher/evaluate/Occupational";
+import Academic from "./pages/teacher/evaluate/Academic";
+import Term from "./pages/teacher/Term";
+import TermEntry from "./pages/teacher/TermEntry";
 
 
 import "react-toastify/dist/ReactToastify.css";
-import Class from "./pages/Class";
-// import StudentHistory from "./pages/StudentHistory";
 import PrivateRoute from './routes/PrivateRoute';
 import AdminPrivateRoute from "./routes/AdminPrivateRoute";
 import PrincipalPrivateRoute from "./routes/PrincipalPrivateRoute";
@@ -89,10 +86,6 @@ export default function App() {
           </Route>
 
         </Route>
-        {/* <Route exact path="/profile/:username" element={<AddStudents />} /> */}
-        <Route exact path="/class" element={<Class />} />
-        <Route path="/eval/:username" element={<StudentEval />} />
-        {/* <Route path="/hist/:username" element={<StudentHistory />} /> */}
       </Routes>
     </BrowserRouter>
   );

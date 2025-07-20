@@ -1,10 +1,10 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { createUseStyles } from 'react-jss';
-import { useLocation } from 'react-router-dom';
+// import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { ScrollToButton, Header, Footer } from '../../components/components';
+import { ScrollToButton, Header, Footer } from '../../../components/components';
 import areAllAnswersSelected from './areAllAnswersSelected';
 // import flattenStudentData from '../helpers/flattenStudentData';
 
@@ -44,12 +44,6 @@ const useStyles = createUseStyles({
         background: '-webkit-linear-gradient(left, #007BFF, #0056b3)',
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
-    },
-    label: {
-        marginBottom: '25px',
-        fontSize: '20px',
-        fontWeight: '500',
-        color: '#444',
     },
     textInput: {
         padding: '12px',
@@ -131,11 +125,22 @@ const useStyles = createUseStyles({
     },
     label: {
         alignSelf: "center",
-        justifySelf: 'flex-end'
+        justifySelf: 'flex-end',
+        marginBottom: '25px',
+        fontSize: '20px',
+        fontWeight: '500',
+        color: '#444',
     },
     buttonContainer1: {
         display: 'flex',
         justifyContent: 'space-between',
+        columnGap: '20px',
+        // marginTop: '20px',
+    },
+    buttonContainer2: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        flexDirection: "column",
         columnGap: '20px',
         // marginTop: '20px',
     },
@@ -160,74 +165,75 @@ const useStyles = createUseStyles({
     },
 });
 
-const Occupational = () => {
+const Recreational = () => {
     const classes = useStyles();
-    const location = useLocation();
-    const { pathname } = location;
-    let username
-    const [isEditing, setIsEditing] = useState(true);
+    // const location = useLocation();
+    // const { pathname } = location;
+    // const [isEditing, setIsEditing] = useState(true);
     const [answer, setAnswer] = useState({});
     const [questions, setQuestions] = useState([]);
     const [newQuestion, setNewQuestion] = useState("");
     const [newAnswer, setNewAnswer] = useState("");
-    const [percent, setPercent] = useState("");
+    const [result, setResult] = useState({
+        mode: '',
+        percent: 0
+    });
     const [comments, setComments] = useState("")
     const [oldComments, setOldComments] = useState("")
+
 
     const section = localStorage.getItem("section")
     const term = localStorage.getItem("term")
     const year = localStorage.getItem("year")
-    const currTerm = localStorage.getItem("currTerm")
-    const currYear = localStorage.getItem("currYear")
-    const currSection = localStorage.getItem("currSection")
+    // const currTerm = localStorage.getItem("currTerm")
+    // const currYear = localStorage.getItem("currYear")
+    // const currSection = localStorage.getItem("currSection")
     const id = localStorage.getItem("studentId")
     const name = localStorage.getItem("studentName")
 
     const navigate = useNavigate()
 
-    useEffect(async () => {
-        console.log(term, currTerm)
-        console.log(year, currYear)
-        console.log(section, currSection)
-        const id = localStorage.getItem("studentId")
-        console.log(id)
-        const data = await axios.get("http://localhost:4000/teacher/evaluate/questions", {
-            headers: {
-                id: id,
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-            }
-        }, { withCredentials: true })
-            .then(res => {
-                // console.log(res)
-                username = res.data.data.name
-                var i = 0, j = 0, k = 0;
-                res.data.data.section.map((s, index) => {
-                    if (s.sec === section)
-                        k = index
+    useEffect(() => {
+        const f = async () => {
+            await axios.get("http://localhost:4000/teacher/evaluate/questions", {
+                headers: {
+                    id: id,
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                }
+            }, { withCredentials: true })
+                .then(res => {
+                    var i = 0, j = 0, k = 0;
+                    res.data.data.section.forEach((s, index) => {
+                        if (s.sec === section)
+                            k = index
+                    })
+                    res.data.data.section[k].yearReport.forEach((y, index) => {
+                        if (y.year === year)
+                            i = index
+                    })
+                    res.data.data.section[k].yearReport[i].termReport.forEach((t, index) => {
+                        if (t.term === term)
+                            j = index
+                    })
+                    const recreationalQuestions = res.data.data.section[k].yearReport[i].termReport[j].report.recreationalQA
+                    setQuestions(recreationalQuestions)
+                    const initialanswer = {}
+                    recreationalQuestions.forEach((question, index) => {
+                        initialanswer[`s${index + 1}`] = question.answer;
+                    });
+                    setAnswer(initialanswer);
+                    if (res.data.data.section[k].yearReport[i].termReport[j].comment.recreationalComment.trim() !== "")
+                        setOldComments(res.data.data.section[k].yearReport[i].termReport[j].comment.recreationalComment)
+                    else
+                        setOldComments("Enter your comments")
                 })
-                res.data.data.section[k].yearReport.map((y, index) => {
-                    if (y.year === year)
-                        i = index
+                .catch((err) => {
+                    console.log(err)
                 })
-                res.data.data.section[k].yearReport[i].termReport.map((t, index) => {
-                    if (t.term === term)
-                        j = index
-                })
-                const occupationalQuestions = res.data.data.section[k].yearReport[i].termReport[j].report.occupationalQA
-                setQuestions(occupationalQuestions)
-                const initialanswer = {}
-                occupationalQuestions.forEach((question, index) => {
-                    initialanswer[`s${index + 1}`] = question.answer;
-                });
-                setAnswer(initialanswer);
-                if (res.data.data.section[k].yearReport[i].termReport[j].comment.occupationalComment.trim() !== "")
-                    setOldComments(res.data.data.section[k].yearReport[i].termReport[j].comment.occupationalComment)
-                else
-                    setOldComments("Enter your comments")
-            })
-            .catch()
-    }, [username]);
+        }
+        f()
+    }, [id, section, year, term]);
 
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -278,7 +284,7 @@ const Occupational = () => {
             return
         }
         const submissionData = {
-            username: username,
+            username: name,
             questions: questions.map((question, index) => ({
                 question: question.question,
                 answer: answer[`s${index + 1}`] || question.answer
@@ -287,7 +293,7 @@ const Occupational = () => {
         // console.log('Submitting data:', submissionData);
         const id = localStorage.getItem("studentId")
         await axios.post("http://localhost:4000/teacher/eval/form", {
-            type: "occupationalQA",
+            type: "recreationalQA",
             id: id,
             section: section,
             year: year,
@@ -300,13 +306,13 @@ const Occupational = () => {
             }
         })
             .then(res => {
-                console.log(res.data.data)
+                // console.log(res.data.data)
             })
             .catch(err => {
                 console.log(err.response)
             })
 
-        axios.get("http://localhost:4000/teacher/evaluate", {
+        await axios.get("http://localhost:4000/teacher/evaluate", {
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -314,13 +320,16 @@ const Occupational = () => {
                 year: year,
                 term: term,
                 id: id,
-                type: "occupationalQA"
+                type: "recreationalQA"
             }
         })
             .then((res) => {
                 console.log(res.data)
-                const per = res.data.result
-                setPercent(per)
+                const result = {
+                    mode: res.data.result.mode,
+                    percent: res.data.result.percent
+                }
+                setResult(result)
             })
             .catch((err) => {
                 console.log(err)
@@ -335,10 +344,7 @@ const Occupational = () => {
 
     const handleCommentsChange = (event) => {
         setComments(event.target.value);
-        if (event.target.value)
-            document.getElementById("submit").disabled = false
-        else
-            document.getElementById("submit").disabled = true
+        document.getElementById("submit").disabled = event.target.value ? true : false
     };
 
     const handleSubmit = (e) => {
@@ -348,7 +354,7 @@ const Occupational = () => {
             year: year,
             term: term,
             id: id,
-            type: "occupationalQA",
+            type: "recreationalQA",
             comments: comments
         }, {
             headers: {
@@ -372,11 +378,11 @@ const Occupational = () => {
             <Header id={id} name={name} backButtonPath={'/teacher/eval'} />
             <form className={classes.registrationForm} onSubmit={handleSubmit}>
                 <div className={classes.title}>Functional Assessment Checklist For Programming</div>
-                <div className={classes.title}>Occupational</div>
+                <div className={classes.title}>Recreational</div>
                 <table className={classes.table}>
                     <tbody>
                         {questions.map((question, index) => (
-                            <tr id={`s${index + 1}`}>
+                            <tr id={`s${index + 1}`} key={`s${index + 1}`}>
                                 <td className={classes.td}>{index + 1}</td>
                                 <td className={classes.td}>{question.question}</td>
                                 <td className={classes.td}>
@@ -388,12 +394,12 @@ const Occupational = () => {
                                         className={classes.textInput}
                                     >
                                         <option value="">Select an option</option>
-                                        <option value="Yes" title='Yes'>+</option>
-                                        {/* <option value="No">No</option> */}
-                                        <option value="NA" title='Not Applicable' >NA</option>
-                                        <option value="NE" title='No Exposure' >NE</option>
-                                        <option value="C-P1" title='Verbal Prompting' >VP</option>
-                                        <option value="C-P2" title='Physical Prompting' >PP</option>
+                                        <option value="A">A</option>
+                                        <option value="B">B</option>
+                                        <option value="C">C</option>
+                                        <option value="D">D</option>
+                                        <option value="E">E</option>
+                                        {/* <option value="">C-P2</option> */}
                                     </select>
                                 </td>
                             </tr>
@@ -418,12 +424,12 @@ const Occupational = () => {
                                     className={classes.textInput}
                                 >
                                     <option value="">Select an option</option>
-                                    <option value="Yes">+</option>
-                                    {/* <option value="No">No</option> */}
-                                    <option value="NA">NA</option>
-                                    <option value="NE">NE</option>
-                                    <option value="C-P1">VP</option>
-                                    <option value="C-P2">PP</option>
+                                    <option value="A">A</option>
+                                    <option value="B">B</option>
+                                    <option value="C">C</option>
+                                    <option value="D">D</option>
+                                    <option value="E">E</option>
+                                    {/* <option value="C-P2">C-P2</option> */}
                                 </select>
                             </td>
                         </tr>
@@ -438,7 +444,10 @@ const Occupational = () => {
                         Add Question
                     </button>
                     <div className={classes.buttonContainer1}>
-                        <label className={classes.label}>{"Percentage : " + percent + "%"}</label>
+                        <div className={classes.buttonContainer2}>
+                            {/* <label className={classes.label}>{"Percentage : " + result.percent + "%"}</label> */}
+                            <label className={classes.label}>{"Mode : " + result.mode}</label>
+                        </div>
                         <button className={classes.button} onClick={handleEvaluate}>Evaluate</button>
                     </div>
                 </div>
@@ -458,4 +467,4 @@ const Occupational = () => {
     );
 };
 
-export default Occupational;
+export default Recreational;

@@ -132,6 +132,7 @@ const Header = ({ id, name, backButtonPath, logout, removeCookie, print }) => {
             removeCookie('jwt');
             localStorage.removeItem("role");
             localStorage.removeItem("token");
+            localStorage.clear()
             navigateTo('/');
         };
 
@@ -149,7 +150,7 @@ const Header = ({ id, name, backButtonPath, logout, removeCookie, print }) => {
             <nav className={classes.navLinks}>
                 {logout && removeCookie && (
                     <div className='home'>
-                        <button onClick={() => navigateTo('/changepassword')} className={classes.logoutButton}>
+                        <button onClick={() => navigateTo('/changepassword')} className={classes.backButton}>
                             Change Password
                         </button>
                         <button onClick={handleLogout} className={classes.logoutButton}>
@@ -194,7 +195,7 @@ const Footer = () => {
  */
 const ScrollToButton = ({ scrollDown = false, scrollTarget = 0 }) => {
     const classes = useStyles();
-    if (scrollDown && scrollTarget == 0)
+    if (scrollDown && scrollTarget === 0)
         scrollTarget = document.documentElement.scrollHeight
     const handleClick = () => {
         window.scrollTo({

@@ -3,10 +3,9 @@ import { useEffect, useState } from 'react';
 import { createUseStyles } from 'react-jss';
 import { /*useLocation,*/ useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import image from './th.jpeg';
 import { confirmAlert } from 'react-confirm-alert'
 import 'react-confirm-alert/src/react-confirm-alert.css';
-import { ScrollToButton, Header } from '../components/components';
+import { ScrollToButton, Header } from '../../components/components';
 
 const useStyles = createUseStyles({
     registrationForm: {
@@ -358,7 +357,7 @@ function AddStudents() {
         };
     }, []);
 
-    const [isScrolled, setIsScrolled] = useState(false);
+    const [, setIsScrolled] = useState(false);
 
     const handleScroll = () => {
         if (window.scrollY > 50) { // Adjust this value based on when you want the opacity change to occur
@@ -367,52 +366,6 @@ function AddStudents() {
             setIsScrolled(false);
         }
     };
-
-    const styles = {
-        header: {
-            // position: 'fixed',
-            top: 0,
-            left: 0,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            padding: '1rem 2rem',
-            backgroundColor: '#007bff',
-            position: 'sticky',
-            color: '#ffffff',
-            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-            marginBottom: '1rem',
-            opacity: isScrolled ? 0.9 : 1, // Change opacity based on scroll state
-            transition: 'opacity 0.3s ease', // Smooth transition for opacity change
-        },
-        logo: {
-            display: 'flex',
-            alignItems: 'center',
-        },
-        logoImage: {
-            width: '40px',
-            height: '40px',
-            marginRight: '0.5rem',
-        },
-        logoLabel: {
-            fontSize: '1.5rem',
-        },
-        backButton: {
-            padding: "0.8rem 1.5rem",
-            fontSize: "1rem",
-            backgroundColor: "#000000",
-            color: "#ffffff",
-            border: "none",
-            borderRadius: "5px",
-            cursor: "pointer",
-            transition: "background-color 0.3s, transform 0.3s",
-        },
-        print: {
-            display: "flex",
-            justifyContent: "center",
-            marginBottom: "1rem",
-        }
-    }
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -631,14 +584,6 @@ function AddStudents() {
             ]
         })
     };
-
-    // useEffect(() => {
-    //     console.log(formData);
-    // }, [formData]);
-
-    const handleNavigate = () => {
-        navigate("/admin");
-    }
 
     const [activeTab, setActiveTab] = useState(1);
     const endTab = 2

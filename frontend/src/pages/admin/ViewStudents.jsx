@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import image from './th.jpeg'
-import { Footer } from '../components/components';
+import { Footer, Header } from '../../components/components';
 
 
 // Add the icons to the library
@@ -54,11 +53,7 @@ const ViewStudents = () => {
         classid: '',
     });
 
-    useEffect(() => {
-        fetchStudentDetails();
-    }, []);
-
-    const fetchStudentDetails = async () => {
+    const fetchStudentDetails = useCallback(async () => {
         setLoading(true);
         try {
             const response = await axios.get('http://localhost:4000/admin/viewstudents', {//'http://localhost:4000/principal/student1'
@@ -77,7 +72,11 @@ const ViewStudents = () => {
             setError('Error fetching student details. Please try again later.');
             setLoading(false);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        fetchStudentDetails();
+    }, [fetchStudentDetails]);
 
     const fetchTeacherDetails = async (classId) => {
         try {
@@ -101,26 +100,26 @@ const ViewStudents = () => {
                 fetchTeacherDetails(student.classId);
             }
         });
-    }, [studentDetails]);
+    }, [studentDetails, teacherDetails, fetchStudentDetails]);
 
-    useEffect(() => {
-        filterStudents();
-    }, [searchValues]);
-
-    const filterStudents = () => {
+    const filterStudents = useCallback((searchvals) => {
         let filtered = studentDetails;
 
-        Object.keys(searchValues).forEach(key => {
-            if (searchValues[key]) {
+        Object.keys(searchvals).forEach(key => {
+            if (searchvals[key]) {
 
                 filtered = filtered.filter(student =>
-                    student[key] && student[key].toString().toLowerCase().includes(searchValues[key].toLowerCase())
+                    student[key] && student[key].toString().toLowerCase().includes(searchvals[key].toLowerCase())
                 );
             }
         });
 
         setFilteredStudents(filtered);
-    };
+    }, [studentDetails]);
+
+    useEffect(() => {
+        filterStudents(searchValues);
+    }, [searchValues, filterStudents]);
 
     const toggleSearch = (column) => {
 
@@ -155,10 +154,6 @@ const ViewStudents = () => {
         setSearchValues(searchValues => ({ ...searchValues, [name]: value }));
     };
 
-    const handlePrint = (e) => {
-        window.print()
-    }
-
     const showHistory = (studentId) => {
         console.log(studentId)
         localStorage.setItem("studentId", studentId)
@@ -174,26 +169,9 @@ const ViewStudents = () => {
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error: {error}</div>;
 
-    const Header = () => (
-        <header style={styles.header}>
-            <div style={styles.logo}>
-                <img src={image} alt="Logo" style={styles.logoImage} />
-                <span style={styles.logoLabel}>NIEPID</span>
-            </div>
-            <nav style={styles.navLinks}>
-                <button onClick={() => handlePrint()} style={styles.backButton}>
-                    Print
-                </button>
-                <button onClick={() => navigate('/admin')} style={styles.backButton}>
-                    Back
-                </button>
-            </nav>
-        </header>
-    );
-
     return (
         <>
-            <Header />
+            <Header backButtonPath={'/admin'} />
             <div style={styles.container}>
                 <h1 style={styles.heading}>Student Details</h1>
                 <table style={styles.table}>

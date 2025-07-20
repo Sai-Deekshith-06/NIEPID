@@ -1,27 +1,26 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import 'react-toastify/dist/ReactToastify.css';
-import { Header, Footer } from '../components/components';
+import { Header, Footer } from '../../components/components';
 
 function App() {
-  const [isAdmin, setIsAdmin] = useState(false); // This state will determine whether to show Admin or Home component
-  const [isTeacher, setIsTeacher] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [term, setTerm] = useState("");
-  const [year, setYear] = useState("");
-  const [group, setGroup] = useState("");
-  const [uploadStatus, setUploadStatus] = useState("");
-  const navigate = useNavigate();
-  const [cookies, setCookie, removeCookie] = useCookies([]);
+    // const [isAdmin, setIsAdmin] = useState(false); // This state will determine whether to show Admin or Home component
+    const [selectedFile, setSelectedFile] = useState(null);
+    // const [term, setTerm] = useState("");
+    // const [year, setYear] = useState("");
+    // const [group, setGroup] = useState("");
+    const [uploadStatus, setUploadStatus] = useState("");
+    const navigate = useNavigate();
+    const [, , removeCookie] = useCookies([]);
 
-  const handleFileChange = (e) => {
-    setSelectedFile(e.target.files[0]);
-  };
+    const handleFileChange = (e) => {
+        setSelectedFile(e.target.files[0]);
+    };
 
-  const handleUpload = async (e) => {
+    const handleUpload = async (e) => {
         e.preventDefault();
         try {
             if (!selectedFile) {
@@ -31,7 +30,6 @@ function App() {
 
             const formData = new FormData();
             formData.append('file', selectedFile);
-            // console.log(formData)
             let response = await axios.post('http://localhost:4000/admin/registerTeacher', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
@@ -55,69 +53,61 @@ function App() {
         }
     };
 
-  const handleDownloadTeachers = async () => {
-    // try {
-    // console.log("Attempting to download file");
-    // console.log(`Bearer ${localStorage.getItem("token")}`);
+    const handleDownloadTeachers = async () => {
+        // try {
+        // console.log("Attempting to download file");
+        // console.log(`Bearer ${localStorage.getItem("token")}`);
 
-    const response = await axios.get("http://localhost:4000/admin/download", {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-      responseType: "blob", // Important
-      maxRedirects: 0, // Do not follow redirects
-    });
+        const response = await axios.get("http://localhost:4000/admin/download", {
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+            responseType: "blob", // Important
+            maxRedirects: 0, // Do not follow redirects
+        });
 
-    console.log(response);
+        console.log(response);
 
-    // Check if the response status is 200 OK
-    if (response.status === 200) {
-      // Create a URL for the file
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", "sampleDataTeacher.xlsx"); // Change 'sampleDataTeacher.xlsx' to the name you want
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link); // Cleanup the DOM
-    } else {
-      console.error(`Unexpected response status: ${response.status}`);
-    }
-    // } catch (error) {
-    //     console.error('Error downloading the file', error);
-    // }
-  };
+        // Check if the response status is 200 OK
+        if (response.status === 200) {
+            // Create a URL for the file
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", "sampleDataTeacher.xlsx"); // Change 'sampleDataTeacher.xlsx' to the name you want
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link); // Cleanup the DOM
+        } else {
+            console.error(`Unexpected response status: ${response.status}`);
+        }
+        // } catch (error) {
+        //     console.error('Error downloading the file', error);
+        // }
+    };
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    if (isTeacher) {
-      handleDownloadTeachers();
-    } else {
-      await handleUpload(e);
-    }
-  };
+    const handleRegister = async (e) => {
+        e.preventDefault();
+        await handleUpload(e);
+    };
 
-  const handleGroupChange = (event) => {
-    setGroup(event.target.value);
-  };
+    const handleNavigateToStudentRegistration = () => {
+        navigate('/admin/addstudents');
+    };
+    const handleViewTeachers = () => {
+        navigate('/admin/viewteachers');
+    };
+    const handleViewPendingTeachers = () => {
+        navigate('/admin/editteachers');
+    };
 
-  const handleNavigateToStudentRegistration = () => {
-      navigate('/admin/addstudents');
-  };
-  const handleViewTeachers = () => {
-      navigate('/admin/viewteachers');
-  };
-  const handleViewPendingTeachers = () => {
-      navigate('/admin/editteachers');
-  };
+    const handleViewStudents = () => {
+        navigate("/admin/viewstudents");
+    };
 
-  const handleViewStudents = () => {
-    navigate("/admin/viewstudents");
-  };
-
-return (
-  <div style={styles.container}>
+    return (
+        <div style={styles.container}>
             <Header logout={true} removeCookie={removeCookie} />
             <div style={styles.hero}>
                 <h1 style={styles.heroTitle}>Welcome to Our Website</h1>

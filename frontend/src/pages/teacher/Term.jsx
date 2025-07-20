@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import image from './th.jpeg';
 import axios from 'axios';
-import { Footer, Header } from '../components/components';
+import { Footer, Header } from '../../components/components';
 
 const Term = () => {
   const navigate = useNavigate();
@@ -26,7 +25,7 @@ const Term = () => {
         localStorage.setItem("currYear", student.currYear);
         localStorage.setItem("currSection", student.currSection);
         const arr = []
-        student.section.map((inst) => {
+        student.section.forEach((inst) => {
           arr.push(inst.sec)
         })
         setSections(arr)
@@ -40,7 +39,7 @@ const Term = () => {
     localStorage.removeItem("term");
     localStorage.removeItem("year");
     localStorage.removeItem("section");
-  }, []);
+  }, [id]);
 
   const handleNavigate = (term) => {
     navigate('/teacher/term/termEntry');
@@ -61,7 +60,7 @@ const Term = () => {
       const data = res.data;
       const secIndex = data.section.findIndex(sec => sec.sec === section);
       const yr = []
-      data.section[secIndex].yearReport.map(year => {
+      data.section[secIndex].yearReport.forEach(year => {
         yr.push(year.year)
       })
       setYears(yr)

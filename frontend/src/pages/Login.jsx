@@ -3,8 +3,8 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import { toast } from "react-toastify";
-import niepidLogo from './th.jpeg';
-import cvrlogo from './cvr_logo.jpg';
+import niepidLogo from "../images/logo.jpeg";
+import cvrlogo from '../images/cvr_logo.jpg';
 
 function Login() {
   const [cookies] = useCookies([]);

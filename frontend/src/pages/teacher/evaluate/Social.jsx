@@ -1,10 +1,10 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { createUseStyles } from 'react-jss';
-import { useLocation } from 'react-router-dom';
+// import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { ScrollToButton, Header, Footer } from '../../components/components';
+import { ScrollToButton, Header, Footer } from '../../../components/components';
 import areAllAnswersSelected from './areAllAnswersSelected';
 // import flattenStudentData from '../helpers/flattenStudentData';
 
@@ -44,12 +44,6 @@ const useStyles = createUseStyles({
         background: '-webkit-linear-gradient(left, #007BFF, #0056b3)',
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
-    },
-    label: {
-        marginBottom: '25px',
-        fontSize: '20px',
-        fontWeight: '500',
-        color: '#444',
     },
     textInput: {
         padding: '12px',
@@ -131,7 +125,11 @@ const useStyles = createUseStyles({
     },
     label: {
         alignSelf: "center",
-        justifySelf: 'flex-end'
+        justifySelf: 'flex-end',
+        marginBottom: '25px',
+        fontSize: '20px',
+        fontWeight: '500',
+        color: '#444',
     },
     buttonContainer1: {
         display: 'flex',
@@ -162,10 +160,9 @@ const useStyles = createUseStyles({
 
 const Social = () => {
     const classes = useStyles();
-    const location = useLocation();
-    const { pathname } = location;
-    let username
-    const [isEditing, setIsEditing] = useState(true);
+    // const location = useLocation();
+    // const { pathname } = location;
+    // const [isEditing, setIsEditing] = useState(true);
     const [answer, setAnswer] = useState({});
     const [questions, setQuestions] = useState([]);
     const [newQuestion, setNewQuestion] = useState("");
@@ -177,57 +174,57 @@ const Social = () => {
     const section = localStorage.getItem("section")
     const term = localStorage.getItem("term")
     const year = localStorage.getItem("year")
-    const currTerm = localStorage.getItem("currTerm")
-    const currYear = localStorage.getItem("currYear")
-    const currSection = localStorage.getItem("currSection")
+    // const currTerm = localStorage.getItem("currTerm")
+    // const currYear = localStorage.getItem("currYear")
+    // const currSection = localStorage.getItem("currSection")
     const id = localStorage.getItem("studentId")
     const name = localStorage.getItem("studentName")
 
     const navigate = useNavigate()
 
-    useEffect(async () => {
-        console.log(term, currTerm)
-        console.log(year, currYear)
-        console.log(section, currSection)
-        const id = localStorage.getItem("studentId")
-        console.log(id)
-        const data = await axios.get("http://localhost:4000/teacher/evaluate/questions", {
-            headers: {
-                id: id,
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-            }
-        }, { withCredentials: true })
-            .then(res => {
-                // console.log(res)
-                username = res.data.data.name
-                var i = 0, j = 0, k = 0;
-                res.data.data.section.map((s, index) => {
-                    if (s.sec === section)
-                        k = index
+    useEffect(() => {
+        const f = async () => {
+            // console.log(term, currTerm)
+            // console.log(year, currYear)
+            // console.log(section, currSection)
+            // console.log(id)
+            await axios.get("http://localhost:4000/teacher/evaluate/questions", {
+                headers: {
+                    id: id,
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                }
+            }, { withCredentials: true })
+                .then(res => {
+                    var i = 0, j = 0, k = 0;
+                    res.data.data.section.forEach((s, index) => {
+                        if (s.sec === section)
+                            k = index
+                    })
+                    res.data.data.section[k].yearReport.forEach((y, index) => {
+                        if (y.year === year)
+                            i = index
+                    })
+                    res.data.data.section[k].yearReport[i].termReport.forEach((t, index) => {
+                        if (t.term === term)
+                            j = index
+                    })
+                    const socialQuestions = res.data.data.section[k].yearReport[i].termReport[j].report.socialQA
+                    setQuestions(socialQuestions)
+                    const initialanswer = {}
+                    socialQuestions.forEach((question, index) => {
+                        initialanswer[`s${index + 1}`] = question.answer;
+                    });
+                    setAnswer(initialanswer);
+                    if (res.data.data.section[k].yearReport[i].termReport[j].comment.socialComment.trim() !== "")
+                        setOldComments(res.data.data.section[k].yearReport[i].termReport[j].comment.socialComment)
+                    else
+                        setOldComments("Enter your comments")
                 })
-                res.data.data.section[k].yearReport.map((y, index) => {
-                    if (y.year === year)
-                        i = index
-                })
-                res.data.data.section[k].yearReport[i].termReport.map((t, index) => {
-                    if (t.term === term)
-                        j = index
-                })
-                const socialQuestions = res.data.data.section[k].yearReport[i].termReport[j].report.socialQA
-                setQuestions(socialQuestions)
-                const initialanswer = {}
-                socialQuestions.forEach((question, index) => {
-                    initialanswer[`s${index + 1}`] = question.answer;
-                });
-                setAnswer(initialanswer);
-                if (res.data.data.section[k].yearReport[i].termReport[j].comment.socialComment.trim() !== "")
-                    setOldComments(res.data.data.section[k].yearReport[i].termReport[j].comment.socialComment)
-                else
-                    setOldComments("Enter your comments")
-            })
-            .catch()
-    }, [username]);
+                .catch()
+        }
+        f()
+    }, [id, section, term, year]);
 
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -278,7 +275,7 @@ const Social = () => {
             return
         }
         const submissionData = {
-            username: username,
+            username: name,
             questions: questions.map((question, index) => ({
                 question: question.question,
                 answer: answer[`s${index + 1}`] || question.answer
@@ -301,13 +298,13 @@ const Social = () => {
             }
         })
             .then(res => {
-                console.log(res.data.data)
+                // console.log(res.data.data)
             })
             .catch(err => {
                 console.log(err.response)
             })
 
-        axios.get("http://localhost:4000/teacher/evaluate", {
+        await axios.get("http://localhost:4000/teacher/evaluate", {
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -319,12 +316,12 @@ const Social = () => {
             }
         })
             .then((res) => {
-                console.log(res.data)
+                // console.log(res.data)
                 const per = res.data.result
                 setPercent(per)
             })
             .catch((err) => {
-                console.log(err)
+                // console.log(err)
                 toast.error(err.response.data.msg)
             })
         const commentsElements = document.getElementsByName("comments");
@@ -341,9 +338,9 @@ const Social = () => {
             document.getElementById("submit").disabled = true
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        axios.post("http://localhost:4000/teacher/termTypeComment", {
+        await axios.post("http://localhost:4000/teacher/termTypeComment", {
             section: section,
             year: year,
             term: term,
@@ -357,7 +354,7 @@ const Social = () => {
             }
         })
             .then((res) => {
-                console.log(res.data)
+                // console.log(res.data)
                 toast.success("checklist submitted")
                 navigate('/teacher/eval')
             })
@@ -375,7 +372,7 @@ const Social = () => {
                 <table className={classes.table}>
                     <tbody>
                         {questions.map((question, index) => (
-                            <tr id={`s${index + 1}`}>
+                            <tr id={`s${index + 1}`} key={`s${index + 1}`}>
                                 <td className={classes.td}>{index + 1}</td>
                                 <td className={classes.td}>{question.question}</td>
                                 <td className={classes.td}>

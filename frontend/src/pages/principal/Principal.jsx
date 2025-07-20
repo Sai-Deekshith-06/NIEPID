@@ -1,24 +1,12 @@
-import axios from 'axios'
-import React, { useEffect } from 'react'
-import { toast } from 'react-toastify'
-import { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
-import image from './th.jpeg';
-import { Footer, Header } from '../components/components';
+import { Footer, Header } from '../../components/components';
 
 
 
 function Principal() {
     const navigate = useNavigate();
-    const [cookies, setCookie, removeCookie] = useCookies([]);
-
-    const handleLogout = () => {
-        removeCookie('jwt');
-        localStorage.removeItem("role");
-        localStorage.removeItem("token");
-        navigate('/');
-    };
+    const [, , removeCookie] = useCookies([]);
 
     const handleViewTeachers = () => {
         navigate('/principal/viewteachers');

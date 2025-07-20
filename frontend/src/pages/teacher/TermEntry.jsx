@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import image from './th.jpeg';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { Footer, Header } from '../components/components';
+import { Footer, Header } from '../../components/components';
 
 const Front = () => {
     const navigate = useNavigate();
@@ -28,16 +27,12 @@ const Front = () => {
         recreationalPercent: ''
     })
 
-    const [termEvaluated, setTermEvaluated] = useState(false);
+    // const [termEvaluated, setTermEvaluated] = useState(false);
 
     const [comments, setComments] = useState(["", "", "", "", "", ""]);
     const [terms, setTerms] = useState([]);
 
     const [evaluationComplete, setEvaluationComplete] = useState(false);
-
-    const navigateTo = (path) => {
-        navigate(path);
-    };
 
     const replacePrimaryLabels = (text) => {
         console.log(text)
@@ -75,7 +70,7 @@ const Front = () => {
                 // const termData = yearData.termReport.find(t => t.term === term);
                 console.log(yearData)
 
-                if (yearData.termReport.length == 4) {
+                if (yearData.termReport.length === 4) {
                     if (yearData.termReport[3].evaluated.personal)
                         if (yearData.termReport[3].evaluated.social)
                             if (yearData.termReport[3].evaluated.academic)
@@ -85,7 +80,7 @@ const Front = () => {
                 }
 
                 const t = []
-                yearData.termReport.map(term => {
+                yearData.termReport.forEach(term => {
                     t.push(term.term)
                 })
                 console.log(
@@ -119,10 +114,6 @@ const Front = () => {
         };
         fetchData();
     }, [id, section, year]);
-
-    const saveTerm = (val) => {
-        localStorage.setItem("term", val)
-    }
 
     const handleSubmit = async () => {
         try {

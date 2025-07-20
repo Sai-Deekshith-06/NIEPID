@@ -632,6 +632,7 @@ const getTeacher = async (req, res) => {
     }
 }
 
+// to save qns/ans in db
 const submitForm = async (req, res) => {
     try {
         // console.log(req.body)

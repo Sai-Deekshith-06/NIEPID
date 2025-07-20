@@ -1,13 +1,13 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
-import { toast } from 'react-toastify';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
-import image from './th.jpeg';
+import { Footer, Header } from '../../components/components';
 
 function Student() {
     console.log("hi 1")
     const navigate = useNavigate()
+    const [, , removeCookie] = useCookies([]);
     const regNo = localStorage.getItem("userId")
     const [formData, setFormData] = useState({
         regNo: '',
@@ -23,9 +23,6 @@ function Student() {
         paymentType: '',
         mobile: '',
     });
-    const handleChangePasswordPage = () => {
-        navigate('/student/changepassword');
-    };
     useEffect(() => {
         const fetchStudentData = async () => {
             try {
@@ -61,50 +58,11 @@ function Student() {
             }
         };
         fetchStudentData();
-    }, []);
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prevState => ({
-            ...prevState,
-            [name]: value
-        }));
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        axios.post('/api/student', formData)
-            .then(response => {
-                toast.success('successfully!');
-            })
-            .catch(error => {
-                toast.error('Error .');
-                console.error('Error:', error);
-            });
-    };
-
-    const handleLogout = () => {
-        console.log('Logout logic here');
-        localStorage.clear()
-        navigate("/")
-    };
+    }, [regNo]);
 
     return (
         <div style={styles.studentContainer}>
-            <header style={styles.header}>
-                <div style={styles.logo}>
-                    <img src={image} alt="Logo" style={styles.logoImage} />
-                    <span style={styles.logoLabel}>NIEPID</span>
-                </div>
-                <div>
-                    <button style={styles.logoutButton} onClick={handleLogout}>Logout</button>
-                    <button
-                    onClick={handleChangePasswordPage}
-                    style={styles.logoutButton}
-                    >
-                        Change Password
-                    </button>
-                </div>
-            </header>
+            <Header logout={true} removeCookie={removeCookie} />
             <div style={styles.contentContainer}>
                 <h3 style={styles.formTitle}>Welcome, {formData.name}</h3>
                 <div style={styles.formContainer}>
@@ -122,9 +80,7 @@ function Student() {
                     </form>
                 </div>
             </div>
-            <footer style={styles.footer}>
-                <p>&copy; 2024 Student Dashboard. All rights reserved.</p>
-            </footer>
+            <Footer />
         </div>
     );
 }
@@ -136,41 +92,6 @@ const styles = {
         minHeight: '100vh',
         backgroundColor: '#f0f4f8',
         fontFamily: 'Arial, sans-serif',
-    },
-    header: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '10px 20px',
-        backgroundColor: '#007bff',
-        color: '#fff',
-        boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-    },
-    logo: {
-        display: 'flex',
-        alignItems: 'center',
-    },
-    logoImage: {
-        width: '50px',
-        height: '50px',
-        marginRight: '10px',
-    },
-    logoLabel: {
-        fontSize: '1.8rem',
-        fontWeight: 'bold',
-    },
-    logoutButton: {
-        padding: '10px 15px',
-        backgroundColor: '#ff4d4d',
-        color: '#fff',
-        border: 'none',
-        borderRadius: '5px',
-        margin : "10px",
-        cursor: 'pointer',
-        transition: 'background-color 0.3s ease',
-    },
-    logoutButtonHover: {
-        backgroundColor: '#e60000',
     },
     contentContainer: {
         flex: '1',
@@ -235,12 +156,6 @@ const styles = {
     },
     buttonHover: {
         backgroundColor: '#0056b3',
-    },
-    footer: {
-        textAlign: 'center',
-        padding: '15px',
-        backgroundColor: '#007bff',
-        color: '#fff',
     },
 };
 

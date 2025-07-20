@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Bar } from 'react-chartjs-2';
-import image from './th.jpeg';
+import image from "../images/logo.jpeg";
 import 'chart.js/auto';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -287,7 +287,7 @@ const StudentPerformance = () => {
         };
 
         fetchData();
-    }, [])
+    }, [id, role, navigate])
 
     const [studentInfo, setStudentInfo] = useState({
         name: "Loading...",
@@ -317,7 +317,7 @@ const StudentPerformance = () => {
                 setSelectedYear(""); // Reset year if no reports are available for the section
             }
         }
-    }, [studentInfo, selectedSection]); // Depend on studentInfo and selectedSection
+    }, [studentInfo, selectedSection, selectedYear]); // Depend on studentInfo and selectedSection
 
     const selectedSectionData = studentInfo.section.find(section => section.sec === selectedSection);
     console.log(selectedSectionData)

@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import image from "./th.jpeg";
 import { toast } from "react-toastify";
-import { Header, Footer } from '../components/components'
+import { Header, Footer } from '../../components/components'
 
 const EditTeachers = () => {
     const [teacherDetails, setTeacherDetails] = useState([]);
@@ -15,6 +14,7 @@ const EditTeachers = () => {
         teacherMNo: "",
         classId: [],
     });
+    const navigate = useNavigate();
     const [refresh, needRefresh] = useState(0);
     const [count, setCount] = useState(-1);
 
@@ -54,7 +54,7 @@ const EditTeachers = () => {
             toast.info("No pending teacher registrations found.");
             navigate('/admin/viewTeachers');
         }
-    }, [count]);
+    }, [teacherDetails, navigate]);
 
     const handleEditClick = (teacher) => {
         setEditMode(teacher.teacherId);
@@ -160,13 +160,6 @@ const EditTeachers = () => {
         }
     };
 
-    const handlePrint = (e) => {
-        window.print();
-    };
-
-
-    const navigate = useNavigate();
-
     // render the edit button
     const renderActionButton = (teacher) => {
         if (editMode === teacher.teacherId) {
@@ -215,7 +208,7 @@ const EditTeachers = () => {
         <>
             <Header backButtonPath={'/admin'} />
             <div style={styles.container}>
-                <h1 style={styles.heading}>Pending Teacher Registrations</h1>
+                <h1 style={styles.heading}>View Upload Errors for Teacher registration</h1>
                 <p style={{ color: "red", textAlign: "center" }}>NOTE: Only use one of the following values for classId: 'preprimary_1', 'preprimary_2', 'preprimary_3', 'primary1_1', 'primary1_2', 'primary1_3', 'primary2_1', 'primary2_2', 'primary2_3'
                 </p>
                 <table style={styles.table}>
@@ -316,11 +309,6 @@ const EditTeachers = () => {
                     </tbody>
                 </table>
             </div>
-            <div style={styles.print}>
-                <button onClick={handlePrint} style={styles.printButton}>
-                    Print
-                </button>
-            </div>
             <Footer />
         </>
     );
@@ -399,28 +387,6 @@ const styles = {
         margin: "4px 2px",
         cursor: "pointer",
         borderRadius: "5px",
-    },
-    input: {
-        width: "100%",
-        padding: "8px",
-        border: "1px solid #ddd",
-        borderRadius: "4px",
-        boxSizing: "border-box",
-    },
-    printButton: {
-        padding: "0.8rem 1.5rem",
-        fontSize: "1rem",
-        backgroundColor: "#000000",
-        color: "#ffffff",
-        border: "none",
-        borderRadius: "5px",
-        cursor: "pointer",
-        transition: "background-color 0.3s, transform 0.3s",
-    },
-    print: {
-        display: "flex",
-        justifyContent: "center",
-        marginBottom: "1rem",
     },
     app: {
         textAlign: "center",

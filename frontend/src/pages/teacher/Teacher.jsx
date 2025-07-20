@@ -2,14 +2,14 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import axios from "axios";
-import { toast, ToastContainer } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import image from './th.jpeg';
+import { Footer, Header } from "../../components/components";
 
 export default function Home() {
 
   const navigate = useNavigate();
-  const [cookies, setCookie, removeCookie] = useCookies([]);
+  const [, , removeCookie] = useCookies([]);
   const [students, setStudents] = useState({});
   const [teacher, setTeacher] = useState({})
   const teacherId = localStorage.getItem("userId")
@@ -63,14 +63,7 @@ export default function Home() {
         console.log("Error", err)
       })
 
-  }, []);
-
-  const logOut = () => {
-    removeCookie("jwt");
-    localStorage.removeItem("role");
-    localStorage.removeItem("token");
-    navigate("/");
-  };
+  }, [teacherId]);
 
   const replacePrimaryLabels = (text) => {
     console.log(text)
@@ -89,32 +82,11 @@ export default function Home() {
 
   };
 
-  const Header = () => (
-    <header style={styles.header}>
-      <div style={styles.logo}>
-        <img src={image} alt="Logo" style={styles.logoImage} />
-        <span style={styles.logoLabel}>NIEPID</span>
-      </div>
-      <div>
-        <b>{teacherId}</b>
-      </div>
-      <nav style={styles.navLinks}>
-        <button onClick={logOut} style={styles.button}>
-          Log out
-        </button>
-      </nav>
-    </header>
-  );
-
-  const Footer = () => (
-    <footer style={styles.footer}>&copy; 2024 Teacher Portal</footer>
-  );
-
   return (
     <>
       <ToastContainer />
       <div style={styles.container}>
-        <Header />
+        <Header logout={true} removeCookie={removeCookie} />
         <main style={styles.hero}>
           <h2 style={styles.heroTitle}>Welcome to the Teacher Portal</h2>
           <p style={styles.heroSubtitle}>
@@ -171,31 +143,6 @@ const styles = {
     fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
     backgroundColor: "#f0f8ff",
   },
-  header: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "1rem 2rem",
-    backgroundColor: "#007bff",
-    color: "#ffffff",
-    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-  },
-  logo: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-  logoImage: {
-    width: '40px',
-    height: '40px',
-    marginRight: '0.5rem',
-  },
-  logoLabel: {
-    fontSize: '1.5rem',
-  },
-  navLinks: {
-    display: "flex",
-    gap: "1.5rem",
-  },
   hero: {
     display: "flex",
     flexDirection: "column",
@@ -219,22 +166,6 @@ const styles = {
     fontSize: "1.2rem",
     color: "#007bff",
     marginBottom: "1rem",
-  },
-  button: {
-    padding: "0.8rem 1.5rem",
-    fontSize: "1rem",
-    backgroundColor: "#ff0000",
-    color: "#ffffff",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-    transition: "background-color 0.3s, transform 0.3s",
-  },
-  footer: {
-    textAlign: "center",
-    padding: "1rem",
-    backgroundColor: "#007bff",
-    color: "#ffffff",
   },
   classContainer: {
     width: "100%",

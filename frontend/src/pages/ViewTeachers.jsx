@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import image from "./th.jpeg";
+import image from "../images/logo.jpeg";
 import { toast } from "react-toastify";
 import { Footer } from '../components/components'
 
@@ -33,44 +33,25 @@ const TeacherTable = () => {
   const role = localStorage.getItem("role");
   // role === "admin" ? console.log("calling as admin") : console.log("calling as pricipal")
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
-      const response =
-        role === "admin"
-          ? await axios.get(
-            "http://localhost:4000/admin/viewTeacher",
-            {
-              headers: {
-                "Content-Type": "application/json",
-                authorization: `Bearer ${localStorage.getItem("token")}`,
-              },
-            },
-            {
-              withCredentials: true,
-            }
-          )
-          : await axios.get(
-            "http://localhost:4000/principal/viewTeacher",
-            {
-              headers: {
-                "Content-Type": "application/json",
-                authorization: `Bearer ${localStorage.getItem("token")}`,
-              },
-            },
-            {
-              withCredentials: true,
-            }
-          );
+      const response = await axios.get(`http://localhost:4000/${role}/viewTeacher`, {
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }, { withCredentials: true }
+      );
       console.log(response.data.data)
       setTeacherDetails(response.data.data);
     } catch (error) {
       console.error("Error fetching teacher details:", error.response);
     }
-  };
+  }, [role]);
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   const handleEditClick = (teacher) => {
     setEditMode(teacher.teacherId);
