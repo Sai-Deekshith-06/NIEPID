@@ -5,6 +5,7 @@ import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { ScrollToButton, Header, Footer } from '../../components/components';
+import areAllAnswersSelected from './areAllAnswersSelected';
 // import flattenStudentData from '../helpers/flattenStudentData';
 
 const useStyles = createUseStyles({
@@ -264,6 +265,18 @@ const Occupational = () => {
 
     const handleEvaluate = async (event) => {
         event.preventDefault();
+        const seleted = areAllAnswersSelected(answer)
+        if (!seleted.status) {
+            const element = document.getElementById(seleted.at);
+            toast.error("Select all answers")
+            if (element) {
+                element.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
+            return
+        }
         const submissionData = {
             username: username,
             questions: questions.map((question, index) => ({
@@ -311,6 +324,7 @@ const Occupational = () => {
             })
             .catch((err) => {
                 console.log(err)
+                toast.error(err.response.data.msg)
             })
 
         const commentsElements = document.getElementsByName("comments");
@@ -362,7 +376,7 @@ const Occupational = () => {
                 <table className={classes.table}>
                     <tbody>
                         {questions.map((question, index) => (
-                            <tr key={index}>
+                            <tr id={`s${index + 1}`}>
                                 <td className={classes.td}>{index + 1}</td>
                                 <td className={classes.td}>{question.question}</td>
                                 <td className={classes.td}>

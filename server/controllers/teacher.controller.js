@@ -460,7 +460,7 @@ const evaluateStudent = async (req, res) => {
             })
             .catch((err) => {
                 console.log(">>" + err);
-                return res.status(404).json({ status: "error", msg: `unable to allocate/deallocate the class` })
+                return res.status(404).json({ status: "error", msg: `Unable to allocate/deallocate the class` })
             })
     }
     await student.save()
@@ -469,7 +469,7 @@ const evaluateStudent = async (req, res) => {
         })
         .catch((err) => {
             console.log(">>" + err);
-            return res.status(404).json({ status: "error", msg: `unable to save the student details` })
+            return res.status(404).json({ status: "error", msg: `Unable to save the student details` })
         })
     res.status(200).json({ result })
 }

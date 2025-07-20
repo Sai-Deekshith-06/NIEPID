@@ -5,6 +5,7 @@ import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { ScrollToButton, Header, Footer } from '../../components/components';
+import areAllAnswersSelected from './areAllAnswersSelected';
 // import flattenStudentData from '../helpers/flattenStudentData';
 
 const useStyles = createUseStyles({
@@ -264,6 +265,18 @@ const Social = () => {
 
     const handleEvaluate = async (event) => {
         event.preventDefault();
+        const seleted = areAllAnswersSelected(answer)
+        if (!seleted.status) {
+            const element = document.getElementById(seleted.at);
+            toast.error("Select all answers")
+            if (element) {
+                element.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
+            return
+        }
         const submissionData = {
             username: username,
             questions: questions.map((question, index) => ({
@@ -312,6 +325,7 @@ const Social = () => {
             })
             .catch((err) => {
                 console.log(err)
+                toast.error(err.response.data.msg)
             })
         const commentsElements = document.getElementsByName("comments");
         commentsElements.forEach((element) => {
@@ -361,7 +375,7 @@ const Social = () => {
                 <table className={classes.table}>
                     <tbody>
                         {questions.map((question, index) => (
-                            <tr key={index}>
+                            <tr id={`s${index + 1}`}>
                                 <td className={classes.td}>{index + 1}</td>
                                 <td className={classes.td}>{question.question}</td>
                                 <td className={classes.td}>
@@ -441,56 +455,6 @@ const Social = () => {
             <ScrollToButton />
         </>
     );
-};
-
-const styles = {
-    header: {
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '1rem 2rem',
-        backgroundColor: '#007bff',
-        color: '#ffffff',
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-        marginBottom: '1rem'
-    },
-    logo: {
-        display: 'flex',
-        alignItems: 'center',
-    },
-    logoImage: {
-        width: '40px',
-        height: '40px',
-        marginRight: '0.5rem',
-    },
-    logoLabel: {
-        fontSize: '1.5rem',
-    },
-    backButton: {
-        padding: "0.8rem 1.5rem",
-        fontSize: "1rem",
-        backgroundColor: "#000000",
-        color: "#ffffff",
-        border: "none",
-        borderRadius: "5px",
-        cursor: "pointer",
-        transition: "background-color 0.3s, transform 0.3s",
-    },
-};
-
-const footerStyles = {
-    footer: {
-        backgroundColor: '#007bff',
-        padding: '1rem',
-        textAlign: 'center',
-        color: '#ffffff',
-        position: 'relative',
-        bottom: 0,
-        width: '100%',
-    },
-    text: {
-        margin: 0,
-    }
 };
 
 export default Social;

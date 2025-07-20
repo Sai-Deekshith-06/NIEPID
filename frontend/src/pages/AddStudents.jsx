@@ -733,6 +733,7 @@ function AddStudents() {
                                 value={formData.details.info.aadharNo}
                                 onChange={(e) => handleSectionChange('info', e)}
                                 className={classes.requiredtextInput}
+                                maxLength={12}
                             />
                         </label>
                         <label className={classes.requiredlabel}>
@@ -743,6 +744,7 @@ function AddStudents() {
                                 value={formData.details.info.mobileNo}
                                 onChange={(e) => handleSectionChange('info', e)}
                                 className={classes.requiredtextInput}
+                                maxLength={10}
                             />
                         </label>
                     </div>
