@@ -4,6 +4,7 @@ import { createUseStyles } from 'react-jss';
 import image from './th.jpeg';
 import { useNavigate } from 'react-router-dom';
 import ChangePasswordModal from './changePassword2';
+import toast from 'react-hot-toast';
 
 const useStyles = createUseStyles({
     // for header 
@@ -139,6 +140,7 @@ const Header = ({ id, name, backButtonPath, logout, removeCookie, CustomButton, 
             localStorage.removeItem("role");
             localStorage.removeItem("token");
             localStorage.clear()
+            toast.success("Logged Out Successfully")
             navigateTo('/');
         };
     }

@@ -302,7 +302,7 @@ const ResetPasswordModal = ({ isOpen, onClose }) => {
                         >
                             <input
                                 type="text"
-                                placeholder="Username"
+                                placeholder="User ID"
                                 name="UsernameToReset"
                                 value={userId}
                                 onChange={e => setUserId(e.target.value)}

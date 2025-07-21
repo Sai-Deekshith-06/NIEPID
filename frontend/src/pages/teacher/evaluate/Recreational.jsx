@@ -344,7 +344,7 @@ const Recreational = () => {
 
     const handleCommentsChange = (event) => {
         setComments(event.target.value);
-        document.getElementById("submit").disabled = event.target.value ? true : false
+        document.getElementById("submit").disabled = event.target.value ? false : true
     };
 
     const handleSubmit = async (e) => {

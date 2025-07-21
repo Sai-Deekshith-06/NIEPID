@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import niepidLogo from "../images/logo.jpeg";
 import cvrlogo from '../images/cvr_logo.jpg';
 import { axiosInstance } from "../libs/axios";
@@ -39,9 +39,9 @@ function Login() {
 
   const [values, setValues] = useState({ id: "", password: "" });
   const generateError = (error) =>
-    toast.error(error, {
-      position: "top-right",
-    });
+    toast.error(error
+      // , { position: "top-right", }
+    );
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
@@ -61,6 +61,7 @@ function Login() {
         localStorage.setItem("userId", data.userId)
         localStorage.setItem("role", data.role);
         localStorage.setItem("token", data.token);
+        toast.success("Logged in Successfully")
         if (data.role === "admin") {
           navigate("/admin");
           return;
@@ -118,6 +119,7 @@ function Login() {
               <input
                 type="text"
                 name="id"
+                id="id"
                 placeholder="id"
                 onChange={(e) =>
                   setValues({ ...values, [e.target.name]: e.target.value })
@@ -131,6 +133,7 @@ function Login() {
                 type="password"
                 placeholder="Password"
                 name="password"
+                id="password"
                 onChange={(e) =>
                   setValues({ ...values, [e.target.name]: e.target.value })
                 }

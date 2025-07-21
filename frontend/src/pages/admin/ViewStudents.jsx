@@ -4,6 +4,7 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import { Footer, Header } from '../../components/components';
+import Loading from '../../components/loading';
 import { axiosInstance } from '../../libs/axios';
 
 
@@ -165,11 +166,18 @@ const ViewStudents = () => {
         localStorage.setItem("regNo", studentId)
         navigate(`/admin/viewstudents/details/${studentId}`);
     }
+    if (error) return <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        fontSize: '1.5rem',
+        fontWeight: '500'
+    }}>
+        Error: {error}
+    </div>;
 
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>Error: {error}</div>;
-
-    return (
+    return (loading ? <Loading /> :
         <>
             <Header backButtonPath={'/admin'} />
             <div style={styles.container}>

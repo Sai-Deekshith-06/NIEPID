@@ -90,389 +90,647 @@ const nextSection = (presentSection) => {
 }
 
 // Remove student from previous class and allocate to new class
-const updateStudentClassAllocation = async (student, prevClassId, newClassId) => {
-    // Remove student from previous class
-    console.log(student.regNo)
-    console.log(">>> update classes(): from " + prevClassId + " to " + newClassId)
-    await classModel.updateMany(
-        { classId: prevClassId },
-        { $pull: { student: student.regNo } }
-    ).then(async (res) => {
-        console.log("removed from prevClass")
-        // Add student to new class (if not already present)
+// const updateStudentClassAllocation = async (student, prevClassId, newClassId) => {
+//     // Remove student from previous class
+//     console.log(student.regNo)
+//     console.log(">>> update classes(): from " + prevClassId + " to " + newClassId)
+//     await classModel.updateMany(
+//         { classId: prevClassId },
+//         { $pull: { student: student.regNo } }
+//     ).then(async (res) => {
+//         console.log("removed from prevClass")
+//         // Add student to new class (if not already present)
+//         await classModel.updateOne(
+//             { classId: newClassId },
+//             { $addToSet: { student: student.regNo } }
+//         )
+//             .then(async (res1) => {
+//                 console.log("added to newClass")
+//                 return res1
+//             }).catch((err) => {
+//                 console.log(err)
+//                 return err
+//             })
+//     }).catch((err) => {
+//         console.log(err)
+//         return err
+//     })
+// };
+
+const updateStudentClassAllocation = async (student, prevClassId, newClassId, session) => {
+    try {
+        console.log(student.regNo);
+        console.log(">>> update classes(): from " + prevClassId + " to " + newClassId);
+
+        // Remove student from previous class
+        await classModel.updateMany(
+            { classId: prevClassId },
+            { $pull: { student: student.regNo } },
+            { session }
+        );
+
+        console.log("removed from prevClass");
+
+        // Add student to new class
         await classModel.updateOne(
             { classId: newClassId },
-            { $addToSet: { student: student.regNo } }
-        )
-            .then(async (res1) => {
-                console.log("added to newClass")
-                return res1
-            }).catch((err) => {
-                console.log(err)
-                return err
-            })
-    }).catch((err) => {
-        console.log(err)
-        return err
-    })
+            { $addToSet: { student: student.regNo } },
+            { session }
+        );
+
+        console.log("added to newClass");
+    } catch (err) {
+        console.log("Error in updateStudentClassAllocation:", err);
+        throw err; // Let the caller handle rollback
+    }
 };
 
+// const evaluateStudent = async (req, res) => {
+//     const session = await studentModel.startSession();
+//     session.startTransaction();
+//     try {
+//         const id = req.headers.id
+//         // console.log(req.headers)
+//         const student = await studentModel.findOne({ regNo: id }).session(session);
+
+//         const section = student.section.find(sec => sec.sec === req.headers.section)
+//         const yearReport = section.yearReport.find(year => year.year === req.headers.year)
+//         const termReport = yearReport.termReport.find(term => term.term === req.headers.term)
+//         if (yearReport.year !== student.currYear || section.sec !== student.currSection) {
+//             await session.abortTransaction();
+//             session.endSession();
+//             return res.status(400).json({ status: "invalid", msg: "Evaluation not allowed for previous year/section paper" });
+//         }   // console.log(termReport)
+//         let questions;
+//         if (req.headers.type === "personalQA")
+//             questions = termReport.report.personalQA
+//         else if (req.headers.type === "socialQA")
+//             questions = termReport.report.socialQA
+//         else if (req.headers.type === "academicQA")
+//             questions = termReport.report.academicQA
+//         else if (req.headers.type === "recreationalQA")
+//             questions = termReport.report.recreationalQA
+//         else if (req.headers.type === "occupationalQA")
+//             questions = termReport.report.occupationalQA
+
+//         let result
+//         // console.log(questions)
+//         if (req.headers.type !== "recreationalQA") {
+//             result = findPercent(questions)
+//             if (req.headers.type === "personalQA") {
+//                 termReport.percent.personalPercent = result
+//                 termReport.evaluated.personal = true
+//             }
+//             else if (req.headers.type === "socialQA") {
+//                 termReport.percent.socialPercent = result
+//                 termReport.evaluated.social = true
+//             }
+//             else if (req.headers.type === "academicQA") {
+//                 termReport.percent.academicPercent = result
+//                 termReport.evaluated.academic = true
+//             }
+//             else if (req.headers.type === "occupationalQA") {
+//                 termReport.percent.occupationalPercent = result
+//                 termReport.evaluated.occupational = true
+//             }
+//         }
+//         else {
+//             result = findPercentForRecreational(questions)
+//             termReport.percent.recreationalPercent = result.percent
+//             termReport.percent.mode = result.mode
+//             termReport.evaluated.recreational = true
+//         }
+
+
+//         let prevClassId = student.classId;
+//         let nxtClassId = "";
+//         let transfer = false
+//         if (termReport.evaluated.academic && termReport.evaluated.occupational && termReport.evaluated.personal && termReport.evaluated.recreational && termReport.evaluated.social) {
+//             if (termReport.term !== "III") {
+//                 // Efficiently determine the next term based on the current term and termReport length
+//                 let newTermReport = {
+//                     evaluated: {
+//                         personal: false,
+//                         academic: false,
+//                         social: false,
+//                         occupational: false,
+//                         recreational: false
+//                     },
+//                     term: '',
+//                     report: findQAs(req.headers.section),
+//                     percent: {//Term Performance
+//                         personalPercent: 0,
+//                         socialPercent: 0,
+//                         academicPercent: 0,
+//                         occupationalPercent: 0,
+//                         recreationalPercent: 0,
+//                         mode: ""
+//                     },
+//                     comment: {//Term Comments
+//                         termComment: "",
+//                         personalComment: "",
+//                         occupationalComment: "",
+//                         recreationalComment: "",
+//                         academicComment: "",
+//                         socialComment: ""
+//                     }
+//                 }
+//                 const termOrder = ['Entry', 'I', 'II', 'III'];
+//                 const currIdx = termOrder.indexOf(termReport.term);
+//                 if (
+//                     currIdx !== -1 && currIdx < termOrder.length - 1 &&
+//                     yearReport.termReport.length === currIdx + 1
+//                 ) {
+//                     newTermReport.term = termOrder[currIdx + 1];
+//                 }
+//                 if (newTermReport.term) {
+//                     yearReport.termReport.push(newTermReport);
+//                     student.currTerm = newTermReport.term;
+//                 }
+//             }
+//             else {
+//                 // Efficiently accumulate sums and mode counts
+//                 let sumPersonal = 0, sumSocial = 0, sumAcademic = 0, sumOccupational = 0, sumRecreational = 0;
+//                 let modeCounts = [0, 0, 0, 0, 0]; // A, B, C, D, E
+//                 let len = 0;
+//                 transfer = true;
+//                 for (const term of yearReport.termReport) {
+//                     len++;
+//                     sumPersonal += Number(term.percent.personalPercent) || 0;
+//                     sumSocial += Number(term.percent.socialPercent) || 0;
+//                     sumAcademic += Number(term.percent.academicPercent) || 0;
+//                     sumOccupational += Number(term.percent.occupationalPercent) || 0;
+//                     sumRecreational += Number(term.percent.recreationalPercent) || 0;
+//                     if (term.percent.mode === 'A') modeCounts[0]++;
+//                     else if (term.percent.mode === 'B') modeCounts[1]++;
+//                     else if (term.percent.mode === 'C') modeCounts[2]++;
+//                     else if (term.percent.mode === 'D') modeCounts[3]++;
+//                     else if (term.percent.mode === 'E') modeCounts[4]++;
+//                 }
+//                 let personalPercent = len ? (sumPersonal / len).toFixed(2) : "0.00";
+//                 let socialPercent = len ? (sumSocial / len).toFixed(2) : "0.00";
+//                 let academicPercent = len ? (sumAcademic / len).toFixed(2) : "0.00";
+//                 let occupationalPercent = len ? (sumOccupational / len).toFixed(2) : "0.00";
+//                 let recreationalPercent = len ? (sumRecreational / len).toFixed(2) : "0.00";
+//                 let modeIdx = modeCounts.indexOf(Math.max(...modeCounts));
+//                 let mode = ['A', 'B', 'C', 'D', 'E'][modeIdx] || '';
+//                 let total = (parseFloat(personalPercent) + parseFloat(socialPercent) + parseFloat(academicPercent) + parseFloat(occupationalPercent)) / 4
+
+//                 const data = {
+//                     personalPercent,
+//                     socialPercent,
+//                     academicPercent,
+//                     occupationalPercent,
+//                     recreationalPercent,
+//                     mode,
+//                     total
+//                 };
+
+//                 yearReport.percent = data
+//                 await student.save({ session });
+//                 console.log("saved: " + data)
+
+//                 const newSection = {
+//                     status: 'ongoing',
+//                     sec: '',
+//                     yearReport: [{
+//                         year: '1',
+//                         termReport: [{
+//                             term: 'Entry',
+//                             report: {
+//                                 personalQA: [{}],
+//                                 socialQA: [{}],
+//                                 academicQA: [{}],
+//                                 occupationalQA: [{}],
+//                                 recreationalQA: [{}]
+//                             },
+//                             comment: {
+//                                 termComment: "",
+//                                 personalComment: "",
+//                                 occupationalComment: "",
+//                                 recreationalComment: "",
+//                                 academicComment: "",
+//                                 socialComment: ""
+//                             },
+//                             percent: {
+//                                 personalPercent: null,
+//                                 socialPercent: null,
+//                                 academicPercent: null,
+//                                 occupationalPercent: null,
+//                                 recreationalPercent: null,
+//                                 mode: ""
+//                             }
+//                         }],
+//                         comment: {
+//                             yearPersonalComment: "",
+//                             yearOccupationalComment: "",
+//                             yearRecreationalComment: "",
+//                             yearAcademicComment: "",
+//                             yearSocialComment: "",
+//                             yearComment: ""
+//                         },
+//                         percent: {
+//                             personalPercent: null,
+//                             socialPercent: null,
+//                             academicPercent: null,
+//                             occupationalPercent: null,
+//                             recreationalPercent: null,
+//                             mode: "",
+//                             result: 0
+//                         }
+//                     }],
+//                 }
+
+
+//                 // const result = (parseFloat(personalPercent) + parseFloat(socialPercent) + parseFloat(academicPercent) + parseFloat(occupationalPercent)) / 4;
+//                 //console.log(typeof(parseFloat(personalPercent)),typeof(socialPercent),typeof(academicPercent),typeof(occupationalPercent))
+//                 console.log(total)
+//                 if (    // if the student is passed
+//                     total >= 60 && yearReport.year === student.currYear &&
+//                     section.sec === student.currSection
+//                 ) {
+//                     section.status = "pass"
+//                     //create new Section
+//                     let nxtSec = nextSection(student.currSection)
+//                     console.log(">60: " + nxtSec + "\t")
+//                     if (nxtSec && nxtSec == 'passedOut') {
+//                         student.currYear = nxtSec
+//                         transfer = false
+//                         // await student.save()
+//                         //     .then(async (res) => {
+//                         //         console.log("updated student")
+//                         //     })
+//                         //     .catch((err) => {
+//                         //         console.log(">>" + err);
+//                         //         res.status(404).json({ status: "error", msg: `unable to save the student details` })
+//                         //     })
+//                     } else if (nxtSec) {
+//                         nxtClassId = `${nxtSec}_1`
+//                         console.log(nxtClassId)
+//                         await classModel.find({ classId: nxtClassId })
+//                             .then((res1) => {
+//                                 newSection.sec = student.currSection = nxtSec
+//                                 student.currYear = '1'
+//                                 student.currTerm = 'Entry'
+//                                 student.classId = nxtClassId
+//                                 newSection.yearReport[0].termReport[0].report = findQAs(nxtSec)
+//                                 student.section.push(newSection)
+//                             })
+//                             .catch((err) => {
+//                                 console.log(err);
+//                                 res.status(404).json({ status: "error", msg: `Next Class with id ${nxtClassId} not found..!!` })
+//                             })
+//                     }
+//                 }
+//                 else if (
+//                     section.yearReport.length < 3 && yearReport.year === student.currYear &&
+//                     section.sec === student.currSection
+//                 ) {
+//                     const newYear = {
+//                         year: '1',
+//                         termReport: [{
+//                             term: 'Entry',
+//                             report: {
+//                                 personalQA: [{}],
+//                                 socialQA: [{}],
+//                                 academicQA: [{}],
+//                                 occupationalQA: [{}],
+//                                 recreationalQA: [{}]
+//                             },
+//                             comment: {
+//                                 termComment: "",
+//                                 personalComment: "",
+//                                 occupationalComment: "",
+//                                 recreationalComment: "",
+//                                 academicComment: "",
+//                                 socialComment: ""
+//                             },
+//                             percent: {
+//                                 personalPercent: null,
+//                                 socialPercent: null,
+//                                 academicPercent: null,
+//                                 occupationalPercent: null,
+//                                 recreationalPercent: null,
+//                                 mode: ""
+//                             }
+//                         }],
+//                         comment: {
+//                             yearPersonalComment: "",
+//                             yearOccupationalComment: "",
+//                             yearRecreationalComment: "",
+//                             yearAcademicComment: "",
+//                             yearSocialComment: "",
+//                             yearComment: ""
+//                         },
+//                         percent: {
+//                             personalPercent: null,
+//                             socialPercent: null,
+//                             academicPercent: null,
+//                             occupationalPercent: null,
+//                             recreationalPercent: null,
+//                             mode: "",
+//                             result: 0
+//                         }
+//                     }
+//                     section.status = "ongoing"
+//                     //create new year
+//                     let nxtYear = (1 + section.yearReport.length).toString();
+//                     const currSec = student.currSection
+//                     nxtClassId = currSec + `_${nxtYear}`
+//                     console.log(currSec + '<80%--<3years\tNew ClassID: ' + nxtClassId)
+//                     await classModel.find({ classId: nxtClassId })
+//                         .then((res1) => {
+//                             newYear.year = student.currYear = nxtYear
+//                             student.classId = nxtClassId
+//                             student.currTerm = 'Entry'
+//                             newYear.termReport[0].report = findQAs(currSec)
+//                             console.log(newYear.termReport[0].report.personalQA.length)
+//                             section.yearReport.push(newYear)
+//                         })
+//                         .catch((err) => {
+//                             console.log(err);
+//                             res.status(404).json({ status: "error", msg: `Next Class with id ${nxtClassId} not found..!!` })
+//                         })
+
+//                 }
+//                 else if (
+//                     yearReport.year === student.currYear && section.sec === student.currSection
+//                 ) {
+//                     section.status = "promoted"
+//                     //create new section after failing 3 years
+//                     let nxtSec = nextSection(student.currSection)
+//                     if (nxtSec) {
+//                         nxtClassId = `${nxtSec}_1`
+//                         await classModel.find({ classId: nxtClassId })
+//                             .then((res1) => {
+//                                 newSection.sec = student.currSection = nxtSec
+//                                 student.classId = nxtClassId
+//                                 student.currYear = '1'
+//                                 student.currTerm = 'Entry'
+//                                 newSection.yearReport[0].termReport[0].report = findQAs(nxtSec)
+//                                 student.section.push(newSection)
+//                             })
+//                             .catch((err) => {
+//                                 console.log(err);
+//                                 res.status(404).json({ status: "error", msg: `Next Class with id ${nxtClassId} not found..!!` })
+//                             })
+//                     }
+//                 }
+//                 else {
+//                     // //trying to evaluate previous evaluated year/section
+//                     // console.log(yearReport.year,section.sec)
+//                     // console.log(student.currYear,student.currSection)
+//                     // res.status(201).json("Not allowed to evaluate previous year/section once evaluated")
+//                 }
+//             }
+//         }
+//         if (transfer) {
+//             console.log("evaluateStudent(): updatingStudentClassAllocation called")
+//             await updateStudentClassAllocation(student, prevClassId, nxtClassId, session)
+//                 .then(async (res1) => {
+//                     console.log("updated classes")
+//                 })
+//                 .catch((err) => {
+//                     console.log(">>" + err);
+//                     return res.status(404).json({ status: "error", msg: `Unable to allocate/deallocate the class` })
+//                 })
+//         }
+//         await student.save({ session })
+//             .then(async (res1) => {
+//                 console.log("updated student")
+//             })
+//             .catch((err) => {
+//                 console.log(">>" + err);
+//                 return res.status(404).json({ status: "error", msg: `Unable to save the student details` })
+//             })
+//         await session.commitTransaction();
+//         res.status(200).json({ result });
+//     } catch (err) {
+//         console.error("evaluateStudent error:", err);
+//         await session.abortTransaction();
+//         session.endSession();
+//         return res.status(500).json({ status: "error", msg: "Transaction failed", error: err.message });
+//     }
+//     session.endSession();
+// }
+
+const createNewTermReport = (term, section) => ({
+    term,
+    evaluated: {
+        personal: false,
+        academic: false,
+        social: false,
+        occupational: false,
+        recreational: false,
+    },
+    report: findQAs(section),
+    percent: {
+        personalPercent: 0,
+        socialPercent: 0,
+        academicPercent: 0,
+        occupationalPercent: 0,
+        recreationalPercent: 0,
+        mode: "",
+    },
+    comment: {
+        termComment: "",
+        personalComment: "",
+        occupationalComment: "",
+        recreationalComment: "",
+        academicComment: "",
+        socialComment: "",
+    }
+});
+const calculateYearPercentages = (termReports) => {
+    let len = termReports.length;
+    let sum = {
+        personal: 0,
+        social: 0,
+        academic: 0,
+        occupational: 0,
+        recreational: 0,
+    };
+    let modeCounts = { A: 0, B: 0, C: 0, D: 0, E: 0 };
+
+    termReports.forEach(term => {
+        sum.personal += Number(term.percent.personalPercent) || 0;
+        sum.social += Number(term.percent.socialPercent) || 0;
+        sum.academic += Number(term.percent.academicPercent) || 0;
+        sum.occupational += Number(term.percent.occupationalPercent) || 0;
+        sum.recreational += Number(term.percent.recreationalPercent) || 0;
+
+        const mode = term.percent.mode;
+        if (modeCounts.hasOwnProperty(mode)) {
+            modeCounts[mode]++;
+        }
+    });
+
+    const average = {
+        personalPercent: (sum.personal / len).toFixed(2),
+        socialPercent: (sum.social / len).toFixed(2),
+        academicPercent: (sum.academic / len).toFixed(2),
+        occupationalPercent: (sum.occupational / len).toFixed(2),
+        recreationalPercent: (sum.recreational / len).toFixed(2),
+    };
+
+    const mode = Object.entries(modeCounts).reduce((a, b) => (b[1] > a[1] ? b : a))[0];
+    const total = (
+        (parseFloat(average.personalPercent) +
+            parseFloat(average.socialPercent) +
+            parseFloat(average.academicPercent) +
+            parseFloat(average.occupationalPercent)) / 4
+    ).toFixed(2);
+
+    return { ...average, mode, total };
+};
+const createNewSection = (sectionName) => ({
+    status: 'ongoing',
+    sec: sectionName,
+    yearReport: [{
+        year: '1',
+        termReport: [createNewTermReport('Entry', sectionName)],
+        comment: {
+            yearPersonalComment: "",
+            yearOccupationalComment: "",
+            yearRecreationalComment: "",
+            yearAcademicComment: "",
+            yearSocialComment: "",
+            yearComment: ""
+        },
+        percent: {
+            personalPercent: null,
+            socialPercent: null,
+            academicPercent: null,
+            occupationalPercent: null,
+            recreationalPercent: null,
+            mode: "",
+            result: 0
+        }
+    }]
+});
+
 const evaluateStudent = async (req, res) => {
-    // try {
-    const id = req.headers.id
-    // console.log(req.headers)
-    const student = await studentModel.findOne({ regNo: id })
-    const section = student.section.find(sec => sec.sec === req.headers.section)
-    const yearReport = section.yearReport.find(year => year.year === req.headers.year)
-    const termReport = yearReport.termReport.find(term => term.term === req.headers.term)
-    if (yearReport.year !== student.currYear || section.sec !== student.currSection) {
-        console.log("[evaluateStudent] - Evaluation not allowed for previous year/section paper")
-        return res.status(400).json({ status: "invalid", msg: "Evaluation not allowed for previous year/section paper" })
-    }    // console.log(termReport)
-    let questions;
-    if (req.headers.type === "personalQA")
-        questions = termReport.report.personalQA
-    else if (req.headers.type === "socialQA")
-        questions = termReport.report.socialQA
-    else if (req.headers.type === "academicQA")
-        questions = termReport.report.academicQA
-    else if (req.headers.type === "recreationalQA")
-        questions = termReport.report.recreationalQA
-    else if (req.headers.type === "occupationalQA")
-        questions = termReport.report.occupationalQA
+    const session = await studentModel.startSession();
+    try {
+        session.startTransaction();
 
-    let result
-    // console.log(questions)
-    if (req.headers.type !== "recreationalQA") {
-        result = findPercent(questions)
-        if (req.headers.type === "personalQA") {
-            termReport.percent.personalPercent = result
-            termReport.evaluated.personal = true
-        }
-        else if (req.headers.type === "socialQA") {
-            termReport.percent.socialPercent = result
-            termReport.evaluated.social = true
-        }
-        else if (req.headers.type === "academicQA") {
-            termReport.percent.academicPercent = result
-            termReport.evaluated.academic = true
-        }
-        else if (req.headers.type === "occupationalQA") {
-            termReport.percent.occupationalPercent = result
-            termReport.evaluated.occupational = true
-        }
-    }
-    else {
-        result = findPercentForRecreational(questions)
-        termReport.percent.recreationalPercent = result.percent
-        termReport.percent.mode = result.mode
-        termReport.evaluated.recreational = true
-    }
+        const id = req.headers.id;
+        const student = await studentModel.findOne({ regNo: id }).session(session);
+        if (!student) throw new Error("Student not found");
 
+        const section = student.section.find(sec => sec.sec === req.headers.section);
+        const yearReport = section.yearReport.find(year => year.year === req.headers.year);
+        const termReport = yearReport.termReport.find(term => term.term === req.headers.term);
 
-    let prevClassId = student.classId;
-    let nxtClassId = "";
-    let transfer = false
-    if (termReport.evaluated.academic && termReport.evaluated.occupational && termReport.evaluated.personal && termReport.evaluated.recreational && termReport.evaluated.social) {
-        if (termReport.term !== "III") {
-            // Efficiently determine the next term based on the current term and termReport length
-            let newTermReport = {
-                evaluated: {
-                    personal: false,
-                    academic: false,
-                    social: false,
-                    occupational: false,
-                    recreational: false
-                },
-                term: '',
-                report: findQAs(req.headers.section),
-                percent: {//Term Performance
-                    personalPercent: 0,
-                    socialPercent: 0,
-                    academicPercent: 0,
-                    occupationalPercent: 0,
-                    recreationalPercent: 0,
-                    mode: ""
-                },
-                comment: {//Term Comments
-                    termComment: "",
-                    personalComment: "",
-                    occupationalComment: "",
-                    recreationalComment: "",
-                    academicComment: "",
-                    socialComment: ""
+        if (yearReport.year !== student.currYear || section.sec !== student.currSection) {
+            throw new Error("Evaluation not allowed for previous year/section paper");
+        }
+
+        let questions, result;
+        switch (req.headers.type) {
+            case "personalQA": questions = termReport.report.personalQA; break;
+            case "socialQA": questions = termReport.report.socialQA; break;
+            case "academicQA": questions = termReport.report.academicQA; break;
+            case "recreationalQA": questions = termReport.report.recreationalQA; break;
+            case "occupationalQA": questions = termReport.report.occupationalQA; break;
+            default: throw new Error("Invalid question type");
+        }
+
+        if (req.headers.type !== "recreationalQA") {
+            result = findPercent(questions);
+            termReport.percent[`${req.headers.type.replace("QA", "Percent")}`] = result;
+            termReport.evaluated[req.headers.type.replace("QA", "")] = true;
+        } else {
+            result = findPercentForRecreational(questions);
+            termReport.percent.recreationalPercent = result.percent;
+            termReport.percent.mode = result.mode;
+            termReport.evaluated.recreational = true;
+        }
+
+        const allEvaluated = Object.values(termReport.evaluated).every(v => v);
+        let transfer = false;
+        let nxtClassId = "";
+        const prevClassId = student.classId;
+
+        if (allEvaluated) {
+            if (termReport.term !== "III") {
+                const termOrder = ['Entry', 'I', 'II', 'III'];
+                const nextTermIndex = termOrder.indexOf(termReport.term) + 1;
+
+                if (yearReport.termReport.length === nextTermIndex) {
+                    const newTermReport = createNewTermReport(termOrder[nextTermIndex], req.headers.section);
+                    yearReport.termReport.push(newTermReport);
+                    student.currTerm = newTermReport.term;
                 }
-            }
-            const termOrder = ['Entry', 'I', 'II', 'III'];
-            const currIdx = termOrder.indexOf(termReport.term);
-            if (
-                currIdx !== -1 && currIdx < termOrder.length - 1 &&
-                yearReport.termReport.length === currIdx + 1
-            ) {
-                newTermReport.term = termOrder[currIdx + 1];
-            }
-            if (newTermReport.term) {
-                yearReport.termReport.push(newTermReport);
-                student.currTerm = newTermReport.term;
-            }
-        }
-        else {
-            // Efficiently accumulate sums and mode counts
-            let sumPersonal = 0, sumSocial = 0, sumAcademic = 0, sumOccupational = 0, sumRecreational = 0;
-            let modeCounts = [0, 0, 0, 0, 0]; // A, B, C, D, E
-            let len = 0;
-            transfer = true;
-            for (const term of yearReport.termReport) {
-                len++;
-                sumPersonal += Number(term.percent.personalPercent) || 0;
-                sumSocial += Number(term.percent.socialPercent) || 0;
-                sumAcademic += Number(term.percent.academicPercent) || 0;
-                sumOccupational += Number(term.percent.occupationalPercent) || 0;
-                sumRecreational += Number(term.percent.recreationalPercent) || 0;
-                if (term.percent.mode === 'A') modeCounts[0]++;
-                else if (term.percent.mode === 'B') modeCounts[1]++;
-                else if (term.percent.mode === 'C') modeCounts[2]++;
-                else if (term.percent.mode === 'D') modeCounts[3]++;
-                else if (term.percent.mode === 'E') modeCounts[4]++;
-            }
-            let personalPercent = len ? (sumPersonal / len).toFixed(2) : "0.00";
-            let socialPercent = len ? (sumSocial / len).toFixed(2) : "0.00";
-            let academicPercent = len ? (sumAcademic / len).toFixed(2) : "0.00";
-            let occupationalPercent = len ? (sumOccupational / len).toFixed(2) : "0.00";
-            let recreationalPercent = len ? (sumRecreational / len).toFixed(2) : "0.00";
-            let modeIdx = modeCounts.indexOf(Math.max(...modeCounts));
-            let mode = ['A', 'B', 'C', 'D', 'E'][modeIdx] || '';
-            let total = (parseFloat(personalPercent) + parseFloat(socialPercent) + parseFloat(academicPercent) + parseFloat(occupationalPercent)) / 4
+            } else {
+                transfer = true;
+                const data = calculateYearPercentages(yearReport.termReport);
+                yearReport.percent = data;
 
-            const data = {
-                personalPercent,
-                socialPercent,
-                academicPercent,
-                occupationalPercent,
-                recreationalPercent,
-                mode,
-                total
-            };
+                const total = parseFloat(data.total);
+                const nxtSec = nextSection(student.currSection);
 
-            yearReport.percent = data
-            await student.save();
-            console.log("saved: " + data)
-
-            const newSection = {
-                status: 'ongoing',
-                sec: '',
-                yearReport: [{
-                    year: '1',
-                    termReport: [{
-                        term: 'Entry',
-                        report: {
-                            personalQA: [{}],
-                            socialQA: [{}],
-                            academicQA: [{}],
-                            occupationalQA: [{}],
-                            recreationalQA: [{}]
-                        },
-                        comment: {
-                            termComment: "",
-                            personalComment: "",
-                            occupationalComment: "",
-                            recreationalComment: "",
-                            academicComment: "",
-                            socialComment: ""
-                        },
-                        percent: {
-                            personalPercent: null,
-                            socialPercent: null,
-                            academicPercent: null,
-                            occupationalPercent: null,
-                            recreationalPercent: null,
-                            mode: ""
-                        }
-                    }],
-                    comment: {
-                        yearPersonalComment: "",
-                        yearOccupationalComment: "",
-                        yearRecreationalComment: "",
-                        yearAcademicComment: "",
-                        yearSocialComment: "",
-                        yearComment: ""
-                    },
-                    percent: {
-                        personalPercent: null,
-                        socialPercent: null,
-                        academicPercent: null,
-                        occupationalPercent: null,
-                        recreationalPercent: null,
-                        mode: "",
-                        result: 0
+                if (total >= 60 && nxtSec) {
+                    section.status = "pass";
+                    if (nxtSec === "passedOut") {
+                        student.currYear = nxtSec;
+                        transfer = false;
+                    } else {
+                        nxtClassId = `${nxtSec}_1`;
+                        const nextClass = await classModel.findOne({ classId: nxtClassId }).session(session);
+                        if (!nextClass) throw new Error(`Class ${nxtClassId} not found`);
+                        const newSection = createNewSection(nxtSec);
+                        student.classId = nxtClassId;
+                        student.currSection = nxtSec;
+                        student.currYear = '1';
+                        student.currTerm = 'Entry';
+                        student.section.push(newSection);
                     }
-                }],
-            }
-
-
-            // const result = (parseFloat(personalPercent) + parseFloat(socialPercent) + parseFloat(academicPercent) + parseFloat(occupationalPercent)) / 4;
-            //console.log(typeof(parseFloat(personalPercent)),typeof(socialPercent),typeof(academicPercent),typeof(occupationalPercent))
-            console.log(total)
-            if (    // if the student is passed
-                total >= 60 && yearReport.year === student.currYear &&
-                section.sec === student.currSection
-            ) {
-                section.status = "pass"
-                //create new Section
-                let nxtSec = nextSection(student.currSection)
-                console.log(">60: " + nxtSec + "\t")
-                if (nxtSec && nxtSec == 'passedOut') {
-                    student.currYear = nxtSec
-                    transfer = false
-                    // await student.save()
-                    //     .then(async (res) => {
-                    //         console.log("updated student")
-                    //     })
-                    //     .catch((err) => {
-                    //         console.log(">>" + err);
-                    //         res.status(404).json({ status: "error", msg: `unable to save the student details` })
-                    //     })
+                } else if (section.yearReport.length < 3) {
+                    const newYear = createNewYear(student.currSection);
+                    const nxtYear = (section.yearReport.length + 1).toString();
+                    nxtClassId = `${student.currSection}_${nxtYear}`;
+                    const nextClass = await classModel.findOne({ classId: nxtClassId }).session(session);
+                    if (!nextClass) throw new Error(`Class ${nxtClassId} not found`);
+                    student.classId = nxtClassId;
+                    student.currYear = nxtYear;
+                    student.currTerm = 'Entry';
+                    section.yearReport.push(newYear);
+                    section.status = "ongoing";
                 } else if (nxtSec) {
-                    nxtClassId = `${nxtSec}_1`
-                    console.log(nxtClassId)
-                    await classModel.find({ classId: nxtClassId })
-                        .then((res1) => {
-                            newSection.sec = student.currSection = nxtSec
-                            student.currYear = '1'
-                            student.currTerm = 'Entry'
-                            student.classId = nxtClassId
-                            newSection.yearReport[0].termReport[0].report = findQAs(nxtSec)
-                            student.section.push(newSection)
-                        })
-                        .catch((err) => {
-                            console.log(err);
-                            res.status(404).json({ status: "error", msg: `Next Class with id ${nxtClassId} not found..!!` })
-                        })
+                    section.status = "promoted";
+                    nxtClassId = `${nxtSec}_1`;
+                    const nextClass = await classModel.findOne({ classId: nxtClassId }).session(session);
+                    if (!nextClass) throw new Error(`Class ${nxtClassId} not found`);
+                    const newSection = createNewSection(nxtSec);
+                    student.classId = nxtClassId;
+                    student.currSection = nxtSec;
+                    student.currYear = '1';
+                    student.currTerm = 'Entry';
+                    student.section.push(newSection);
                 }
-            }
-            else if (
-                section.yearReport.length < 3 && yearReport.year === student.currYear &&
-                section.sec === student.currSection
-            ) {
-                const newYear = {
-                    year: '1',
-                    termReport: [{
-                        term: 'Entry',
-                        report: {
-                            personalQA: [{}],
-                            socialQA: [{}],
-                            academicQA: [{}],
-                            occupationalQA: [{}],
-                            recreationalQA: [{}]
-                        },
-                        comment: {
-                            termComment: "",
-                            personalComment: "",
-                            occupationalComment: "",
-                            recreationalComment: "",
-                            academicComment: "",
-                            socialComment: ""
-                        },
-                        percent: {
-                            personalPercent: null,
-                            socialPercent: null,
-                            academicPercent: null,
-                            occupationalPercent: null,
-                            recreationalPercent: null,
-                            mode: ""
-                        }
-                    }],
-                    comment: {
-                        yearPersonalComment: "",
-                        yearOccupationalComment: "",
-                        yearRecreationalComment: "",
-                        yearAcademicComment: "",
-                        yearSocialComment: "",
-                        yearComment: ""
-                    },
-                    percent: {
-                        personalPercent: null,
-                        socialPercent: null,
-                        academicPercent: null,
-                        occupationalPercent: null,
-                        recreationalPercent: null,
-                        mode: "",
-                        result: 0
-                    }
-                }
-                section.status = "ongoing"
-                //create new year
-                let nxtYear = (1 + section.yearReport.length).toString();
-                const currSec = student.currSection
-                nxtClassId = currSec + `_${nxtYear}`
-                console.log(currSec + '<80%--<3years\tNew ClassID: ' + nxtClassId)
-                await classModel.find({ classId: nxtClassId })
-                    .then((res1) => {
-                        newYear.year = student.currYear = nxtYear
-                        student.classId = nxtClassId
-                        student.currTerm = 'Entry'
-                        newYear.termReport[0].report = findQAs(currSec)
-                        console.log(newYear.termReport[0].report.personalQA.length)
-                        section.yearReport.push(newYear)
-                    })
-                    .catch((err) => {
-                        console.log(err);
-                        res.status(404).json({ status: "error", msg: `Next Class with id ${nxtClassId} not found..!!` })
-                    })
-
-            }
-            else if (
-                yearReport.year === student.currYear && section.sec === student.currSection
-            ) {
-                section.status = "promoted"
-                //create new section after failing 3 years
-                let nxtSec = nextSection(student.currSection)
-                if (nxtSec) {
-                    nxtClassId = `${nxtSec}_1`
-                    await classModel.find({ classId: nxtClassId })
-                        .then((res1) => {
-                            newSection.sec = student.currSection = nxtSec
-                            student.classId = nxtClassId
-                            student.currYear = '1'
-                            student.currTerm = 'Entry'
-                            newSection.yearReport[0].termReport[0].report = findQAs(nxtSec)
-                            student.section.push(newSection)
-                        })
-                        .catch((err) => {
-                            console.log(err);
-                            res.status(404).json({ status: "error", msg: `Next Class with id ${nxtClassId} not found..!!` })
-                        })
-                }
-            }
-            else {
-                // //trying to evaluate previous evaluated year/section
-                // console.log(yearReport.year,section.sec)
-                // console.log(student.currYear,student.currSection)
-                // res.status(201).json("Not allowed to evaluate previous year/section once evaluated")
             }
         }
+
+        if (transfer) {
+            await updateStudentClassAllocation(student, prevClassId, nxtClassId, session);
+        }
+
+        await student.save({ session });
+        await session.commitTransaction();
+        res.status(200).json({ result });
+    } catch (err) {
+        console.error("evaluateStudent error:", err);
+        try {
+            await session.abortTransaction();
+        } catch (abortErr) {
+            console.error("Abort failed:", abortErr);
+        }
+        res.status(500).json({ status: "error", msg: err.message });
+    } finally {
+        session.endSession();
     }
-    if (transfer) {
-        console.log("evaluateStudent(): updatingStudentClassAllocation called")
-        await updateStudentClassAllocation(student, prevClassId, nxtClassId)
-            .then(async (res1) => {
-                console.log("updated classes")
-            })
-            .catch((err) => {
-                console.log(">>" + err);
-                return res.status(404).json({ status: "error", msg: `Unable to allocate/deallocate the class` })
-            })
-    }
-    await student.save()
-        .then(async (res1) => {
-            console.log("updated student")
-        })
-        .catch((err) => {
-            console.log(">>" + err);
-            return res.status(404).json({ status: "error", msg: `Unable to save the student details` })
-        })
-    res.status(200).json({ result })
-}
+};
 
 const findPercent = (arr) => {
     let count = 0

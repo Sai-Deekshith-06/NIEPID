@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
+import { createUseStyles } from 'react-jss';
 import 'react-toastify/dist/ReactToastify.css';
 import { Header, Footer } from '../../components/components';
 import ResetPasswordModal from '../../components/resetPassword';
@@ -107,24 +108,12 @@ function App() {
         navigate("/admin/viewstudents");
     };
 
-    const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
     const CustomButton = () => {
-        const customButtonCss = {
-            backgroundColor: 'white',
-            border: '1px solid #ccc',
-            padding: '8px 12px',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            color: '#007bff',
-            fontWeight: 'bold',
-            marginLeft: '1rem',
-            '&:hover': {
-                backgroundColor: '#e6e6e6',
-            }
-        }
+        const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
+        const classes = useStyles();
         return (
             <>
-                <button onClick={() => setShowResetPasswordModal(true)} style={customButtonCss}>Reset Password</button>
+                <button onClick={() => setShowResetPasswordModal(true)} className={classes.customButton}>Reset Password</button>
                 <ResetPasswordModal isOpen={showResetPasswordModal} onClose={() => setShowResetPasswordModal(false)} />
             </>
         )
@@ -352,5 +341,21 @@ const styles = {
 
     },
 };
+const useStyles = createUseStyles({
+    customButton: {
+        backgroundColor: 'white',
+        border: '1px solid #ccc',
+        padding: '8px 12px',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        color: '#007bff',
+        fontWeight: 'bold',
+        marginLeft: '1rem',
+        transition: 'background-color 0.3s ease',
+        '&:hover': {
+            backgroundColor: '#e6e6e6',
+        },
+    },
+});
 
 export default App;

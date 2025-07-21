@@ -6,10 +6,10 @@ const requestIp = require("request-ip");
 const os = require("os");
 
 require("dotenv").config();
-// app.use(cors());
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',')
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: allowedOrigins,
     credentials: true,
   })
 );
@@ -69,7 +69,7 @@ const mongoose = require("mongoose");
 mongoose
   .connect("mongodb://127.0.0.1:27017/niepid1")
   .then((res) => {
-    console.log("connected successfully");
+    console.log("Database connected successfully");
   })
   .catch((err) => {
     console.log(err);
@@ -96,4 +96,5 @@ app.get("/", (req, res) => {
 //server connection
 app.listen(4000, () => {
   console.log(`server is listening at port 4000`);
+  console.log("And from: ", allowedOrigins)
 });
