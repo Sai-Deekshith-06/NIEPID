@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import 'react-toastify/dist/ReactToastify.css';
 import { Header, Footer } from '../../components/components';
+import ResetPasswordModal from '../../components/resetPassword';
 
 function App() {
     // const [isAdmin, setIsAdmin] = useState(false); // This state will determine whether to show Admin or Home component
@@ -106,9 +107,32 @@ function App() {
         navigate("/admin/viewstudents");
     };
 
+    const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
+    const CustomButton = () => {
+        const customButtonCss = {
+            backgroundColor: 'white',
+            border: '1px solid #ccc',
+            padding: '8px 12px',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            color: '#007bff',
+            fontWeight: 'bold',
+            marginLeft: '1rem',
+            '&:hover': {
+                backgroundColor: '#e6e6e6',
+            }
+        }
+        return (
+            <>
+                <button onClick={() => setShowResetPasswordModal(true)} style={customButtonCss}>Reset Password</button>
+                <ResetPasswordModal isOpen={showResetPasswordModal} onClose={() => setShowResetPasswordModal(false)} />
+            </>
+        )
+    };
+
     return (
         <div style={styles.container}>
-            <Header logout={true} removeCookie={removeCookie} />
+            <Header logout={true} removeCookie={removeCookie} CustomButton={CustomButton} />
             <div style={styles.hero}>
                 <h1 style={styles.heroTitle}>Welcome to Our Website</h1>
                 <p style={styles.heroSubtitle}>

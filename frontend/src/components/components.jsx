@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FaArrowDown, FaArrowUp } from 'react-icons/fa';
 import { createUseStyles } from 'react-jss';
 import image from './th.jpeg';
 import { useNavigate } from 'react-router-dom';
+import ChangePasswordModal from './changePassword2';
 
 const useStyles = createUseStyles({
     // for header 
@@ -118,16 +119,21 @@ const useStyles = createUseStyles({
 * @param {string} name - The name of the user to be displayed in the header.
 * @param {string} backButtonPath - A string representing the URL path to navigate when the back button is clicked.
 * @param {boolean} logout - Displays a logout button
-* @param {boolean} print - Displays a print button
 * @param {function} removeCookie - A function to remove the user's authentication cookie, typically called during logout.
+* @param {function} CustomButton - A function to render a customized button
+* @param {boolean} print - Displays a print button
 * 
 * @returns {JSX.Element} The rendered Header component.
 */
-const Header = ({ id, name, backButtonPath, logout, removeCookie, print }) => {
+const Header = ({ id, name, backButtonPath, logout, removeCookie, CustomButton, print }) => {
+    if (backButtonPath && (logout || removeCookie)) {
+        console.warn("Haeder: Cannot use both logout and back button")
+    }
     const classes = useStyles();
     const navigateTo = useNavigate();
     let handleLogout
-    if (removeCookie)
+    const [showModal, setShowModal] = useState(false);
+    if (removeCookie) {
         handleLogout = () => {
             removeCookie('jwt');
             localStorage.removeItem("role");
@@ -135,6 +141,7 @@ const Header = ({ id, name, backButtonPath, logout, removeCookie, print }) => {
             localStorage.clear()
             navigateTo('/');
         };
+    }
 
     return (
         <header className={classes.header}>
@@ -148,16 +155,6 @@ const Header = ({ id, name, backButtonPath, logout, removeCookie, print }) => {
                 </div>
             )}
             <nav className={classes.navLinks}>
-                {logout && removeCookie && (
-                    <div className='home'>
-                        <button onClick={() => navigateTo('/changepassword')} className={classes.backButton}>
-                            Change Password
-                        </button>
-                        <button onClick={handleLogout} className={classes.logoutButton}>
-                            Logout
-                        </button>
-                    </div>
-                )}
                 {print && (
                     <button onClick={(e) => window.print()} className={classes.backButton}>
                         Print
@@ -167,6 +164,21 @@ const Header = ({ id, name, backButtonPath, logout, removeCookie, print }) => {
                     <button onClick={() => navigateTo(backButtonPath)} className={classes.backButton}>
                         Back
                     </button>
+                )}
+                {CustomButton && <CustomButton />}
+                {logout && removeCookie && (
+                    <div className='home'>
+                        <>
+                            <button onClick={() => setShowModal(true)} className={classes.backButton}>Change Password</button>
+                            <ChangePasswordModal isOpen={showModal} onClose={() => setShowModal(false)} />
+                        </>
+                        {/* <button onClick={() => navigateTo('/changepassword')} className={classes.backButton}>
+                            Change Password
+                        </button> */}
+                        <button onClick={handleLogout} className={classes.logoutButton}>
+                            Logout
+                        </button>
+                    </div>
                 )}
             </nav>
         </header>

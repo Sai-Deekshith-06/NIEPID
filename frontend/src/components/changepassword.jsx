@@ -95,7 +95,7 @@ const ChangePassword = () => {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [buttonHover, setButtonHover] = useState(false);
-    const [cookies, setCookie, removeCookie] = useCookies([]);
+    const [, , removeCookie] = useCookies([]);
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {

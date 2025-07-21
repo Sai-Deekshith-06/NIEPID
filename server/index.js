@@ -52,6 +52,7 @@ const adminRoutes = require("./routes/admin.route");
 const teacherRoutes = require("./routes/teacher.route");
 const loginRoutes = require("./routes/login.route");
 const principalRoutes = require("./routes/principal.route");
+const { changePassword, checkUserForReset, resetPasswordConfirm } = require("./controllers/changePassword.controller");
 
 const {
   verifyToken,
@@ -84,8 +85,9 @@ app.use("/student", verifyToken, isStudent, studentRoutes);
 app.use("/teacher", verifyToken, isTeacher, teacherRoutes);
 app.use("/principal", verifyToken, isprincipal, principalRoutes);
 app.use("/admin", verifyToken, isAdmin, adminRoutes);
-const { changePassword } = require("./controllers/changePassword.controller");
 app.post("/api/changepassword", changePassword);
+app.post("/api/checkUserForReset", checkUserForReset)
+app.post("/api/resetPasswordConfirm", resetPasswordConfirm)
 
 app.get("/", (req, res) => {
   res.status(200).send("hello page");
