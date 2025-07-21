@@ -1,9 +1,9 @@
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { createUseStyles } from 'react-jss';
 import { useNavigate } from 'react-router-dom';
 import image from "../images/logo.jpeg";
 import { ScrollToButton } from '../components/components';
+import { axiosInstance } from '../libs/axios';
 
 
 const useStyles = createUseStyles({
@@ -315,7 +315,7 @@ const Student = () => {
                 console.log("Hello")
                 const role = localStorage.getItem("role");
                 console.log(role, regNo)
-                await axios.get(`http://localhost:4000/${role}/viewStudentDetails`, {
+                await axiosInstance.get(`/${role}/viewStudentDetails`, {
                     headers: {
                         regNo: regNo,
                         "Content-Type": "application/json",

@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import image from "../images/logo.jpeg";
 import { toast } from "react-toastify";
 import { Footer } from '../components/components'
+import { axiosInstance } from "../libs/axios";
 
 const TeacherTable = () => {
   const [teacherDetails, setTeacherDetails] = useState([]);
@@ -35,7 +35,7 @@ const TeacherTable = () => {
 
   const fetchData = useCallback(async () => {
     try {
-      const response = await axios.get(`http://localhost:4000/${role}/viewTeacher`, {
+      const response = await axiosInstance.get(`/${role}/viewTeacher`, {
         headers: {
           "Content-Type": "application/json",
           authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -84,8 +84,8 @@ const TeacherTable = () => {
     try {
       console.log(editedTeacher);
       const id = localStorage.getItem("teacherId");
-      const response = await axios.put(
-        `http://localhost:4000/admin/updateTeacher/${id}`,
+      const response = await axiosInstance.put(
+        `/admin/updateTeacher/${id}`,
         editedTeacher,
         {
           headers: {
@@ -131,8 +131,8 @@ const TeacherTable = () => {
           .filter((item) => item !== "");
       }
 
-      const response = await axios.put(
-        `http://localhost:4000/admin/updateTeacher/${id}`,
+      const response = await axiosInstance.put(
+        `/admin/updateTeacher/${id}`,
         updatedTeacher,
         {
           headers: {

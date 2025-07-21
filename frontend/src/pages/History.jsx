@@ -3,9 +3,9 @@ import { Bar } from 'react-chartjs-2';
 import image from "../images/logo.jpeg";
 import 'chart.js/auto';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { toast } from 'react-toastify';
 import { ScrollToButton } from '../components/components';
+import { axiosInstance } from '../libs/axios';
 
 const styles = {
     header: {
@@ -145,7 +145,7 @@ const StudentPerformance = () => {
             console.log("hello")
             if (role === "teacher") {
                 console.log("hello")
-                await axios.get("http://localhost:4000/teacher/abc", {
+                await axiosInstance.get("/teacher/abc", {
                     headers: {
                         id: id,
                         "Content-Type": "application/json",
@@ -184,7 +184,7 @@ const StudentPerformance = () => {
             else if (role === "principal") {
                 console.log(role)
                 console.log(id)
-                axios.get("http://localhost:4000/principal/student/viewHistory", {
+                await axiosInstance.get("/principal/student/viewHistory", {
                     headers: {
                         id: id,
                         "Content-Type": "application/json",
@@ -217,7 +217,7 @@ const StudentPerformance = () => {
                     })
             }
             else if (role === "admin") {
-                axios.get("http://localhost:4000/admin/student/viewHistory", {
+                await axiosInstance.get("/admin/student/viewHistory", {
                     headers: {
                         id: id,
                         "Content-Type": "application/json",
@@ -252,7 +252,7 @@ const StudentPerformance = () => {
                 console.log("student")
                 const id1 = localStorage.getItem('regNo')
                 console.log(id1)
-                axios.get("http://localhost:4000/student/viewHistory", {
+                await axiosInstance.get("/student/viewHistory", {
                     headers: {
                         id: id1,
                         "Content-Type": "application/json",

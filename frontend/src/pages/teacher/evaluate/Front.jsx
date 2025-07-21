@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { toast } from 'react-toastify';
 import { Header, Footer } from '../../../components/components';
+import { axiosInstance } from '../../../libs/axios';
 
 const Front = () => {
   const navigate = useNavigate();
@@ -19,7 +19,7 @@ const Front = () => {
   const [socialPercent, setSocialPercent] = useState(0)
   const [academicPercent, setAcademicPercent] = useState(0)
   const [occupationalPercent, setOccupationalPercent] = useState(0)
-  const [recreationalPercent, setRecreationalPercent] = useState(0)
+  // const [recreationalPercent, setRecreationalPercent] = useState(0)
   const [mode, setMode] = useState('')
 
 
@@ -47,73 +47,76 @@ const Front = () => {
 
   };
 
-  useEffect(async () => {
-    const data = await axios.get("http://localhost:4000/teacher/evaluate/questions", {
-      headers: {
-        id: id,
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      }
-    }, { withCredentials: true })
-      .then(res => {
-        var i = 0, j = 0, k = 0;
-        res.data.data.section.map((s, index) => {
-          if (s.sec === section)
-            k = index
+  useEffect(() => {
+    const f = async () => {
+      await axiosInstance.get("/teacher/evaluate/questions", {
+        headers: {
+          id: id,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        }
+      }, { withCredentials: true })
+        .then(res => {
+          var i = 0, j = 0, k = 0;
+          res.data.data.section.map((s, index) => {
+            if (s.sec === section)
+              k = index
+          })
+          res.data.data.section[k].yearReport.map((y, index) => {
+            if (y.year === year)
+              i = index
+          })
+          res.data.data.section[k].yearReport[i].termReport.map((t, index) => {
+            if (t.term === term)
+              j = index
+          })
+          if (res.data.data.section[k].yearReport[i].termReport[j].comment.termComment.trim() !== "")
+            setOldComments(res.data.data.section[k].yearReport[i].termReport[j].comment.termComment)
+          else
+            setOldComments("Enter your comments")
+
+          // console.log(res.data.data.section[k].yearReport[i].termReport[j].percent.personalPercent)
+          if (res.data.data.section[k].yearReport[i].termReport[j].percent.personalPercent)
+            setPersonalPercent(res.data.data.section[k].yearReport[i].termReport[j].percent.personalPercent)
+          else
+            setPersonalPercent(0)
+
+          if (res.data.data.section[k].yearReport[i].termReport[j].percent.socialPercent)
+            setSocialPercent(res.data.data.section[k].yearReport[i].termReport[j].percent.socialPercent)
+          else
+            setSocialPercent(0)
+
+          if (res.data.data.section[k].yearReport[i].termReport[j].percent.academicPercent)
+            setAcademicPercent(res.data.data.section[k].yearReport[i].termReport[j].percent.academicPercent)
+          else
+            setAcademicPercent(0)
+
+          if (res.data.data.section[k].yearReport[i].termReport[j].percent.occupationalPercent)
+            setOccupationalPercent(res.data.data.section[k].yearReport[i].termReport[j].percent.occupationalPercent)
+          else
+            setOccupationalPercent(0)
+
+          // if (res.data.data.section[k].yearReport[i].termReport[j].percent.recreationalPercent)
+          //   setRecreationalPercent(res.data.data.section[k].yearReport[i].termReport[j].percent.recreationalPercent)
+          // else
+          //   setRecreationalPercent(0)
+
+          if (res.data.data.section[k].yearReport[i].termReport[j].percent.mode.trim())
+            setMode(res.data.data.section[k].yearReport[i].termReport[j].percent.mode)
+          else
+            setMode("")
+
+          // console.log(res)
         })
-        res.data.data.section[k].yearReport.map((y, index) => {
-          if (y.year === year)
-            i = index
+        .catch(err => {
+          console.log(err)
         })
-        res.data.data.section[k].yearReport[i].termReport.map((t, index) => {
-          if (t.term === term)
-            j = index
-        })
-        if (res.data.data.section[k].yearReport[i].termReport[j].comment.termComment.trim() !== "")
-          setOldComments(res.data.data.section[k].yearReport[i].termReport[j].comment.termComment)
-        else
-          setOldComments("Enter your comments")
-
-        // console.log(res.data.data.section[k].yearReport[i].termReport[j].percent.personalPercent)
-        if (res.data.data.section[k].yearReport[i].termReport[j].percent.personalPercent)
-          setPersonalPercent(res.data.data.section[k].yearReport[i].termReport[j].percent.personalPercent)
-        else
-          setPersonalPercent(0)
-
-        if (res.data.data.section[k].yearReport[i].termReport[j].percent.socialPercent)
-          setSocialPercent(res.data.data.section[k].yearReport[i].termReport[j].percent.socialPercent)
-        else
-          setSocialPercent(0)
-
-        if (res.data.data.section[k].yearReport[i].termReport[j].percent.academicPercent)
-          setAcademicPercent(res.data.data.section[k].yearReport[i].termReport[j].percent.academicPercent)
-        else
-          setAcademicPercent(0)
-
-        if (res.data.data.section[k].yearReport[i].termReport[j].percent.occupationalPercent)
-          setOccupationalPercent(res.data.data.section[k].yearReport[i].termReport[j].percent.occupationalPercent)
-        else
-          setOccupationalPercent(0)
-
-        if (res.data.data.section[k].yearReport[i].termReport[j].percent.recreationalPercent)
-          setRecreationalPercent(res.data.data.section[k].yearReport[i].termReport[j].percent.recreationalPercent)
-        else
-          setRecreationalPercent(0)
-
-        if (res.data.data.section[k].yearReport[i].termReport[j].percent.mode.trim())
-          setMode(res.data.data.section[k].yearReport[i].termReport[j].percent.mode)
-        else
-          setMode("")
-
-        // console.log(res)
-      })
-      .catch(err => {
-        console.log(err)
-      })
-  }, [id])
+    }
+    f()
+  }, [id, section, term, year])
 
   const handleSubmit = async () => {
-    await axios.post("http://localhost:4000/teacher/termTypeComment", {
+    await axiosInstance.post("/teacher/termTypeComment", {
       id: id,
       section: section,
       year: year,

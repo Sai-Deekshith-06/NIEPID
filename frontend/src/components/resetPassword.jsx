@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { toast } from "react-toastify";
 import { FaEye, FaEyeSlash, FaArrowRight } from "react-icons/fa"; // Importing FaArrowRight for the arrow button
+import { axiosInstance } from "../libs/axios";
 
 const resetModalStyles = {
     overlay: {
@@ -218,7 +218,7 @@ const ResetPasswordModal = ({ isOpen, onClose }) => {
 
         try {
             // Replace with your actual API endpoint to check user ID and get info
-            const res = await axios.post("http://localhost:4000/api/checkUserForReset",
+            const res = await axiosInstance.post("/api/checkUserForReset",
                 { userId },
                 {
                     headers: { "Content-Type": "application/json" },
@@ -249,7 +249,7 @@ const ResetPasswordModal = ({ isOpen, onClose }) => {
 
         try {
             // Replace with your actual API endpoint to reset password
-            const res = await axios.post("http://localhost:4000/api/resetPasswordConfirm",
+            const res = await axiosInstance.post("/api/resetPasswordConfirm",
                 { userId: userId, adminID: adminID, confirmationPassword: password },
                 {
                     headers: {

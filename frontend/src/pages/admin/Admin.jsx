@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import 'react-toastify/dist/ReactToastify.css';
 import { Header, Footer } from '../../components/components';
 import ResetPasswordModal from '../../components/resetPassword';
+import { axiosInstance } from '../../libs/axios';
 
 function App() {
     // const [isAdmin, setIsAdmin] = useState(false); // This state will determine whether to show Admin or Home component
@@ -31,7 +31,7 @@ function App() {
 
             const formData = new FormData();
             formData.append('file', selectedFile);
-            let response = await axios.post('http://localhost:4000/admin/registerTeacher', formData, {
+            let response = await axiosInstance.post('/admin/registerTeacher', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     Authorization: `Bearer ${localStorage.getItem("token")}`
@@ -59,7 +59,7 @@ function App() {
         // console.log("Attempting to download file");
         // console.log(`Bearer ${localStorage.getItem("token")}`);
 
-        const response = await axios.get("http://localhost:4000/admin/download", {
+        const response = await axiosInstance.get("/admin/download", {
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${localStorage.getItem("token")}`,

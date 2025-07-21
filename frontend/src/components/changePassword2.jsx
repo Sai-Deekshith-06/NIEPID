@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import { toast } from "react-toastify";
 import { FaEye, FaEyeSlash } from "react-icons/fa"; // Using react-icons as per previous request
+import { axiosInstance } from "../libs/axios";
 
 const modalStyles = {
     overlay: {
@@ -175,8 +175,8 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
 
         try {
             const userId = localStorage.getItem("userId");
-            const res = await axios.post(
-                "http://localhost:4000/api/changepassword",
+            const res = await axiosInstance.post(
+                "/api/changepassword",
                 { userId, currentPassword, newPassword },
                 {
                     headers: {

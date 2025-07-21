@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { Footer, Header } from '../../components/components';
+import { axiosInstance } from '../../libs/axios';
 
 const Term = () => {
   const navigate = useNavigate();
@@ -13,7 +13,7 @@ const Term = () => {
   useEffect(() => {
     const fetchStudentData = async () => {
       try {
-        const res = await axios.get("http://localhost:4000/teacher/getStudentbyId", {
+        const res = await axiosInstance.get("/teacher/getStudentbyId", {
           headers: {
             id: id,
             "Content-Type": "application/json",
@@ -50,7 +50,7 @@ const Term = () => {
       setYears([]);
       localStorage.setItem("section", section);
       const id = localStorage.getItem("studentId");
-      const res = await axios.get("http://localhost:4000/teacher/getStudentbyId", {
+      const res = await axiosInstance.get("/teacher/getStudentbyId", {
         headers: {
           id: id,
           "Content-Type": "application/json",

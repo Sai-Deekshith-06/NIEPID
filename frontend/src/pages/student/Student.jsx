@@ -1,8 +1,8 @@
-import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import { Footer, Header } from '../../components/components';
+import { axiosInstance } from '../../libs/axios';
 
 function Student() {
     console.log("hi 1")
@@ -27,7 +27,7 @@ function Student() {
         const fetchStudentData = async () => {
             try {
                 console.log("hello")
-                const res = await axios.get("http://localhost:4000/student/viewStudentDetails", {
+                const res = await axiosInstance.get("/student/viewStudentDetails", {
                     headers: {
                         regNo: regNo,
                         "Content-Type": "application/json",

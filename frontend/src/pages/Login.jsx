@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import { toast } from "react-toastify";
 import niepidLogo from "../images/logo.jpeg";
 import cvrlogo from '../images/cvr_logo.jpg';
+import { axiosInstance } from "../libs/axios";
 
 function Login() {
   const [cookies] = useCookies([]);
@@ -48,7 +48,7 @@ function Login() {
       const id = values.id
       const password = values.password
       console.log(id, password)
-      const response = await axios.post("http://localhost:4000/login",
+      const response = await axiosInstance.post("/login",
         {
           id: id,
           password: password

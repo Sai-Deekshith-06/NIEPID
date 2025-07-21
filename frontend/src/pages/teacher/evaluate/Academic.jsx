@@ -1,10 +1,10 @@
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { createUseStyles } from 'react-jss';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { ScrollToButton, Header, Footer } from '../../../components/components';
 import areAllAnswersSelected from './areAllAnswersSelected';
+import { axiosInstance } from '../../../libs/axios';
 // import flattenStudentData from '../helpers/flattenStudentData';
 
 const useStyles = createUseStyles({
@@ -177,7 +177,7 @@ const Academic = () => {
 
     useEffect(() => {
         const f = async () => {
-            await axios.get("http://localhost:4000/teacher/evaluate/questions", {
+            await axiosInstance.get("/teacher/evaluate/questions", {
                 headers: {
                     id: id,
                     "Content-Type": "application/json",
@@ -273,7 +273,7 @@ const Academic = () => {
         };
         // console.log('Submitting data:', submissionData);
         const id = localStorage.getItem("studentId")
-        await axios.post("http://localhost:4000/teacher/eval/form", {
+        await axiosInstance.post("/teacher/eval/form", {
             type: "academicQA",
             id: id,
             section: section,
@@ -293,7 +293,7 @@ const Academic = () => {
                 console.log(err.response)
             })
 
-        axios.get("http://localhost:4000/teacher/evaluate", {
+        await axiosInstance.get("/teacher/evaluate", {
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -328,9 +328,9 @@ const Academic = () => {
             document.getElementById("submit").disabled = true
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        axios.post("http://localhost:4000/teacher/termTypeComment", {
+        await axiosInstance.post("/teacher/termTypeComment", {
             section: section,
             year: year,
             term: term,

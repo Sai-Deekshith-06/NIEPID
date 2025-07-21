@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Header, Footer } from '../../components/components'
+import { axiosInstance } from "../../libs/axios";
 
 const EditTeachers = () => {
     const [teacherDetails, setTeacherDetails] = useState([]);
@@ -23,8 +23,8 @@ const EditTeachers = () => {
 
     const fetchData = useCallback(async () => {
         try {
-            const response = await axios.get(
-                "http://localhost:4000/admin/pendingTeacher",
+            const response = await axiosInstance.get(
+                "/admin/pendingTeacher",
                 {
                     headers: {
                         "Content-Type": "application/json",
@@ -63,8 +63,8 @@ const EditTeachers = () => {
 
     const handleDeleteClick = async (teacher) => {
         try {
-            await axios.post(
-                `http://localhost:4000/admin/deletePendingTeacher/`,
+            await axiosInstance.post(
+                `/admin/deletePendingTeacher/`,
                 teacher,
                 {
                     headers: {
@@ -98,8 +98,8 @@ const EditTeachers = () => {
                     .filter((item) => item !== "");
             }
 
-            await axios.post(
-                `http://localhost:4000/admin/editPendingTeacher/`,
+            await axiosInstance.post(
+                `/admin/editPendingTeacher/`,
                 { updatedTeacher },
                 {
                     headers: {

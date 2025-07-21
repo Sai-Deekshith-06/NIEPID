@@ -3,8 +3,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { Footer, Header } from '../../components/components';
+import { axiosInstance } from '../../libs/axios';
 
 
 // Add the icons to the library
@@ -56,7 +56,7 @@ const ViewStudents = () => {
     const fetchStudentDetails = useCallback(async () => {
         setLoading(true);
         try {
-            const response = await axios.get('http://localhost:4000/admin/viewstudents', {//'http://localhost:4000/principal/student1'
+            const response = await axiosInstance.get('/admin/viewstudents', {//'http://localhost:4000/principal/student1'
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${localStorage.getItem("token")}`
@@ -81,7 +81,7 @@ const ViewStudents = () => {
     const fetchTeacherDetails = async (classId) => {
         try {
             console.log("Hello")
-            const response = await axios.get(`http://localhost:4000/admin/teacher/${classId}`, {
+            const response = await axiosInstance.get(`/admin/teacher/${classId}`, {
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${localStorage.getItem("token")}`

@@ -48,7 +48,7 @@ const useStyles = createUseStyles({
     },
     logoutButton: {
         padding: '10px 15px',
-        backgroundColor: '#ff4d4d',
+        backgroundColor: '#f83e3e',
         color: '#fff',
         border: 'none',
         borderRadius: '5px',

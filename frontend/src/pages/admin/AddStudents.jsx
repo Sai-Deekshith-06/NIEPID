@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { createUseStyles } from 'react-jss';
 import { /*useLocation,*/ useNavigate } from 'react-router-dom';
@@ -6,6 +5,7 @@ import { toast } from 'react-toastify';
 import { confirmAlert } from 'react-confirm-alert'
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import { ScrollToButton, Header } from '../../components/components';
+import { axiosInstance } from '../../libs/axios';
 
 const useStyles = createUseStyles({
     registrationForm: {
@@ -545,7 +545,7 @@ function AddStudents() {
                     label: 'Yes',
                     onClick: async () => {
                         try {
-                            await axios.post('http://localhost:4000/admin/registerStudent', { formData }, {
+                            await axiosInstance.post('/admin/registerStudent', { formData }, {
                                 headers: {
                                     "Content-Type": "application/json",
                                     Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -2719,7 +2719,14 @@ function AddStudents() {
                         style={{ justifyContent: 'flex-end' }}
                         type='button'
                         name='next'
-                        onClick={(e) => handleButton(e)}>
+                        onClick={(e) => {
+                            handleButton(e)
+                            if (activeTab < endTab)
+                                window.scrollTo({
+                                    top: 0,
+                                    behavior: 'auto',
+                                });
+                        }}>
                         Next
                     </button>
                 </div>

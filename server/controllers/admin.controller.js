@@ -18,7 +18,7 @@ const { default: mongoose } = require('mongoose')
 const editTeacher = async (req, res) => {
     const id = req.params.id;
     console.log(id);
-    console.log(req.body)
+    // console.log(req.body)
     const { teacherId, teacherName, email, teacherMNo, classId } = req.body;
     const mno = String(teacherMNo)
     const regexEmail = /^[a-zA-Z0-9._%+-]+@(gmail.com)$/;

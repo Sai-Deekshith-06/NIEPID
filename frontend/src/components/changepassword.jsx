@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import { Footer, Header } from "./components";
+import { axiosInstance } from "../libs/axios";
 
 const styles = {
     container: {
@@ -119,8 +119,8 @@ const ChangePassword = () => {
         try {
             // Get userId from localStorage or context
             const userId = localStorage.getItem("userId");
-            const res = await axios.post(
-                "http://localhost:4000/api/changepassword",
+            const res = await axiosInstance.post(
+                "/api/changepassword",
                 { userId, currentPassword, newPassword },
                 {
                     headers: {
