@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import niepidLogo from "../images/logo.jpeg";
 import cvrlogo from '../images/cvr_logo.jpg';
 import { axiosInstance } from "../libs/axios";
+import { Footer } from "../components/components";
 
 function Login() {
   const [cookies] = useCookies([]);
@@ -144,9 +145,7 @@ function Login() {
           </form>
         </div>
       </div>
-      <footer style={footerStyles.footer}>
-        <p style={footerStyles.text}>© 2024 NIEPID. All rights reserved.</p>
-      </footer>
+      <Footer />
     </div>
   );
 }
@@ -161,21 +160,6 @@ const headerStyles = {
   title: {
     margin: 0,
     fontSize: '2rem',
-  }
-};
-
-const footerStyles = {
-  footer: {
-    backgroundColor: '#007bff',
-    padding: '1rem',
-    textAlign: 'center',
-    color: '#ffffff',
-    position: 'relative',
-    bottom: 0,
-    width: '100%',
-  },
-  text: {
-    margin: 0,
   }
 };
 

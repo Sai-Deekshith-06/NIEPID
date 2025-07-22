@@ -9,6 +9,26 @@ const deriveHistory = require('../deriving/deriveHistory')
 const findQAs = require('../deriving/deriveQAs')
 const jwt = require('jsonwebtoken')
 
+const canSubmitComment = (student, section, year, term) => {
+    // console.log(student)
+    console.log("[canSubmitComment] - ", section, year, term)
+    // console.log(student.currSection === section)
+    // console.log(student.currYear === year)
+    // if (student.currYear !== year) {
+    //     const lastYear = student.section.at(-1).yearReport.at(-1)
+    // }
+    // console.log(student.currTerm === term)
+    if (student.currTerm !== term) {
+        const lastTerm = student.section.at(-1).yearReport.at(-1).termReport.at(-1)
+        const last2ndTerm = student.section.at(-1).yearReport.at(-1).termReport.at(-2)
+        // console.log(last2ndTerm, last2ndTerm.term === term, Object.values(lastTerm.evaluated).every(v => !v))
+        if (!(last2ndTerm && last2ndTerm.term === term && Object.values(lastTerm.evaluated).every(v => !v))) {
+            return false
+        }
+    }
+    return true
+}
+
 const submitYearTypeComment = async (req, res) => {
     // try {
     const id = req.body.id
@@ -16,6 +36,9 @@ const submitYearTypeComment = async (req, res) => {
     const section = student.section.find(sec => sec.sec === req.body.section)
     const yearReport = section.yearReport.find(year => year.year === req.body.year)
     // console.log(req.body)
+    if (!canSubmitComment(student, req.body.section, req.body.year, null)) {
+        return res.status(501).json({ status: "error", msg: "Comments re-submission is not allowed" })
+    }
     yearReport.comment.yearComment = req.body.comments[0]
     yearReport.comment.yearPersonalComment = req.body.comments[1]
     yearReport.comment.yearOccupationalComment = req.body.comments[2]
@@ -30,6 +53,50 @@ const submitYearTypeComment = async (req, res) => {
     //     console.log(err)
     //     res.status(400).send(false)
     // }
+}
+
+const submitTermTypeComment = async (req, res) => {
+    try {
+        const id = req.body.id
+        let flag = true
+        // console.log(req.body)
+        const student = await studentModel.findOne({ regNo: id })
+        if (!canSubmitComment(student, req.body.section, req.body.year, req.body.term)) {
+            return res.status(501).json({ status: "error", msg: "Comments re-submission is not allowed" })
+        }
+        const section = student.section.find(sec => sec.sec === req.body.section)
+        const yearReport = section.yearReport.find(year => year.year === req.body.year)
+        const termReport = yearReport.termReport.find(term => term.term === req.body.term)
+
+        if (req.body.type === "personalQA")
+            termReport.comment.personalComment = req.body.comments
+        else if (req.body.type === "socialQA")
+            termReport.comment.socialComment = req.body.comments
+        else if (req.body.type === "academicQA")
+            termReport.comment.academicComment = req.body.comments
+        else if (req.body.type === "recreationalQA")
+            termReport.comment.recreationalComment = req.body.comments
+        else if (req.body.type === "occupationalQA")
+            termReport.comment.occupationalComment = req.body.comments
+        else if (termReport.comment.personalComment && termReport.comment.socialComment && termReport.comment.academicComment && termReport.comment.occupationalComment && termReport.comment.recreationalComment) {
+            // console.log("-------")
+            termReport.comment.termComment = req.body.comments
+        }
+        else {
+            flag = false
+            res.status(201).json("no comments updated")
+        }
+
+        // console.log(termReport.comment.termComment)
+        // console.log(termReport)
+        if (flag) {
+            student.save()
+            res.status(200).json("Success")
+        }
+    } catch (err) {
+        // console.log(err)
+        res.status(400).send(false)
+    }
 }
 
 const evaluateYearStudent = async (req, res) => {
@@ -116,34 +183,6 @@ const nextSection = (presentSection) => {
 //         return err
 //     })
 // };
-
-const updateStudentClassAllocation = async (student, prevClassId, newClassId, session) => {
-    try {
-        console.log(student.regNo);
-        console.log(">>> update classes(): from " + prevClassId + " to " + newClassId);
-
-        // Remove student from previous class
-        await classModel.updateMany(
-            { classId: prevClassId },
-            { $pull: { student: student.regNo } },
-            { session }
-        );
-
-        console.log("removed from prevClass");
-
-        // Add student to new class
-        await classModel.updateOne(
-            { classId: newClassId },
-            { $addToSet: { student: student.regNo } },
-            { session }
-        );
-
-        console.log("added to newClass");
-    } catch (err) {
-        console.log("Error in updateStudentClassAllocation:", err);
-        throw err; // Let the caller handle rollback
-    }
-};
 
 // const evaluateStudent = async (req, res) => {
 //     const session = await studentModel.startSession();
@@ -513,6 +552,34 @@ const updateStudentClassAllocation = async (student, prevClassId, newClassId, se
 //     }
 //     session.endSession();
 // }
+
+const updateStudentClassAllocation = async (student, prevClassId, newClassId, session) => {
+    try {
+        console.log(student.regNo);
+        console.log(">>> update classes(): from " + prevClassId + " to " + newClassId);
+
+        // Remove student from previous class
+        await classModel.updateMany(
+            { classId: prevClassId },
+            { $pull: { student: student.regNo } },
+            { session }
+        );
+
+        console.log("removed from prevClass");
+
+        // Add student to new class
+        await classModel.updateOne(
+            { classId: newClassId },
+            { $addToSet: { student: student.regNo } },
+            { session }
+        );
+
+        console.log("added to newClass");
+    } catch (err) {
+        console.log("Error in updateStudentClassAllocation:", err);
+        throw err; // Let the caller handle rollback
+    }
+};
 
 const createNewTermReport = (term, section) => ({
     term,
@@ -986,47 +1053,6 @@ const getStudentbyId = async (req, res) => {
     } catch (err) {
         // console.log(err)
         res.status(500).json({ message: "internal server error" })
-    }
-}
-
-const submitTermTypeComment = async (req, res) => {
-    try {
-        const id = req.body.id
-        let flag = true
-        // console.log(req.body)
-        const student = await studentModel.findOne({ regNo: id })
-        const section = student.section.find(sec => sec.sec === req.body.section)
-        const yearReport = section.yearReport.find(year => year.year === req.body.year)
-        const termReport = yearReport.termReport.find(term => term.term === req.body.term)
-
-        if (req.body.type === "personalQA")
-            termReport.comment.personalComment = req.body.comments
-        else if (req.body.type === "socialQA")
-            termReport.comment.socialComment = req.body.comments
-        else if (req.body.type === "academicQA")
-            termReport.comment.academicComment = req.body.comments
-        else if (req.body.type === "recreationalQA")
-            termReport.comment.recreationalComment = req.body.comments
-        else if (req.body.type === "occupationalQA")
-            termReport.comment.occupationalComment = req.body.comments
-        else if (termReport.comment.personalComment && termReport.comment.socialComment && termReport.comment.academicComment && termReport.comment.occupationalComment && termReport.comment.recreationalComment) {
-            // console.log("-------")
-            termReport.comment.termComment = req.body.comments
-        }
-        else {
-            flag = false
-            res.status(201).json("no comments updated")
-        }
-
-        // console.log(termReport.comment.termComment)
-        // console.log(termReport)
-        if (flag) {
-            student.save()
-            res.status(200).json("Success")
-        }
-    } catch (err) {
-        // console.log(err)
-        res.status(400).send(false)
     }
 }
 

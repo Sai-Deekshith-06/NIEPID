@@ -19,10 +19,15 @@ const Front = () => {
   const [socialPercent, setSocialPercent] = useState(0)
   const [academicPercent, setAcademicPercent] = useState(0)
   const [occupationalPercent, setOccupationalPercent] = useState(0)
+  const [evaluated, setEvaluated] = useState({
+    personal: false,
+    academic: false,
+    social: false,
+    occupational: false,
+    recreational: false,
+  })
   // const [recreationalPercent, setRecreationalPercent] = useState(0)
   const [mode, setMode] = useState('')
-
-
   const navigateTo = (path) => {
     navigate(path);
   };
@@ -70,6 +75,7 @@ const Front = () => {
             if (t.term === term)
               j = index
           })
+          setEvaluated(res.data.data.section[k].yearReport[i].termReport[j].evaluated)
           if (res.data.data.section[k].yearReport[i].termReport[j].comment.termComment.trim() !== "")
             setOldComments(res.data.data.section[k].yearReport[i].termReport[j].comment.termComment)
           else
@@ -156,24 +162,24 @@ const Front = () => {
         <div style={styles.buttonContainer}>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <button style={styles.button} onClick={() => navigateTo('/teacher/term/termEntry/eval/personal')}>Personal</button>
-            <label style={{ fontSize: '13px' }}>{personalPercent !== 0 ? "Percentage : " + personalPercent + "%" : ""}</label>
+            <label style={{ fontSize: '13px' }}>{evaluated.personal ? "Percentage : " + personalPercent + "%" : ""}</label>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <button style={styles.button} onClick={() => navigateTo('/teacher/term/termEntry/eval/social')}>Social</button>
-            <label style={{ fontSize: '13px' }}>{socialPercent !== 0 ? "Percentage : " + socialPercent + "%" : ""}</label>
+            <label style={{ fontSize: '13px' }}>{evaluated.social ? "Percentage : " + socialPercent + "%" : ""}</label>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <button style={styles.button} onClick={() => navigateTo('/teacher/term/termEntry/eval/occupational')}>Occupational</button>
-            <label style={{ fontSize: '13px' }}>{occupationalPercent !== 0 ? "Percentage : " + occupationalPercent + "%" : ""}</label>
+            <label style={{ fontSize: '13px' }}>{evaluated.occupational ? "Percentage : " + occupationalPercent + "%" : ""}</label>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <button style={styles.button} onClick={() => navigateTo('/teacher/term/termEntry/eval/academic')}>Academic</button>
-            <label style={{ fontSize: '13px' }}>{academicPercent !== 0 ? "Percentage : " + academicPercent + "%" : ""}</label>
+            <label style={{ fontSize: '13px' }}>{evaluated.academic ? "Percentage : " + academicPercent + "%" : ""}</label>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <button style={styles.button} onClick={() => navigateTo('/teacher/term/termEntry/eval/recreational')}>Recreational</button>
             {/* <label style={{ fontSize: '13px' }}>{"Percentage : " + recreationalPercent + "%"}</label> */}
-            <label style={{ fontSize: '13px' }}>{mode ? "Mode : " + mode : ""}</label>
+            <label style={{ fontSize: '13px' }}>{evaluated.recreational ? "Mode : " + mode : ""}</label>
           </div>
         </div>
       </main>

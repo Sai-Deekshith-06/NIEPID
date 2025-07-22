@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import image from "../images/logo.jpeg";
 import { toast } from "react-toastify";
-import { Footer } from '../components/components'
+import { Footer, Header } from '../components/components'
 import { axiosInstance } from "../libs/axios";
 
 const TeacherTable = () => {
@@ -15,24 +15,24 @@ const TeacherTable = () => {
     teacherMNo: "",
     classId: [],
   });
-
-
+  const role = localStorage.getItem("role");
+  let backButtonPath = ""
+  switch (role) {
+    case "principal": backButtonPath = '/principal'; break;
+    case "admin": backButtonPath = '/admin'; break;
+    default: backButtonPath = '/';
+  }
   const [isOpen, setIsOpen] = useState(false);
-
   // Function to open the modal
   const openModal = () => {
     setIsOpen(true);
   };
-
   // Function to close the modal
   const closeModal = () => {
     setIsOpen(false);
   };
-
   // Fetch the role from localStorage
-  const role = localStorage.getItem("role");
   // role === "admin" ? console.log("calling as admin") : console.log("calling as pricipal")
-
   const fetchData = useCallback(async () => {
     try {
       const response = await axiosInstance.get(`/${role}/viewTeacher`, {
@@ -175,48 +175,6 @@ const TeacherTable = () => {
       setEditedTeacher({ ...editedTeacher, [name]: value });
     }
   };
-  //navigate('/principal')108
-
-  const handlePrint = (e) => {
-    window.print();
-  };
-
-  const navigate = useNavigate();
-
-  const handleNavigate = () => {
-    if (role === "admin") {
-      navigate("/admin");
-    } else if (role === "principal") {
-      navigate("/principal");
-    }
-  };
-
-  const Header = () => (
-    <header style={styles.header}>
-      <div style={styles.logo}>
-        <img src={image} alt="Logo" style={styles.logoImage} />
-        <span style={styles.logoLabel}>NIEPID</span>
-      </div>
-      <nav style={styles.navLinks}>
-        <button
-          onClick={() => {
-            handlePrint();
-          }}
-          style={styles.backButton}
-        >
-          Print
-        </button>
-        <button
-          onClick={() => {
-            handleNavigate();
-          }}
-          style={styles.backButton}
-        >
-          Back
-        </button>
-      </nav>
-    </header>
-  );
 
   // Conditionally render the edit button based on the role
   const renderActionButton = (teacher) => {
@@ -270,11 +228,9 @@ const TeacherTable = () => {
     headers.push("Actions");
   }
 
-
-
   return (
     <>
-      <Header />
+      <Header backButtonPath={backButtonPath} print={true} />
       <div style={styles.container}>
         <h1 style={styles.heading}>Teacher Details</h1>
         <table style={styles.table}>
@@ -541,53 +497,6 @@ const styles = {
       backgroundColor: "#004a9f",
       transform: "translateY(1px)",
     },
-  },
-  // input: {
-  //   width: "100%",
-  //   padding: "8px",
-  //   border: "1px solid #ddd",
-  //   borderRadius: "4px",
-  //   boxSizing: "border-box",
-  // },
-  header: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "1rem 2rem",
-    backgroundColor: "#007bff",
-    color: "#ffffff",
-    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-    marginBottom: "1rem",
-  },
-  logo: {
-    display: "flex",
-    alignItems: "center",
-  },
-  logoImage: {
-    width: "40px",
-    height: "40px",
-    marginRight: "0.5rem",
-  },
-  logoLabel: {
-    fontSize: "1.5rem",
-  },
-  backButton: {
-    backgroundColor: 'white',
-    border: '1px solid #ccc',
-    padding: '8px 12px',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    color: '#007bff',
-    fontWeight: 'bold',
-    marginLeft: '1rem',
-    '&:hover': {
-      backgroundColor: '#e6e6e6',
-    },
-  },
-  print: {
-    display: "flex",
-    justifyContent: "center",
-    marginBottom: "1rem",
   },
   app: {
     textAlign: "center",

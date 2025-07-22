@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { createUseStyles } from 'react-jss';
-import { useNavigate } from 'react-router-dom';
-import image from "../images/logo.jpeg";
-import { ScrollToButton } from '../components/components';
+import { Footer, Header, ScrollToButton } from '../components/components';
 import { axiosInstance } from '../libs/axios';
 
 
@@ -93,57 +91,7 @@ const useStyles = createUseStyles({
         backgroundColor: '#fff',
     },
 });
-const styles = {
-    header: {
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '1rem 2rem',
-        backgroundColor: '#007bff',
-        color: '#ffffff',
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-        marginBottom: '1rem'
-    },
-    logo: {
-        display: 'flex',
-        alignItems: 'center',
-    },
-    logoImage: {
-        width: '40px',
-        height: '40px',
-        marginRight: '0.5rem',
-    },
-    logoLabel: {
-        fontSize: '1.5rem',
-    },
-    backButton: {
-        backgroundColor: 'white',
-        border: '1px solid #ccc',
-        padding: '8px 12px',
-        borderRadius: '4px',
-        cursor: 'pointer',
-        color: '#007bff',
-        fontWeight: 'bold',
-        marginLeft: '1rem',
-        '&:hover': {
-            backgroundColor: '#e6e6e6',
-        },
-    },
-}
-const footerStyles = {
-    footer: {
-        backgroundColor: '#007bff',
-        padding: '1rem',
-        textAlign: 'center',
-        color: '#ffffff',
-        position: 'relative',
-        bottom: 0,
-        width: '100%',
-    },
-    text: {
-        margin: 0,
-    }
-};
+
 const Student = () => {
     const classes = useStyles();
     const [studentData, setStdentData] = useState({
@@ -308,12 +256,19 @@ const Student = () => {
     const [dateOfBirth, setDateOfBirth] = useState('');
     const regNo = localStorage.getItem('regNo')
     const token = localStorage.getItem('token')
+    const role = localStorage.getItem("role");
+    let backButtonPath = ""
+    switch (role) {
+        case "student": backButtonPath = '/student'; break;
+        case "principal": backButtonPath = '/principal/viewstudents'; break;
+        case "admin": backButtonPath = '/admin/viewstudents'; break;
+        default: backButtonPath = '/';
+    }
     console.log(regNo)
     useEffect(() => {
         async function fetchStudentData() {
             try {
                 console.log("Hello")
-                const role = localStorage.getItem("role");
                 console.log(role, regNo)
                 await axiosInstance.get(`/${role}/viewStudentDetails`, {
                     headers: {
@@ -342,66 +297,11 @@ const Student = () => {
             }
         };
         fetchStudentData();
-    }, [regNo, token])    //src={image}
-    // const navigate = useNavigate()
-    // const role = localStorage.getItem("role")
-    // const Header = () => (
-    //     <header style={useStyles.header}>
-    //         <div style={useStyles.logo}>
-    //             <img  alt="Logo" style={useStyles.logoImage} /> 
-    //             <span style={useStyles.logoLabel}>NIEPID</span>
-    //         </div>
-    //         <nav style={useStyles.navLinks}>
-    //             <button onClick={() => {
-    //                 if (role === "principal")
-    //                     navigate("/principal/viewStudents")
-    //                 else if (role === "admin")
-    //                     navigate("/admin/viewstudents")
-    //                 else if (role === "student")
-    //                     navigate("/student")
-    //             }} style={useStyles.backButton}>
-    //                 Back
-    //             </button>
-    //         </nav>
-    //     </header>
-    // );
-    const navigate = useNavigate()
-    const Header = () => {
-        const role = localStorage.getItem("role")
-        return (
-            <>
-                <header style={styles.header}>
-                    <div style={styles.logo}>
-                        <img src={image} alt="Logo" style={styles.logoImage} />
-                        <span style={styles.logoLabel}>NIEPID</span>
-                    </div>
-                    <nav style={styles.navLinks}>
-                        <button onClick={handlePrint} style={styles.backButton}>
-                            Print
-                        </button>
-                        <button onClick={() => {
-                            if (role === "principal")
-                                navigate("/principal/viewStudents")
-                            else if (role === "admin")
-                                navigate("/admin/viewstudents")
-                            else if (role === "student")
-                                navigate("/student")
-                        }} style={styles.backButton}>
-                            Back
-                        </button>
-                    </nav>
-                </header>
-            </>
-        );
-    }
-
-    const handlePrint = (e) => {
-        window.print()
-    }
+    }, [regNo, role, token])
 
     return (
         <>
-            <Header />
+            <Header backButtonPath={backButtonPath} print={true} />
             <ScrollToButton scrollDown={true} />
             <form className={classes.registrationForm}>
                 <div className={classes.title}>Student Details</div>
@@ -976,9 +876,7 @@ const Student = () => {
                     </tbody>
                 </table>
             </form>
-            <footer style={footerStyles.footer}>
-                <p style={footerStyles.text}>© 2024 NIEPID. All rights reserved.</p>
-            </footer>
+            <Footer />
             <ScrollToButton />
         </>
     );

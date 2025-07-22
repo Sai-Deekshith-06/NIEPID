@@ -1,41 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Bar } from 'react-chartjs-2';
-import image from "../images/logo.jpeg";
 import 'chart.js/auto';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { ScrollToButton } from '../components/components';
+import { Footer, Header, ScrollToButton } from '../components/components';
 import { axiosInstance } from '../libs/axios';
 
 const styles = {
-    header: {
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        padding: "1rem 2rem",
-        backgroundColor: "#007bff",
-        color: "#ffffff",
-        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-    },
-    logo: {
-        display: "flex",
-        alignItems: "center",
-    },
-    logoImage: {
-        width: "40px",
-        height: "40px",
-        marginRight: "10px",
-    },
-    logoLabel: {
-        fontSize: "1.5rem",
-        fontWeight: "bold",
-    },
-    footer: {
-        textAlign: "center",
-        padding: "1rem",
-        backgroundColor: "#007bff",
-        color: "#ffffff",
-    },
     selector: {
         display: "flex",
         flexDirection: "row",
@@ -68,19 +39,6 @@ const styles = {
     selectHover: {
         borderColor: "#007bff",
     },
-    backButton: {
-        padding: '8px 12px',
-        backgroundColor: 'white',
-        border: '1px solid #ccc',
-        borderRadius: '4px',
-        cursor: 'pointer',
-        color: '#007bff',
-        fontWeight: 'bold',
-        marginLeft: "1rem",
-        '&:hover': {
-            backgroundColor: '#e6e6e6',
-        },
-    },
 };
 
 const StudentPerformance = () => {
@@ -88,33 +46,13 @@ const StudentPerformance = () => {
     const id = localStorage.getItem("studentId")
     const role = localStorage.getItem("role")
     console.log(role);
-    const Header = () => (
-        <header style={styles.header}>
-            <div style={styles.logo}>
-                <img src={image} alt="Logo" style={styles.logoImage} />
-                <span style={styles.logoLabel}>NIEPID</span>
-            </div>
-            <div>
-                <button onClick={handlePrint} style={styles.backButton}>
-                    Print
-                </button>
-                <button onClick={() => {
-                    const role = localStorage.getItem("role");
-                    if (role === "student")
-                        navigate('/student')
-                    if (role === "teacher")
-                        navigate('/teacher')
-                    if (role === "principal")
-                        navigate('/principal/viewstudents')
-                    if (role === "admin")
-                        navigate('/admin/viewstudents')
-                }} style={styles.backButton}>Back</button>
-            </div>
-        </header>
-    );
-
-    const handlePrint = (e) => {
-        window.print()
+    let backButtonPath = ""
+    switch (role) {
+        case "student": backButtonPath = '/student'; break;
+        case "teacher": backButtonPath = '/teacher'; break;
+        case "principal": backButtonPath = '/principal/viewstudents'; break;
+        case "admin": backButtonPath = '/admin/viewstudents'; break;
+        default: backButtonPath = '/';
     }
 
     const replacePrimaryLabels = (text) => {
@@ -137,9 +75,6 @@ const StudentPerformance = () => {
 
     };
 
-    const Footer = () => (
-        <footer style={styles.footer}>&copy; 2024 Student History Portal</footer>
-    );
     useEffect(() => { // Changed to async function for async/await
         const fetchData = async () => {
             console.log("hello")
@@ -373,7 +308,7 @@ const StudentPerformance = () => {
 
     return (
         <div>
-            <Header />
+            <Header backButtonPath={backButtonPath} print={true} />
             <ScrollToButton scrollDown={true} />
             <div className="container">
                 <h1>Student Information</h1>

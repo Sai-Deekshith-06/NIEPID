@@ -175,12 +175,11 @@ const Recreational = () => {
     const [newQuestion, setNewQuestion] = useState("");
     const [newAnswer, setNewAnswer] = useState("");
     const [result, setResult] = useState({
-        mode: '',
-        percent: 0
+        mode: ''
     });
     const [comments, setComments] = useState("")
     const [oldComments, setOldComments] = useState("")
-
+    const [evaluated, setEvaluated] = useState(false)
 
     const section = localStorage.getItem("section")
     const term = localStorage.getItem("term")
@@ -216,6 +215,8 @@ const Recreational = () => {
                         if (t.term === term)
                             j = index
                     })
+                    setEvaluated(res.data.data.section[k].yearReport[i].termReport[j].evaluated.recreational)
+                    setResult({ mode: res.data.data.section[k].yearReport[i].termReport[j].percent.mode })
                     const recreationalQuestions = res.data.data.section[k].yearReport[i].termReport[j].report.recreationalQA
                     setQuestions(recreationalQuestions)
                     const initialanswer = {}
@@ -327,7 +328,7 @@ const Recreational = () => {
                 console.log(res.data)
                 const result = {
                     mode: res.data.result.mode,
-                    percent: res.data.result.percent
+                    // percent: res.data.result.percent
                 }
                 setResult(result)
             })
@@ -335,11 +336,11 @@ const Recreational = () => {
                 console.log(err)
                 toast.error(err.response.data.msg)
             })
-
-        const commentsElements = document.getElementsByName("comments");
-        commentsElements.forEach((element) => {
-            element.disabled = false;
-        });
+        setEvaluated(true)
+        // const commentsElements = document.getElementsByName("comments");
+        // commentsElements.forEach((element) => {
+        //     element.disabled = false;
+        // });
     };
 
     const handleCommentsChange = (event) => {
@@ -370,6 +371,7 @@ const Recreational = () => {
             })
             .catch((err) => {
                 console.log(err.response)
+                toast.error(err.response.data.msg)
             })
     }
 
@@ -455,7 +457,7 @@ const Recreational = () => {
                     name="comments"
                     value={comments}
                     onChange={handleCommentsChange}
-                    disabled={true}
+                    disabled={!evaluated}
                     className={classes.textArea}
                     placeholder={oldComments}
                 />

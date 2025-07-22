@@ -166,6 +166,7 @@ const Academic = () => {
     const [percent, setPercent] = useState("");
     const [comments, setComments] = useState("")
     const [oldComments, setOldComments] = useState("")
+    const [evaluated, setEvaluated] = useState(false)
 
     const section = localStorage.getItem("section")
     const term = localStorage.getItem("term")
@@ -198,6 +199,8 @@ const Academic = () => {
                         if (t.term === term)
                             j = index
                     })
+                    setEvaluated(res.data.data.section[k].yearReport[i].termReport[j].evaluated.academic)
+                    setPercent(res.data.data.section[k].yearReport[i].termReport[j].percent.academicPercent)
                     const academicQuestions = res.data.data.section[k].yearReport[i].termReport[j].report.academicQA
                     setQuestions(academicQuestions)
                     const initialanswer = {}
@@ -313,11 +316,11 @@ const Academic = () => {
                 // console.log(err)
                 toast.error(err.response.data.msg)
             })
-
-        const commentsElements = document.getElementsByName("comments");
-        commentsElements.forEach((element) => {
-            element.disabled = false;
-        });
+        setEvaluated(true)
+        // const commentsElements = document.getElementsByName("comments");
+        // commentsElements.forEach((element) => {
+        //     element.disabled = false;
+        // });
     };
 
     const handleCommentsChange = (event) => {
@@ -351,6 +354,7 @@ const Academic = () => {
             })
             .catch((err) => {
                 console.log(err.response)
+                toast.error(err.response.data.msg)
             })
     }
 
@@ -433,7 +437,7 @@ const Academic = () => {
                     name="comments"
                     value={comments}
                     onChange={handleCommentsChange}
-                    disabled={true}
+                    disabled={!evaluated}
                     className={classes.textArea}
                     placeholder={oldComments}
                 />

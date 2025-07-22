@@ -67,7 +67,7 @@ const mongoose = require("mongoose");
 //mongoose.connect(process.env.MONGODB_URL)
 //For localhost uncomment the below line and comment above line***
 mongoose
-  .connect("mongodb://127.0.0.1:27017/niepid1")
+  .connect(process.env.MONGODB_URL)
   .then((res) => {
     console.log("Database connected successfully");
   })

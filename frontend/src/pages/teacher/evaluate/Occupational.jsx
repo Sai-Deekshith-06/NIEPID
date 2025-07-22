@@ -165,6 +165,7 @@ const Occupational = () => {
     const [percent, setPercent] = useState("");
     const [comments, setComments] = useState("")
     const [oldComments, setOldComments] = useState("")
+    const [evaluated, setEvaluated] = useState(false)
 
     const section = localStorage.getItem("section")
     const term = localStorage.getItem("term")
@@ -197,6 +198,8 @@ const Occupational = () => {
                         if (t.term === term)
                             j = index
                     })
+                    setEvaluated(res.data.data.section[k].yearReport[i].termReport[j].evaluated.occupational)
+                    setPercent(res.data.data.section[k].yearReport[i].termReport[j].percent.occupationalPercent)
                     const occupationalQuestions = res.data.data.section[k].yearReport[i].termReport[j].report.occupationalQA
                     setQuestions(occupationalQuestions)
                     const initialanswer = {}
@@ -311,11 +314,11 @@ const Occupational = () => {
                 console.log(err)
                 toast.error(err.response.data.msg)
             })
-
-        const commentsElements = document.getElementsByName("comments");
-        commentsElements.forEach((element) => {
-            element.disabled = false;
-        });
+        setEvaluated(true)
+        // const commentsElements = document.getElementsByName("comments");
+        // commentsElements.forEach((element) => {
+        //     element.disabled = false;
+        // });
     };
 
     const handleCommentsChange = (event) => {
@@ -349,6 +352,7 @@ const Occupational = () => {
             })
             .catch((err) => {
                 console.log(err.response)
+                toast.error(err.response.data.msg)
             })
     }
 
@@ -431,7 +435,7 @@ const Occupational = () => {
                     name="comments"
                     value={comments}
                     onChange={handleCommentsChange}
-                    disabled={true}
+                    disabled={!evaluated}
                     className={classes.textArea}
                     placeholder={oldComments}
                 />
