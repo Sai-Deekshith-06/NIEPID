@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Footer, Header } from '../../components/components';
 import { axiosInstance } from '../../libs/axios';
+import { confirmAlert } from 'react-confirm-alert';
 
 const Front = () => {
     const navigate = useNavigate();
@@ -116,28 +117,79 @@ const Front = () => {
     }, [id, section, year]);
 
     const handleSubmit = async () => {
-        try {
-            await axiosInstance.post("/teacher/yearTypeComment", {
-                id: id,
-                section: section,
-                year: year,
-                comments: comments
-            }, {
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+        confirmAlert({
+            title: 'Confirm submission',
+            message: "You won't be able to view or edit this student after this point.",
+            buttons: [
+                {
+                    label: 'No',
+                    onClick: () => { }
                 },
-            })
-                .then(res => {
-                    toast.success("Comments saved successfully..!")
-                    console.log(res.data)
-                }).catch(err => {
-                    console.log(err)
-                    toast.error(`Error saving comments: ${err.response.data.msg}`)
-                })
-        } catch (err) {
-            console.log(err.response);
-        }
+                {
+                    label: 'Yes',
+                    onClick: async () => {
+                        // try {
+                        //     await axiosInstance.post('/admin/registerStudent', { formData }, {
+                        //         headers: {
+                        //             "Content-Type": "application/json",
+                        //             Authorization: `Bearer ${localStorage.getItem("token")}`,
+                        //         },
+                        //     }, { withCredentials: true })
+                        //         .then(() => {
+                        //             setFormData({
+                        //                 details: {
+                        //                     info: initialInfo,
+                        //                     presentingComplaints: initialPresentingComplaints,
+                        //                     history: initialHistory,
+                        //                     familyHistory: initialFamilyHistory,
+                        //                     developmentHistory: initialDevelopmentHistory,
+                        //                 },
+                        //                 stdCred: initialStdCred,
+                        //             });
+                        //             toast.success(`${initialInfo.regNo} registered successfully`)
+                        //             navigate('/admin/viewstudents')
+                        //         })
+                        //         .catch(err => {
+                        //             toast.error("Error: " + err.response.data);
+                        //             console.log(err.response)
+                        //             return;
+                        //         })
+                        //     // console.log("success");
+                        //     // console.log(formData);
+                        //     // console.log("Form reset:", formData);
+                        //     // navigate("/admin");
+                        // } catch (err) {
+                        //     console.error(err);
+                        //     console.log(formData);
+                        // }
+                        // window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                        try {
+                            await axiosInstance.post("/teacher/yearEndTransfer", {
+                                comments: comments
+                            }, {
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                                    id: id,
+                                    section: section,
+                                    year: year,
+                                },
+                            })
+                                .then(res => {
+                                    toast.success("Comments saved successfully..!")
+                                    console.log(res.data)
+                                }).catch(err => {
+                                    console.log(err)
+                                    toast.error(`${err.response.data.msg}`)
+                                })
+                        } catch (err) {
+                            console.log(err.response);
+                        }
+                    }
+                }
+            ]
+        })
     };
 
     const handleCommentsChange = (index) => (event) => {
@@ -251,7 +303,7 @@ const Front = () => {
                 />
             </div>
             <button id="submit" style={styles.submitButton} onClick={handleSubmit} disabled={!evaluationComplete}>
-                Submit
+                Submit & Transfer
             </button>
 
             <Footer />

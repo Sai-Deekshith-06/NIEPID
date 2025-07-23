@@ -142,6 +142,7 @@ const Front = () => {
       })
       .catch(err => {
         console.log(err.response)
+        toast.error(err.response.data.msg)
       })
   }
 
@@ -192,7 +193,12 @@ const Front = () => {
         style={styles.textArea}
         placeholder={oldComments}
       />
-      <button id="submit" style={styles.submitButton} onClick={handleSubmit}>Submit</button>
+      <button
+        id="submit"
+        style={styles.submitButton}
+        onClick={handleSubmit}
+        disabled={!Object.values(evaluated).every(Boolean)}
+      >Submit</button>
 
       <Footer />
     </div>
