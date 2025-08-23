@@ -1,4 +1,4 @@
-website url: https://niepid-final.vercel.app/
+website url: https://niepid.vercel.app/
 
 • Digitized operations at the National Institute for the Empowerment of Persons with Intellectual Disabilities
 (DIVYANGJAN) https://www.niepid.nic.in/
