@@ -356,6 +356,8 @@ const ViewStudents = () => {
                     toast.success(`${name}'s account has been deleted successfully!`);
                     setPassword('');
                     onClose();
+                    // Refresh the student list after successful deletion
+                    fetchStudentDetails();
                 } else {
                     setError(res.data.message || "Failed to delete student account.");
                 }
