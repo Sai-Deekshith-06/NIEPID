@@ -60,8 +60,8 @@ const registerStudent = async (req, res) => {
         // console.log(data)
         const arr1 = await studentDetailsModel.findOne({ 'info.regNo': data.formData.details.info.regNo })
         const arr2 = await studentModel.findOne({ regNo: data.formData.details.info.regNo })
-        console.log(arr1)
-        console.log(arr2)
+        // console.log(arr1)
+        // console.log(arr2)
         lable1: if (!arr1 && !arr2) {
             let flag = false
 
@@ -147,6 +147,72 @@ const registerStudent = async (req, res) => {
     }
     catch (error) {
         console.log("Error-404")
+        console.log(error)
+        res.status(404).send(false)
+    } finally {
+        (await session).endSession()
+    }
+}
+
+const deleteStudent = async (req, res) => {
+    const session = mongoose.startSession()
+    try {
+        (await session).startTransaction()
+        const { regNo, adminID, confirmationPassword } = req.body;
+        lable1:
+        {
+            let flag = false
+            await User.findOne({ id: adminID })
+                .then((res1) => {
+                    if (res1.password !== confirmationPassword) {
+                        res.status(400).json({ success: false, message: "Incorrect Password" })
+                        flag = true
+                    }
+                })
+                .catch((err) => {
+                    res.status(400).json({ success: false, message: "Admin ID not found" })
+                    flag = true
+                })
+            if (flag) {
+                break lable1
+            }
+            await studentModel.findOneAndDelete({ regNo })
+                .then(() => {
+                    // res.status(200).json({ success: true, message: "Student deleted successfully" })
+                })
+                .catch((err) => {
+                    res.status(400).json({ success: false, message: err })
+                    flag = true
+                })
+            if (flag) {
+                break lable1
+            }
+            await studentDetailsModel.findOneAndDelete({ 'info.regNo': regNo })
+                .then(() => {
+                    // res.status(200).json({ success: true, message: "Student deleted successfully" })
+                })
+                .catch((err) => {
+                    res.status(400).json({ success: false, message: err })
+                    flag = true
+                })
+            if (flag) {
+                break lable1
+            }
+            await userModel.findOneAndDelete({ id: regNo })
+                .then(() => {
+                })
+                .catch((err) => {
+                    res.status(400).json({ success: false, message: err })
+                    flag = true
+                })
+            if (flag) {
+                break lable1
+            } else {
+                res.status(200).json({ success: true, message: "Student deleted successfully" })
+                    (await session).commitTransaction();
+            }
+        }
+    } catch (error) {
         console.log(error)
         res.status(404).send(false)
     } finally {

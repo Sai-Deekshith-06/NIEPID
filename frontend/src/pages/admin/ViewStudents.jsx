@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import { Footer, Header } from '../../components/components';
 import Loading from '../../components/loading';
 import { axiosInstance } from '../../libs/axios';
+import { toast } from "react-toastify";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 
 // Add the icons to the library
@@ -134,7 +136,7 @@ const ViewStudents = () => {
     };
 
     const replacePrimaryLabels = (text) => {
-        console.log(text)
+        // console.log(text)
         if (!text) return '';
 
         return text
@@ -166,6 +168,286 @@ const ViewStudents = () => {
         localStorage.setItem("regNo", studentId)
         navigate(`/admin/viewstudents/details/${studentId}`);
     }
+    const DeleteModalStyles = {
+        overlay: {
+            position: 'fixed',
+            top: 0, left: 0, right: 0, bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.6)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1000
+        },
+        modal: {
+            backgroundColor: '#ffffff',
+            padding: '2.5rem',
+            borderRadius: '12px',
+            boxShadow: '0 10px 40px rgba(0, 0, 0, 0.25)',
+            width: '100%',
+            maxWidth: '450px',
+            position: 'relative',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center'
+        },
+        closeBtn: {
+            position: 'absolute',
+            top: '15px',
+            right: '15px',
+            fontSize: '1.5rem',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            color: '#666',
+            transition: 'color 0.2s ease',
+            padding: '5px'
+        },
+        closeBtnHover: {
+            color: '#333'
+        },
+        title: {
+            fontSize: '2rem',
+            fontWeight: '600',
+            color: '#333',
+            marginBottom: '1.8rem',
+            textAlign: 'center'
+        },
+        userInfo: {
+            // marginBottom: '1.2rem',
+            fontSize: '1rem',
+            color: '#555',
+            textAlign: 'center',
+            width: '100%',
+            padding: '0 1rem',
+        },
+        passwordInputContainer: { // New style for input container to hold input and icon
+            position: 'relative',
+            width: '100%',
+            marginBottom: '1.2rem',
+            display: 'flex',
+            alignItems: 'center'
+        },
+        passwordInputField: { // Style for the password input field itself
+            width: '100%',
+            padding: '1rem',
+            borderRadius: '8px',
+            border: '1px solid #ddd',
+            fontSize: '1rem',
+            outline: 'none',
+            transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+            boxSizing: 'border-box',
+            paddingRight: '3.5rem', // Space for the eye icon
+        },
+        passwordInputFieldFocus: {
+            borderColor: '#007bff',
+            boxShadow: '0 0 0 3px rgba(0, 123, 255, 0.2)'
+        },
+        passwordToggle: {
+            position: 'absolute',
+            right: '12px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            color: '#666',
+            fontSize: '1.2rem',
+            padding: '5px',
+            zIndex: 10,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+        },
+        passwordToggleHover: {
+            color: '#333',
+        },
+        button: {
+            width: '100%',
+            padding: '1rem',
+            background: '#007bff',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+            fontSize: '1.1rem',
+            transition: 'background-color 0.2s ease, transform 0.1s ease',
+            marginTop: '0.8rem'
+        },
+        buttonHover: {
+            backgroundColor: '#0056b3',
+            transform: 'translateY(-1px)'
+        },
+        buttonActive: {
+            transform: 'translateY(0)',
+            backgroundColor: '#004085'
+        },
+        error: {
+            color: '#dc3545',
+            fontSize: '0.95rem',
+            marginBottom: '1rem',
+            textAlign: 'center',
+            backgroundColor: '#f8d7da',
+            border: '1px solid #f5c6cb',
+            borderRadius: '5px',
+            padding: '0.75rem 1rem',
+            width: '100%',
+            boxSizing: 'border-box'
+        },
+        success: {
+            color: '#28a745',
+            fontSize: '0.95rem',
+            marginBottom: '1rem',
+            textAlign: 'center',
+            backgroundColor: '#d4edda',
+            border: '1px solid #c3e6cb',
+            borderRadius: '5px',
+            padding: '0.75rem 1rem',
+            width: '100%',
+            boxSizing: 'border-box'
+        },
+        form: {
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center'
+        },
+        message: {
+            margin: '0',
+            /*marginBottom: '1rem',*/
+            textAlign: 'center',
+            color: 'red'
+        }
+    };
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [selectedStudent, setSelectedStudent] = useState(null);
+    const ConfirmDelete = ({ isOpen = true, onClose, regNo, name }) => {
+        const [password, setPassword] = useState('');
+        const [error, setError] = useState('');
+        const [success, setSuccess] = useState('');
+        const [showPassword, setShowPassword] = useState(false);
+        const adminID = localStorage.getItem('userId');
+
+        const deleteStudent = async (e) => {
+            e.preventDefault();
+            setError('');
+            setSuccess('');
+
+            if (!password) {
+                setError('Please enter your password to confirm deletion.');
+                return;
+            }
+
+            try {
+                const res = await axiosInstance.post(
+                    "/admin/deleteStudent",
+                    { regNo, adminID, confirmationPassword: password },
+                    {
+                        headers: {
+                            "Content-Type": "application/json",
+                            authorization: `Bearer ${localStorage.getItem("token")}`,
+                        },
+                        Authorization: `Bearer ${localStorage.getItem("token")}`
+                    }
+                );
+
+                if (res.data.success) {
+                    setSuccess("Student deleted successfully!");
+                    toast.success(`${name}'s account has been deleted successfully!`);
+                    setPassword('');
+                    onClose();
+                } else {
+                    setError(res.data.message || "Failed to delete student account.");
+                }
+            } catch (err) {
+                console.log(err);
+                setError(err.response?.data?.message || "Error deleting student account.");
+            }
+        };
+
+        if (!isOpen) return null;
+
+        return (
+            <div style={DeleteModalStyles.overlay}>
+                <div style={DeleteModalStyles.modal}>
+                    <button
+                        onClick={() => {
+                            onClose();
+                            setPassword('');
+                            setError('');
+                            setSuccess('');
+                        }}
+                        style={DeleteModalStyles.closeBtn}
+                        onMouseEnter={e => e.currentTarget.style.color = DeleteModalStyles.closeBtnHover.color}
+                        onMouseLeave={e => e.currentTarget.style.color = DeleteModalStyles.closeBtn.color}
+                    >
+                        &times;
+                    </button>
+                    <h2 style={DeleteModalStyles.title}>Confirm Deletion</h2>
+
+                    <form onSubmit={deleteStudent} style={DeleteModalStyles.form}>
+                        <p style={DeleteModalStyles.message}>
+                            Enter your password to confirm the account deletion for:
+                        </p>
+                        <div style={DeleteModalStyles.userInfo}>
+                            <p>ID: {regNo}</p>
+                            <p>Name: {name}</p>
+                        </div>
+                        <div style={DeleteModalStyles.passwordInputContainer}>
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                placeholder="Password"
+                                value={password}
+                                onChange={e => setPassword(e.target.value)}
+                                style={DeleteModalStyles.passwordInputField}
+                                onFocus={e => {
+                                    e.target.style.borderColor = DeleteModalStyles.passwordInputFieldFocus.borderColor;
+                                    e.target.style.boxShadow = DeleteModalStyles.passwordInputFieldFocus.boxShadow;
+                                }}
+                                onBlur={e => {
+                                    e.target.style.borderColor = DeleteModalStyles.passwordInputField.border;
+                                    e.target.style.boxShadow = 'none';
+                                }}
+                            />
+                            <button
+                                type="button"
+                                style={DeleteModalStyles.passwordToggle}
+                                onClick={() => setShowPassword(!showPassword)}
+                                onMouseEnter={e => e.currentTarget.style.color = DeleteModalStyles.passwordToggleHover.color}
+                                onMouseLeave={e => e.currentTarget.style.color = DeleteModalStyles.passwordToggle.color}
+                            >
+                                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                            </button>
+                        </div>
+                        {error && <div style={DeleteModalStyles.error}>{error}</div>}
+                        {success && <div style={DeleteModalStyles.success}>{success}</div>}
+                        <button
+                            type="submit"
+                            style={DeleteModalStyles.button}
+                            onMouseEnter={e => {
+                                e.currentTarget.style.backgroundColor = DeleteModalStyles.buttonHover.backgroundColor;
+                                e.currentTarget.style.transform = DeleteModalStyles.buttonHover.transform;
+                            }}
+                            onMouseLeave={e => {
+                                e.currentTarget.style.backgroundColor = DeleteModalStyles.button.background;
+                                e.currentTarget.style.transform = 'translateY(0)';
+                            }}
+                            onMouseDown={e => {
+                                e.currentTarget.style.transform = DeleteModalStyles.buttonActive.transform;
+                                e.currentTarget.style.backgroundColor = DeleteModalStyles.buttonActive.backgroundColor;
+                            }}
+                            onMouseUp={e => {
+                                e.currentTarget.style.transform = DeleteModalStyles.buttonHover.transform;
+                                e.currentTarget.style.backgroundColor = DeleteModalStyles.buttonHover.backgroundColor;
+                            }}
+                        >
+                            Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+        );
+    };
     if (error) return <div style={{
         display: 'flex',
         justifyContent: 'center',
@@ -237,12 +519,30 @@ const ViewStudents = () => {
                                         <button style={styles.button} onClick={() => showDetails(student.regNo)}>
                                             Show Details
                                         </button>
+                                        <button
+                                            style={styles.delete}
+                                            onClick={() => {
+                                                setSelectedStudent(student);
+                                                setShowDeleteModal(true);
+                                            }}
+                                        >
+                                            Delete
+                                        </button>
+
                                     </div>
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
+                {showDeleteModal && selectedStudent && (
+                    <ConfirmDelete
+                        isOpen={showDeleteModal}
+                        onClose={() => setShowDeleteModal(false)}
+                        regNo={selectedStudent.regNo}
+                        name={selectedStudent.name}
+                    />
+                )}
             </div>
             <Footer />
         </>
@@ -322,10 +622,20 @@ const styles = {
         borderRadius: '4px',
         cursor: 'pointer',
         transition: 'background-color 0.3s',
-        margin: '5px'
+        margin: '5px',
+        '&:hover': {
+            backgroundColor: '#005bb5'
+        }
     },
-    buttonHover: {
-        backgroundColor: '#005bb5'
+    delete: {
+        padding: '8px 12px',
+        border: 'none',
+        color: '#fff',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        transition: 'background-color 0.3s',
+        margin: '5px',
+        backgroundColor: '#f83e3e',
     },
     evenRow: {
         backgroundColor: '#f9f9f9',
