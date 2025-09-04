@@ -50,109 +50,294 @@ const editTeacher = async (req, res) => {
         res.status(500).send({ message: 'Server Error' });
     }
 }
-
 const registerStudent = async (req, res) => {
-    const session = mongoose.startSession()
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    
     try {
-        (await session).startTransaction()
-        const val1 = {}
-        const data = req.body
-        // console.log(data)
-        const arr1 = await studentDetailsModel.findOne({ 'info.regNo': data.formData.details.info.regNo })
-        const arr2 = await studentModel.findOne({ regNo: data.formData.details.info.regNo })
-        console.log(arr1)
-        console.log(arr2)
-        lable1: if (!arr1 && !arr2) {
-            let flag = false
+        const data = req.body;
+        console.log("Received student data:", JSON.stringify(data, null, 2));
+        
+        // Check if student already exists
+        const existingStudent = await studentModel.findOne({ regNo: data.formData.details.info.regNo }).session(session);
+        const existingStudentDetails = await studentDetailsModel.findOne({ 'info.regNo': data.formData.details.info.regNo }).session(session);
+        
+        if (existingStudent || existingStudentDetails) {
+            await session.abortTransaction();
+            console.log("Error: Student with this registration number already exists");
+            return res.status(409).json({ success: false, message: "Student with this registration number already exists" });
+        }
 
-            if (data.formData.details.info.regNo) {
-                const responce1 = await new studentDetailsModel(data.formData.details).save()
-                    .then(() => {
-                        console.log("data entered in studentDetailsModel successfully")
-                    })
-                    .catch((err) => {
-                        flag = true
-                    })
-            }
-            if (flag) {
-                console.log("Error-405")
-                res.status(405).json({ reason: "studentDetails already exists" })
-                break lable1
-            }
-            const value1 = generateClassId(data.formData.stdCred.section, data.formData.stdCred.year)
-            console.log(data.formData.stdCred)
-            const arr3 = await classModel.findOne({ classId: value1 })
-            // console.log(arr3.length)
-            // console.log(arr3)
-            if (!arr3) {
-                console.log("Error-404")
-                res.status(404).json({ reason: "no class exists" })
-                break lable1
-            } else {
-                const v1 = arr3.student
-                v1.push(data.formData.details.info.regNo)
-                // console.log(v1)
-                const searchClass = generateClassId(data.formData.stdCred.section, data.formData.stdCred.year)
-                const responce2 = await classModel.findOneAndUpdate(
-                    { classId: searchClass },
-                    { student: v1 },
-                    { new: true }
-                )
-                const ans = studentJsonGenerate(data, searchClass)
-                // console.log(ans)
-                const responce3 = await new studentModel(ans).save()
-                    .then(() => {
-                        // console.log("student has been saved")
-                    })
-                    .catch((err) => {
-                        // console.log("student has not been saved \n"+err)
-                        flag = true
-                        // console.log(ans)
-                    })
-                if (flag) {
-                    console.log("Error-403")
-                    res.status(403).json({ reason: "student already exists" })
-                    break lable1
-                }
-                const stdUser = {
-                    id: data.formData.details.info.regNo,
-                    password: data.formData.details.info.regNo,
-                    role: "student"
-                }
-                const responce4 = await new userModel(stdUser).save()
-                    .then(() => {
-                        console.log("student has been saved in userDB")
-                    })
-                    .catch((err) => {
-                        console.log("student has not been saved in userDB \n" + err)
-                        flag = true
-                        console.log(ans)
-                    })
-                if (flag) {
-                    console.log("Error-402")
-                    res.status(402).json({ reason: "student already exists" })
-                    break lable1
-                } else {
-                    (await session).commitTransaction();
-                    res.status(200).json("success")
-                }
-            }
+        // Generate class ID
+        const classId = generateClassId(data.formData.stdCred.section, data.formData.stdCred.year);
+        console.log("Generated classId:", classId);
+        
+        // Find the class
+        const classInfo = await classModel.findOne({ classId }).session(session);
+        if (!classInfo) {
+            await session.abortTransaction();
+            console.log("Error: Class not found for ID:", classId);
+            return res.status(404).json({ success: false, message: "Class not found" });
         }
-        else {
-            // console.log(arr1)
-            // console.log(arr2)
-            console.log("Error-401: Student regNo already exists")
-            res.status(401).json("Student regNo already exists")
-        }
-    }
-    catch (error) {
-        console.log("Error-404")
-        console.log(error)
-        res.status(404).send(false)
+
+        // Save student details
+        const studentDetails = new studentDetailsModel(data.formData.details);
+        await studentDetails.save({ session });
+        console.log("Student details saved successfully");
+
+        // Add student to class
+        await classModel.updateOne(
+            { classId },
+            { $addToSet: { student: data.formData.details.info.regNo } },
+            { session }
+        );
+
+        // Generate and save student record
+        const studentData = studentJsonGenerate(data, classId);
+        const student = new studentModel(studentData);
+        await student.save({ session });
+
+        // Create user account
+        const user = new userModel({
+            id: data.formData.details.info.regNo,
+            password: data.formData.details.info.regNo, // In production, hash this password
+            role: "student"
+        });
+        await user.save({ session });
+
+        await session.commitTransaction();
+        console.log("Student registration completed successfully");
+        res.status(200).json({ success: true, message: "Student registered successfully" });
+
+    } catch (error) {
+        await session.abortTransaction();
+        console.error("Error in registerStudent:", error);
+        res.status(500).json({ 
+            success: false, 
+            message: "Internal server error",
+            error: error.message 
+        });
     } finally {
-        (await session).endSession()
+        session.endSession();
     }
-}
+};
+// const registerStudent = async (req, res) => {
+//     const session = mongoose.startSession()
+//     try {
+//         (await session).startTransaction()
+//         const val1 = {}
+//         const data = req.body
+//         // console.log(data)
+//         const arr1 = await studentDetailsModel.findOne({ 'info.regNo': data.formData.details.info.regNo })
+//         const arr2 = await studentModel.findOne({ regNo: data.formData.details.info.regNo })
+//         // console.log(arr1)
+//         // console.log(arr2)
+//         lable1: if (!arr1 && !arr2) {
+//             let flag = false
+
+//             if (data.formData.details.info.regNo) {
+//                 const responce1 = await new studentDetailsModel(data.formData.details).save()
+//                     .then(() => {
+//                         console.log("data entered in studentDetailsModel successfully")
+//                     })
+//                     .catch((err) => {
+//                         flag = true
+//                     })
+//             }
+//             if (flag) {
+//                 console.log("Error-405")
+//                 res.status(405).json({ reason: "studentDetails already exists" })
+//                 break lable1
+//             }
+//             const value1 = generateClassId(data.formData.stdCred.section, data.formData.stdCred.year)
+//             console.log(data.formData.stdCred)
+//             const arr3 = await classModel.findOne({ classId: value1 })
+//             // console.log(arr3.length)
+//             // console.log(arr3)
+//             if (!arr3) {
+//                 console.log("Error-404")
+//                 res.status(404).json({ reason: "no class exists" })
+//                 break lable1
+//             } else {
+//                 const v1 = arr3.student
+//                 v1.push(data.formData.details.info.regNo)
+//                 // console.log(v1)
+//                 const searchClass = generateClassId(data.formData.stdCred.section, data.formData.stdCred.year)
+//                 const responce2 = await classModel.findOneAndUpdate(
+//                     { classId: searchClass },
+//                     { student: v1 },
+//                     { new: true }
+//                 )
+//                 const ans = studentJsonGenerate(data, searchClass)
+//                 // console.log(ans)
+//                 const responce3 = await new studentModel(ans).save()
+//                     .then(() => {
+//                         // console.log("student has been saved")
+//                     })
+//                     .catch((err) => {
+//                         // console.log("student has not been saved \n"+err)
+//                         flag = true
+//                         // console.log(ans)
+//                     })
+//                 if (flag) {
+//                     console.log("Error-403")
+//                     res.status(403).json({ reason: "student already exists" })
+//                     break lable1
+//                 }
+//                 const stdUser = {
+//                     id: data.formData.details.info.regNo,
+//                     password: data.formData.details.info.regNo,
+//                     role: "student"
+//                 }
+//                 const responce4 = await new userModel(stdUser).save()
+//                     .then(() => {
+//                         console.log("student has been saved in userDB")
+//                     })
+//                     .catch((err) => {
+//                         console.log("student has not been saved in userDB \n" + err)
+//                         flag = true
+//                         console.log(ans)
+//                     })
+//                 if (flag) {
+//                     console.log("Error-402")
+//                     res.status(402).json({ reason: "student already exists" })
+//                     break lable1
+//                 } else {
+//                     (await session).commitTransaction();
+//                     res.status(200).json("success")
+//                 }
+//             }
+//         }
+//         else {
+//             // console.log(arr1)
+//             // console.log(arr2)
+//             console.log("Error-401: Student regNo already exists")
+//             res.status(401).json("Student regNo already exists")
+//         }
+//     }
+//     catch (error) {
+//         console.log("Error-404")
+//         console.log(error)
+//         res.status(404).send(false)
+//     } finally {
+//         (await session).endSession()
+//     }
+// }
+
+const deleteStudent = async (req, res) => {
+    console.log('Delete student request received:', req.body);
+    const session = await mongoose.startSession();
+    
+    try {
+        if (!session) {
+            console.error('Failed to create database session');
+            return res.status(500).json({ success: false, message: 'Database session error' });
+        }
+
+        await session.startTransaction();
+        const { regNo, adminID, confirmationPassword } = req.body || {};
+
+        // Input validation
+        if (!regNo || !adminID || !confirmationPassword) {
+            console.log('Missing required fields:', { regNo, adminID, hasPassword: !!confirmationPassword });
+            await session.abortTransaction();
+            return res.status(400).json({ 
+                success: false, 
+                message: "Missing required fields" 
+            });
+        }
+
+        // Verify admin credentials
+        console.log('Looking for admin with ID:', adminID);
+        let admin;
+        try {
+            admin = await userModel.findOne({ id: adminID }).session(session).lean();
+            console.log('Admin found:', !!admin);
+        } catch (adminError) {
+            console.error('Error finding admin:', adminError);
+            await session.abortTransaction();
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Error verifying admin',
+                error: adminError.message 
+            });
+        }
+        if (!admin) {
+            await session.abortTransaction();
+            return res.status(404).json({ 
+                success: false, 
+                message: "Admin not found" 
+            });
+        }
+
+        if (admin.password !== confirmationPassword) {
+            await session.abortTransaction();
+            return res.status(401).json({ 
+                success: false, 
+                message: "Incorrect password" 
+            });
+        }
+
+        // Delete student records in a transaction
+        console.log('Deleting student records for regNo:', regNo);
+        try {
+            const studentDelete = await studentModel.findOneAndDelete({ regNo }).session(session);
+            console.log('Student deleted from studentModel:', !!studentDelete);
+            
+            const studentDetailsDelete = await studentDetailsModel.findOneAndDelete({ 'info.regNo': regNo }).session(session);
+            console.log('Student deleted from studentDetailsModel:', !!studentDetailsDelete);
+            
+            const userDelete = await userModel.findOneAndDelete({ id: regNo }).session(session);
+            console.log('User deleted from userModel:', !!userDelete);
+            
+            if (!studentDelete || !studentDetailsDelete || !userDelete) {
+                console.error('One or more delete operations failed:', {
+                    student: !!studentDelete,
+                    studentDetails: !!studentDetailsDelete,
+                    user: !!userDelete
+                });
+                throw new Error('Failed to delete one or more student records');
+            }
+
+            // Commit the transaction if all operations succeed
+            await session.commitTransaction();
+            
+            res.status(200).json({ 
+                success: true, 
+                message: "Student deleted successfully" 
+            });
+        } catch (deleteError) {
+            console.error('Error during student deletion:', deleteError);
+            await session.abortTransaction();
+            throw deleteError; // This will be caught by the outer catch block
+        }
+
+    } catch (error) {
+        // Abort transaction on error
+        console.error("Error in deleteStudent:", error);
+        if (session.inTransaction()) {
+            await session.abortTransaction();
+        }
+        
+        // More specific error handling
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Validation error",
+                error: error.message 
+            });
+        }
+        
+        res.status(500).json({ 
+            success: false, 
+            message: "Internal server error",
+            error: error.message 
+        });
+    } finally {
+        // End the session
+        await session.endSession();
+    }
+};
 
 const vaildateTeacherDetails = async (row) => {
     msg = "";
@@ -374,5 +559,6 @@ module.exports = {
     downloadExcel,
     editTeacher,
     getTeacher,
-    viewHistory
+    viewHistory,
+    deleteStudent
 }

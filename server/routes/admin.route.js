@@ -1,7 +1,7 @@
 const express = require('express')
 const multer = require('multer')
 const routes = express.Router()
-const { registerStudent, registerTeacher, viewStudent, viewTeacher, downloadExcel, editTeacher, getTeacher, viewHistory } = require('../controllers/admin.controller')
+const { registerStudent, registerTeacher, viewStudent, viewTeacher, downloadExcel, editTeacher, getTeacher, viewHistory, deleteStudent } = require('../controllers/admin.controller')
 const { pendingTeacher, deletePendingTeacher, editPendingTeacher } = require('../controllers/admin.pendingTeacher.controller')
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage })
@@ -20,5 +20,6 @@ routes.post('/editPendingTeacher/', editPendingTeacher);
 routes.get('/viewTeacher', viewTeacher);
 routes.get('/download', downloadExcel);
 routes.get('/teacher/:classId', getTeacher);
+routes.post('/deleteStudent', deleteStudent);
 
 module.exports = routes

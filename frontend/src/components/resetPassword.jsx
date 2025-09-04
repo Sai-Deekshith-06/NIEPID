@@ -91,7 +91,7 @@ const resetModalStyles = {
         color: '#555',
         textAlign: 'center',
         width: '100%',
-        padding: '0 1rem', // Add some padding
+        padding: '0 1rem',
     },
     passwordInputContainer: { // New style for input container to hold input and icon
         position: 'relative',
@@ -217,7 +217,7 @@ const ResetPasswordModal = ({ isOpen, onClose }) => {
         }
 
         try {
-            // Replace with your actual API endpoint to check user ID and get info
+            // API endpoint to check user ID and get info
             const res = await axiosInstance.post("/api/checkUserForReset",
                 { userId },
                 {
@@ -324,7 +324,7 @@ const ResetPasswordModal = ({ isOpen, onClose }) => {
                 {step === 2 && foundUser && (
                     <form onSubmit={handleResetPassword} style={resetModalStyles.form}>
                         <p style={resetModalStyles.message}>
-                            Enter password to confirm the reset password for:
+                            Enter your password to confirm the reset password for:
                         </p>
                         <div style={resetModalStyles.userInfo}>
                             <p>id: {foundUser.id}</p>
